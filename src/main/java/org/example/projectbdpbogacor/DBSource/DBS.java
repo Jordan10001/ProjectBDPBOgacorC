@@ -13,7 +13,7 @@ public class DBS {
     protected static final String PASSWORD = "admin"; // Ganti password kamu
 
 
-    public static Connection getUserConnection() {
+    public static Connection getConnection() {
 
         try {
             Connection conn = DriverManager.getConnection(URL, USER, PASSWORD);
