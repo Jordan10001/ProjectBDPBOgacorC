@@ -156,7 +156,7 @@ CREATE TABLE Users
      password VARCHAR(200) NOT NULL ,
      NIS_NIP VARCHAR(50) NOT NULL ,
      nama VARCHAR(100) NOT NULL ,
-     gender VARCHAR(10) NOT NULL ,
+     gender VARCHAR(1) NOT NULL ,
      alamat VARCHAR(255) NOT NULL ,
      email VARCHAR(100) NOT NULL ,
      nomer_hp VARCHAR(20) NOT NULL ,
