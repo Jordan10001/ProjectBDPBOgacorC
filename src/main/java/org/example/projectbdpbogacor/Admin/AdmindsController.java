@@ -168,7 +168,7 @@ public class AdmindsController {
     @FXML
     private TextField newSubjectNameField;
     @FXML
-    private TextField newSubjectCategoryField;
+    private ChoiceBox newCategoryChoiceBox; // Category for the new subject
     @FXML
     private ChoiceBox<String> assignTeacherSubjectChoiceBox; // Subject to assign
     @FXML
@@ -211,6 +211,10 @@ public class AdmindsController {
         // Initialize ChoiceBoxes for new user
         newGenderChoiceBox.getItems().addAll("L", "P"); // L: Laki-laki, P: Perempuan
         newGenderChoiceBox.setValue("L"); // Default
+
+
+        newCategoryChoiceBox.getItems().addAll("General", "Science"); // L: Laki-laki, P: Perempuan
+        newCategoryChoiceBox.setValue("General");
 
         loadRolesForChoiceBox(); // Load roles into the newRoleChoiceBox
         newRoleChoiceBox.setValue("Siswa"); // Default to student for adding users
@@ -887,7 +891,7 @@ public class AdmindsController {
     @FXML
     void handleAddSubject() {
         String namaMapel = newSubjectNameField.getText();
-        String category = newSubjectCategoryField.getText();
+        String category = (String) newCategoryChoiceBox.getValue();
 
         if (namaMapel.isEmpty() || category.isEmpty()) {
             AlertClass.WarningAlert("Input Error", "Missing Information", "Please fill in both subject name and category.");
@@ -904,7 +908,7 @@ public class AdmindsController {
             if (rowsAffected > 0) {
                 AlertClass.InformationAlert("Success", "Subject Added", "New subject '" + namaMapel + "' has been added successfully.");
                 newSubjectNameField.clear();
-                newSubjectCategoryField.clear();
+                newSubjectNameField.clear();
                 loadSubjectsForChoiceBox(); // Refresh subjects in choice box for all tabs
                 loadSubjectAssignments(); // Refresh assignments table
             } else {
