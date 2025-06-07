@@ -140,7 +140,7 @@ public class LoginController {
                 String fxmlFile = "";
                 String title = "";
                 int sceneWidth = 1300;
-                int sceneHeight = 600;
+                int sceneHeight = 700;
 
                 switch (role) {
                     case "Admin":

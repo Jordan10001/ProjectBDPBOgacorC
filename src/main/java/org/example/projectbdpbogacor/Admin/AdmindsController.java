@@ -72,7 +72,7 @@ public class AdmindsController {
     @FXML
     private TextField editEmailField;
     @FXML
-    private TextField editPhoneNumberField;
+    private TextField editNomerHpField; // Changed from newPhoneNumberField for consistency with edit
     @FXML
     private ChoiceBox<String> editRoleChoiceBox;
     @FXML
@@ -81,9 +81,9 @@ public class AdmindsController {
     private Button updateUserButton;
 
 
-    // Manage Schedules & Subjects
+    // Manage Schedules & Subjects (This section will now be for schedules only, subjects moved to a new tab)
     @FXML
-    private TextField scheduleDayField;
+    private ChoiceBox<String> scheduleDayChoiceBox; // Changed from TextField to ChoiceBox for days
     @FXML
     private TextField scheduleStartTimeField;
     @FXML
@@ -92,16 +92,13 @@ public class AdmindsController {
     private ChoiceBox<String> scheduleSubjectChoiceBox;
     @FXML
     private ChoiceBox<String> scheduleClassChoiceBox; // Displays "Nama Kelas - Nama Wali"
-    @FXML
-    private TextField newSubjectNameField;
-    @FXML
-    private TextField newSubjectCategoryField;
 
-    // Assign Students to Classes
+
+    // Assign Students to Classes (now integrated into Manage Students in Class)
     @FXML
-    private ChoiceBox<String> assignStudentChoiceBox; // Displays "Student Name (NIS/NIP)"
+    private ChoiceBox<String> assignStudentToClassChoiceBox; // Display: "Student Name (NIS/NIP)"
     @FXML
-    private ChoiceBox<String> assignClassChoiceBox; // Displays "Nama Kelas - Nama Wali"
+    private Button assignStudentToClassButton;
 
     // Manage Students in Class
     @FXML
@@ -123,7 +120,7 @@ public class AdmindsController {
     @FXML
     private TextArea announcementTextArea;
 
-    // NEW: Create Class
+    // Manage Class
     @FXML
     private TextField newClassNameField;
     @FXML
@@ -132,8 +129,15 @@ public class AdmindsController {
     private ChoiceBox<String> newClassWaliKelasChoiceBox; // Displays "Wali Kelas Name (ID)"
     @FXML
     private ChoiceBox<String> newClassSemesterChoiceBox; // Displays "Tahun Ajaran - Semester"
+    @FXML
+    private ChoiceBox<String> editClassChoiceBox; // For selecting a class to edit/delete
+    @FXML
+    private Button updateClassButton;
+    @FXML
+    private Button deleteClassButton;
 
-    // NEW: View All Users Table
+
+    // View All Users Table
     @FXML
     private TableView<UserTableEntry> allUsersTableView;
     @FXML
@@ -154,6 +158,33 @@ public class AdmindsController {
     private TableColumn<UserTableEntry, String> tableNomerHpColumn;
     @FXML
     private TableColumn<UserTableEntry, String> tableRoleColumn;
+    @FXML
+    private ChoiceBox<String> filterRoleChoiceBox; // Filter by role
+    @FXML
+    private TextField filterNameField; // Filter by name
+
+
+    // NEW FXML elements for "Manage Subjects" Tab
+    @FXML
+    private TextField newSubjectNameField;
+    @FXML
+    private TextField newSubjectCategoryField;
+    @FXML
+    private ChoiceBox<String> assignTeacherSubjectChoiceBox; // Subject to assign
+    @FXML
+    private ChoiceBox<String> assignTeacherClassChoiceBox; // Class for the assignment
+    @FXML
+    private ChoiceBox<String> assignTeacherGuruChoiceBox; // Teacher to assign
+    @FXML
+    private TableView<SubjectAssignmentEntry> subjectAssignmentTable; // Table to view assignments
+    @FXML
+    private TableColumn<SubjectAssignmentEntry, String> assignmentSubjectColumn;
+    @FXML
+    private TableColumn<SubjectAssignmentEntry, String> assignmentClassColumn;
+    @FXML
+    private TableColumn<SubjectAssignmentEntry, String> assignmentTeacherColumn;
+    @FXML
+    private Button deleteAssignmentButton;
 
 
     private String loggedInUserId;
@@ -165,8 +196,11 @@ public class AdmindsController {
     private ObservableList<Pair<String, String>> allUsersData = FXCollections.observableArrayList(); // Pair<Display, UserID> for edit/delete
     private ObservableList<Pair<String, String>> waliKelasData = FXCollections.observableArrayList(); // Pair<Display, WaliID> for new class
     private ObservableList<Pair<String, Integer>> semesterData = FXCollections.observableArrayList(); // Pair<Display, SemesterID> for new class
+    private ObservableList<Pair<String, String>> guruData = FXCollections.observableArrayList(); // Pair<Display, GuruID> for assigning teachers
     private Map<String, String> roleNameToIdMap = new HashMap<>(); // Map role names to role IDs
     private Map<String, String> roleIdToNameMap = new HashMap<>(); // Map ID to role names
+    // New map for editClassChoiceBox: Display -> Kelas_id-Wali_user_id
+    private Map<String, String> editableClassesMap = new HashMap<>();
 
 
     @FXML
@@ -190,58 +224,98 @@ public class AdmindsController {
 
 
         // Initialize ChoiceBoxes for schedules and assignments
+        scheduleDayChoiceBox.getItems().addAll("Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"); // Initialize days
+        scheduleDayChoiceBox.setValue("Senin"); // Default day
         loadSubjectsForChoiceBox();
         loadClassesForChoiceBox();
-        loadStudentsForChoiceBox();
+        loadStudentsForChoiceBox(); // Now also for assignStudentToClassChoiceBox
 
         // Initialize edit/delete user fields
         editGenderChoiceBox.getItems().addAll("L", "P");
         loadUsersForEditDelete(); // Load users for the edit/delete dropdown
         editRoleChoiceBox.getItems().addAll(roleNameToIdMap.keySet()); // Populate edit role choice box
+        editUserChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                handleUserSelectionForEditDelete();
+            } else {
+                clearEditUserFields();
+            }
+        });
 
         // Initialize Student in Class Table
         initStudentInClassTable();
         loadClassesForStudentFilter(); // Load classes for the filter dropdown
 
-        // NEW: Initialize elements for Create Class
+        // Initialize elements for Manage Class
         loadWaliKelasForChoiceBox();
         loadSemestersForChoiceBox();
+        loadClassesForEdit(); // Load classes for editing
+        editClassChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            if (newValue != null) {
+                handleClassSelectionForEdit();
+            } else {
+                clearClassEditFields();
+            }
+        });
 
-        // NEW: Initialize all users table
+
+        // Initialize all users table
         initAllUsersTable();
+        filterRoleChoiceBox.getItems().addAll("All Roles"); // Add "All Roles" option
+        filterRoleChoiceBox.getItems().addAll(roleNameToIdMap.keySet()); // Add actual roles
+        filterRoleChoiceBox.setValue("All Roles"); // Default selection
+
+        // NEW: Initialize elements for "Manage Subjects" Tab
+        initSubjectAssignmentTable();
+        loadGuruForChoiceBox(); // Load Guru for assignment
+        // These will be refreshed when the tab is selected
+        // loadSubjectsForAssignmentChoiceBox(); // Re-use existing loadSubjectsForChoiceBox
+        // loadClassesForAssignmentChoiceBox(); // Re-use existing loadClassesForChoiceBox
 
         // Add listeners to tabs to load data when selected
         adminTabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if (newTab != null) {
                 switch (newTab.getText()) {
-                    case "Manage Schedules & Subjects":
+                    case "Manage Schedules": // Renamed from "Manage Schedules & Subjects"
                         loadSubjectsForChoiceBox(); // Refresh subjects
                         loadClassesForChoiceBox();  // Refresh classes
                         break;
-                    case "Assign Students to Classes":
-                        loadStudentsForChoiceBox(); // Refresh students
-                        loadClassesForChoiceBox();  // Refresh classes
-                        break;
-                    case "Manage Users": // Assuming this is the new tab for edit/delete
+                    case "Manage Users":
                         loadUsersForEditDelete();
                         // Clear selected user fields when switching to this tab
                         editUserChoiceBox.getSelectionModel().clearSelection();
                         clearEditUserFields();
                         break;
-                    case "Manage Students in Class":
-                        loadClassesForStudentFilter();
+                    case "Manage Students in Class": // This tab now includes student assignment
+                        loadStudentsForChoiceBox(); // Refresh students
+                        loadClassesForStudentFilter(); // Refresh classes for filter and assignment
                         studentInClassTableView.getItems().clear(); // Clear table until a class is selected
                         break;
-                    case "Create Class":
+                    case "Manage Classes":
                         loadWaliKelasForChoiceBox(); // Refresh wali kelas list
                         loadSemestersForChoiceBox(); // Refresh semester list
+                        loadClassesForEdit(); // Refresh classes for edit/delete
+                        clearClassEditFields();
                         break;
                     case "View All Users":
-                        loadAllUsersToTable(); // Load all users to the table
+                        loadAllUsersToTable(filterRoleChoiceBox.getValue(), filterNameField.getText()); // Load all users to the table with current filters
+                        break;
+                    case "Manage Subjects": // NEW: Handle "Manage Subjects" tab selection
+                        loadSubjectsForChoiceBox(); // Populate assignTeacherSubjectChoiceBox
+                        loadClassesForChoiceBox(); // Populate assignTeacherClassChoiceBox
+                        loadGuruForChoiceBox(); // Populate assignTeacherGuruChoiceBox
+                        loadSubjectAssignments(); // Load existing assignments
                         break;
                 }
             }
         });
+
+        // Add listeners for filter fields
+        filterRoleChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> handleFilterUsers());
+        filterNameField.textProperty().addListener((observable, oldValue, newValue) -> handleFilterUsers());
+
+        // Load all users initially
+        loadAllUsersToTable(filterRoleChoiceBox.getValue(), filterNameField.getText());
     }
 
     private void loadAdminName() {
@@ -377,7 +451,8 @@ public class AdmindsController {
                 loadUsersForEditDelete(); // Refresh list of users for edit/delete
                 loadStudentsForChoiceBox(); // Refresh students for assignment
                 loadWaliKelasForChoiceBox(); // Refresh wali kelas for new class
-                loadAllUsersToTable(); // Refresh all users table
+                loadGuruForChoiceBox(); // Refresh guru for subject assignment
+                loadAllUsersToTable(filterRoleChoiceBox.getValue(), filterNameField.getText()); // Refresh all users table
             } else {
                 AlertClass.ErrorAlert("Failed", "User Not Added", "Failed to add user to the database.");
             }
@@ -442,7 +517,7 @@ public class AdmindsController {
                 editGenderChoiceBox.setValue(rs.getString("gender"));
                 editAddressField.setText(rs.getString("alamat"));
                 editEmailField.setText(rs.getString("email"));
-                editPhoneNumberField.setText(rs.getString("nomer_hp"));
+                editNomerHpField.setText(rs.getString("nomer_hp"));
                 String roleId = rs.getString("Role_role_id");
                 editRoleChoiceBox.setValue(roleIdToNameMap.get(roleId));
             } else {
@@ -464,7 +539,7 @@ public class AdmindsController {
         editGenderChoiceBox.getSelectionModel().clearSelection();
         editAddressField.clear();
         editEmailField.clear();
-        editPhoneNumberField.clear();
+        editNomerHpField.clear();
         editRoleChoiceBox.getSelectionModel().clearSelection();
     }
 
@@ -478,7 +553,7 @@ public class AdmindsController {
         String gender = editGenderChoiceBox.getValue();
         String alamat = editAddressField.getText();
         String email = editEmailField.getText();
-        String nomerHp = editPhoneNumberField.getText();
+        String nomerHp = editNomerHpField.getText();
         String selectedRoleName = editRoleChoiceBox.getValue();
 
         if (userId.isEmpty() || username.isEmpty() || nisNip.isEmpty() || nama.isEmpty() ||
@@ -536,8 +611,10 @@ public class AdmindsController {
                 loadUsersForEditDelete(); // Refresh the choice box
                 loadStudentsForChoiceBox(); // Refresh student lists if user role changed to/from student
                 loadWaliKelasForChoiceBox(); // Refresh wali kelas list if user role changed to/from wali kelas
+                loadGuruForChoiceBox(); // Refresh guru list if user role changed to/from guru
                 loadClassesForChoiceBox(); // Refresh classes if wali kelas info changed
-                loadAllUsersToTable(); // Refresh all users table
+                loadAllUsersToTable(filterRoleChoiceBox.getValue(), filterNameField.getText()); // Refresh all users table
+                loadSubjectAssignments(); // Refresh subject assignments if a guru was updated
             } else {
                 AlertClass.ErrorAlert("Failed", "User Not Updated", "Failed to update user. User ID might not exist.");
             }
@@ -628,8 +705,10 @@ public class AdmindsController {
                     loadUsersForEditDelete(); // Refresh the choice box
                     loadStudentsForChoiceBox(); // Refresh student lists if a student was deleted
                     loadWaliKelasForChoiceBox(); // Refresh wali kelas list if a wali was deleted
+                    loadGuruForChoiceBox(); // Refresh guru for subject assignment if a guru was deleted
                     loadClassesForChoiceBox(); // Refresh classes if wali kelas deleted
-                    loadAllUsersToTable(); // Refresh all users table
+                    loadAllUsersToTable(filterRoleChoiceBox.getValue(), filterNameField.getText()); // Refresh all users table
+                    loadSubjectAssignments(); // Refresh subject assignments
                 } else {
                     AlertClass.ErrorAlert("Failed", "User Not Deleted", "Failed to delete user. User ID might not exist or there are other dependencies.");
                 }
@@ -644,6 +723,7 @@ public class AdmindsController {
     private void loadSubjectsForChoiceBox() {
         subjectData.clear();
         scheduleSubjectChoiceBox.getItems().clear();
+        assignTeacherSubjectChoiceBox.getItems().clear(); // For new tab
         String sql = "SELECT mapel_id, nama_mapel FROM Matpel";
         try (Connection con = DBS.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql);
@@ -653,6 +733,7 @@ public class AdmindsController {
                 String namaMapel = rs.getString("nama_mapel");
                 subjectData.add(new Pair<>(namaMapel, mapelId));
                 scheduleSubjectChoiceBox.getItems().add(namaMapel);
+                assignTeacherSubjectChoiceBox.getItems().add(namaMapel); // For new tab
             }
         } catch (SQLException e) {
             AlertClass.ErrorAlert("Database Error", "Failed to load subjects", e.getMessage());
@@ -663,8 +744,9 @@ public class AdmindsController {
     private void loadClassesForChoiceBox() {
         classData.clear();
         scheduleClassChoiceBox.getItems().clear();
-        assignClassChoiceBox.getItems().clear();
+        // assignClassChoiceBox.getItems().clear(); // Removed as it's merged
         studentClassFilterChoiceBox.getItems().clear(); // Also clear for student filter
+        assignTeacherClassChoiceBox.getItems().clear(); // For new tab
 
         // SQL to get class details and their wali kelas (homeroom teacher) name
         String sql = "SELECT k.kelas_id, k.nama_kelas, k.Users_user_id AS wali_id, u.nama AS wali_name " +
@@ -681,8 +763,9 @@ public class AdmindsController {
                 // Store a combined ID that includes both kelas_id and wali_id for lookup
                 classData.add(new Pair<>(display, kelasId + "-" + waliId));
                 scheduleClassChoiceBox.getItems().add(display);
-                assignClassChoiceBox.getItems().add(display);
+                // assignClassChoiceBox.getItems().add(display); // Removed as it's merged
                 studentClassFilterChoiceBox.getItems().add(display); // Populate for student filter
+                assignTeacherClassChoiceBox.getItems().add(display); // For new tab
             }
         } catch (SQLException e) {
             AlertClass.ErrorAlert("Database Error", "Failed to load classes", e.getMessage());
@@ -692,7 +775,7 @@ public class AdmindsController {
 
     private void loadStudentsForChoiceBox() {
         studentData.clear();
-        assignStudentChoiceBox.getItems().clear();
+        assignStudentToClassChoiceBox.getItems().clear(); // Updated for merged tab
         String sql = "SELECT user_id, nama, NIS_NIP FROM Users WHERE Role_role_id = 'S'"; // Only students
         try (Connection con = DBS.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql);
@@ -703,7 +786,7 @@ public class AdmindsController {
                 String nisNip = rs.getString("NIS_NIP");
                 String display = nama + " (NIS/NIP: " + nisNip + ")";
                 studentData.add(new Pair<>(display, userId));
-                assignStudentChoiceBox.getItems().add(display);
+                assignStudentToClassChoiceBox.getItems().add(display); // Updated for merged tab
             }
         } catch (SQLException e) {
             AlertClass.ErrorAlert("Database Error", "Failed to load students", e.getMessage());
@@ -711,15 +794,36 @@ public class AdmindsController {
         }
     }
 
+    // NEW: Load Guru for the assignment choice box
+    private void loadGuruForChoiceBox() {
+        guruData.clear();
+        assignTeacherGuruChoiceBox.getItems().clear();
+        String sql = "SELECT user_id, nama FROM Users WHERE Role_role_id = 'G'"; // Only Guru
+        try (Connection con = DBS.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                String userId = rs.getString("user_id");
+                String nama = rs.getString("nama");
+                String display = nama + " (" + userId + ")";
+                guruData.add(new Pair<>(display, userId));
+                assignTeacherGuruChoiceBox.getItems().add(display);
+            }
+        } catch (SQLException e) {
+            AlertClass.ErrorAlert("Database Error", "Failed to load teachers (Guru)", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
     @FXML
     void handleAddSchedule() {
-        String hari = scheduleDayField.getText();
+        String hari = scheduleDayChoiceBox.getValue(); // Get day from ChoiceBox
         String jamMulai = scheduleStartTimeField.getText();
         String jamSelesai = scheduleEndTimeField.getText();
         String selectedSubjectDisplay = scheduleSubjectChoiceBox.getValue();
         String selectedClassDisplay = scheduleClassChoiceBox.getValue();
 
-        if (hari.isEmpty() || jamMulai.isEmpty() || jamSelesai.isEmpty() ||
+        if (hari == null || hari.isEmpty() || jamMulai.isEmpty() || jamSelesai.isEmpty() ||
                 selectedSubjectDisplay == null || selectedClassDisplay == null) {
             AlertClass.WarningAlert("Input Error", "Missing Information", "Please fill in all schedule details.");
             return;
@@ -765,7 +869,7 @@ public class AdmindsController {
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
                 AlertClass.InformationAlert("Success", "Schedule Added", "New schedule has been added successfully.");
-                scheduleDayField.clear();
+                scheduleDayChoiceBox.getSelectionModel().clearSelection(); // Clear selected day
                 scheduleStartTimeField.clear();
                 scheduleEndTimeField.clear();
                 scheduleSubjectChoiceBox.getSelectionModel().clearSelection();
@@ -779,6 +883,7 @@ public class AdmindsController {
         }
     }
 
+    // Moved to the new "Manage Subjects" tab
     @FXML
     void handleAddSubject() {
         String namaMapel = newSubjectNameField.getText();
@@ -800,7 +905,8 @@ public class AdmindsController {
                 AlertClass.InformationAlert("Success", "Subject Added", "New subject '" + namaMapel + "' has been added successfully.");
                 newSubjectNameField.clear();
                 newSubjectCategoryField.clear();
-                loadSubjectsForChoiceBox(); // Refresh subjects in choice box
+                loadSubjectsForChoiceBox(); // Refresh subjects in choice box for all tabs
+                loadSubjectAssignments(); // Refresh assignments table
             } else {
                 AlertClass.ErrorAlert("Failed", "Subject Not Added", "Failed to add subject to the database.");
             }
@@ -810,10 +916,165 @@ public class AdmindsController {
         }
     }
 
+    // NEW: Assign Teacher to Subject
+    @FXML
+    void handleAssignTeacherToSubject() {
+        String selectedSubjectDisplay = assignTeacherSubjectChoiceBox.getValue();
+        String selectedClassDisplay = assignTeacherClassChoiceBox.getValue();
+        String selectedGuruDisplay = assignTeacherGuruChoiceBox.getValue();
+
+        if (selectedSubjectDisplay == null || selectedClassDisplay == null || selectedGuruDisplay == null) {
+            AlertClass.WarningAlert("Input Error", "Missing Information", "Please select a subject, class, and teacher.");
+            return;
+        }
+
+        Integer mapelId = subjectData.stream()
+                .filter(p -> p.getKey().equals(selectedSubjectDisplay))
+                .map(Pair::getValue)
+                .findFirst()
+                .orElse(null);
+
+        String combinedClassId = classData.stream()
+                .filter(p -> p.getKey().equals(selectedClassDisplay))
+                .map(Pair::getValue)
+                .findFirst()
+                .orElse(null);
+
+        String guruUserId = guruData.stream()
+                .filter(p -> p.getKey().equals(selectedGuruDisplay))
+                .map(Pair::getValue)
+                .findFirst()
+                .orElse(null);
+
+        if (mapelId == null || combinedClassId == null || guruUserId == null) {
+            AlertClass.ErrorAlert("Selection Error", "Invalid Selection", "Could not retrieve IDs for selected subject, class, or teacher.");
+            return;
+        }
+
+        String[] ids = combinedClassId.split("-");
+        int kelasId = Integer.parseInt(ids[0]);
+        String waliKelasId = ids[1]; // This is the Kelas.Users_user_id (Wali Kelas's ID)
+
+        try (Connection con = DBS.getConnection()) {
+            // Check for existing assignment to prevent duplicates
+            String checkSql = "SELECT COUNT(*) FROM Detail_Pengajar WHERE Users_user_id = ? AND Matpel_mapel_id = ? AND Kelas_Users_user_id = ? AND Kelas_kelas_id = ?";
+            PreparedStatement checkStmt = con.prepareStatement(checkSql);
+            checkStmt.setString(1, guruUserId);
+            checkStmt.setInt(2, mapelId);
+            checkStmt.setString(3, waliKelasId);
+            checkStmt.setInt(4, kelasId);
+            ResultSet rs = checkStmt.executeQuery();
+            if (rs.next() && rs.getInt(1) > 0) {
+                AlertClass.WarningAlert("Duplicate Assignment", "Teacher Already Assigned", "This teacher is already assigned to this subject in this class.");
+                return;
+            }
+
+            String sql = "INSERT INTO Detail_Pengajar (Users_user_id, Matpel_mapel_id, Kelas_Users_user_id, Kelas_kelas_id) VALUES (?, ?, ?, ?)";
+            PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setString(1, guruUserId);
+            stmt.setInt(2, mapelId);
+            stmt.setString(3, waliKelasId);
+            stmt.setInt(4, kelasId);
+
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                AlertClass.InformationAlert("Success", "Assignment Added", "Teacher assigned to subject in class successfully.");
+                assignTeacherSubjectChoiceBox.getSelectionModel().clearSelection();
+                assignTeacherClassChoiceBox.getSelectionModel().clearSelection();
+                assignTeacherGuruChoiceBox.getSelectionModel().clearSelection();
+                loadSubjectAssignments(); // Refresh the table
+            } else {
+                AlertClass.ErrorAlert("Failed", "Assignment Failed", "Failed to assign teacher to subject in class.");
+            }
+        } catch (SQLException e) {
+            AlertClass.ErrorAlert("Database Error", "Failed to assign teacher", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // NEW: Initialize Subject Assignment Table
+    private void initSubjectAssignmentTable() {
+        assignmentSubjectColumn.setCellValueFactory(new PropertyValueFactory<>("subjectName"));
+        assignmentClassColumn.setCellValueFactory(new PropertyValueFactory<>("className"));
+        assignmentTeacherColumn.setCellValueFactory(new PropertyValueFactory<>("teacherName"));
+    }
+
+    // NEW: Load Subject Assignments
+    @FXML
+    void loadSubjectAssignments() {
+        ObservableList<SubjectAssignmentEntry> assignmentList = FXCollections.observableArrayList();
+        String sql = "SELECT m.nama_mapel, k.nama_kelas, u_guru.nama AS guru_name, dp.Users_user_id AS guru_id, dp.Matpel_mapel_id, dp.Kelas_Users_user_id AS kelas_wali_id, dp.Kelas_kelas_id " +
+                "FROM Detail_Pengajar dp " +
+                "JOIN Matpel m ON dp.Matpel_mapel_id = m.mapel_id " +
+                "JOIN Kelas k ON dp.Kelas_kelas_id = k.kelas_id AND dp.Kelas_Users_user_id = k.Users_user_id " +
+                "JOIN Users u_guru ON dp.Users_user_id = u_guru.user_id " +
+                "ORDER BY m.nama_mapel, k.nama_kelas, u_guru.nama";
+        try (Connection con = DBS.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                assignmentList.add(new SubjectAssignmentEntry(
+                        rs.getString("nama_mapel"),
+                        rs.getString("nama_kelas"),
+                        rs.getString("guru_name"),
+                        rs.getString("guru_id"),
+                        rs.getInt("Matpel_mapel_id"),
+                        rs.getString("kelas_wali_id"),
+                        rs.getInt("Kelas_kelas_id")
+                ));
+            }
+            subjectAssignmentTable.setItems(assignmentList);
+        } catch (SQLException e) {
+            AlertClass.ErrorAlert("Database Error", "Failed to load subject assignments", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // NEW: Delete Subject Assignment
+    @FXML
+    void handleDeleteSubjectAssignment() {
+        SubjectAssignmentEntry selectedAssignment = subjectAssignmentTable.getSelectionModel().getSelectedItem();
+        if (selectedAssignment == null) {
+            AlertClass.WarningAlert("Selection Error", "No Assignment Selected", "Please select an assignment to delete.");
+            return;
+        }
+
+        Optional<ButtonType> result = AlertClass.ConfirmationAlert(
+                "Confirm Deletion",
+                "Delete Subject Assignment",
+                "Are you sure you want to delete the assignment of " + selectedAssignment.getTeacherName() +
+                        " to " + selectedAssignment.getSubjectName() + " in " + selectedAssignment.getClassName() + "?"
+        );
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            try (Connection con = DBS.getConnection()) {
+                String sql = "DELETE FROM Detail_Pengajar WHERE Users_user_id = ? AND Matpel_mapel_id = ? AND Kelas_Users_user_id = ? AND Kelas_kelas_id = ?";
+                PreparedStatement stmt = con.prepareStatement(sql);
+                stmt.setString(1, selectedAssignment.getTeacherId());
+                stmt.setInt(2, selectedAssignment.getSubjectId());
+                stmt.setString(3, selectedAssignment.getKelasWaliId());
+                stmt.setInt(4, selectedAssignment.getKelasId());
+
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    AlertClass.InformationAlert("Success", "Assignment Deleted", "Subject assignment has been deleted.");
+                    loadSubjectAssignments(); // Refresh the table
+                } else {
+                    AlertClass.ErrorAlert("Failed", "Deletion Failed", "Failed to delete subject assignment. It might not exist.");
+                }
+            } catch (SQLException e) {
+                AlertClass.ErrorAlert("Database Error", "Failed to delete assignment", e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+
+    // MERGED: Assign Student to Class & Manage Students in Class
     @FXML
     void handleAssignStudentToClass() {
-        String selectedStudentDisplay = assignStudentChoiceBox.getValue();
-        String selectedClassDisplay = assignClassChoiceBox.getValue();
+        String selectedStudentDisplay = assignStudentToClassChoiceBox.getValue();
+        String selectedClassDisplay = studentClassFilterChoiceBox.getValue(); // Use the class from the filter choice box
 
         if (selectedStudentDisplay == null || selectedClassDisplay == null) {
             AlertClass.WarningAlert("Selection Error", "Missing Selection", "Please select both a student and a class.");
@@ -864,9 +1125,8 @@ public class AdmindsController {
             int rowsAffected = insertStmt.executeUpdate();
             if (rowsAffected > 0) {
                 AlertClass.InformationAlert("Success", "Student Assigned", "Student assigned to class successfully.");
-                assignStudentChoiceBox.getSelectionModel().clearSelection();
-                assignClassChoiceBox.getSelectionModel().clearSelection();
-                loadStudentsInSelectedClass(); // Refresh the table
+                assignStudentToClassChoiceBox.getSelectionModel().clearSelection(); // Clear the assignment student choicebox
+                loadStudentsInSelectedClass(); // Refresh the table of students in the selected class
             } else {
                 AlertClass.ErrorAlert("Failed", "Assignment Failed", "Failed to assign student to class.");
             }
@@ -952,7 +1212,6 @@ public class AdmindsController {
         String sql = "SELECT u.user_id, u.nama, u.NIS_NIP FROM Users u " +
                 "JOIN Student_Class_Enrollment sce ON u.user_id = sce.Users_user_id " +
                 "WHERE sce.Kelas_kelas_id = ? AND sce.Kelas_Users_user_id = ? AND u.Role_role_id = 'S'";
-
         try (Connection con = DBS.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql)) {
             stmt.setInt(1, kelasId);
@@ -1045,7 +1304,7 @@ public class AdmindsController {
         handleUserSelectionForEditDelete(); // Load details for the selected user
     }
 
-    // NEW: Class Creation Methods
+    // NEW: Class Management Methods (Create, Update, Delete)
     private void loadWaliKelasForChoiceBox() {
         waliKelasData.clear();
         newClassWaliKelasChoiceBox.getItems().clear(); // Clear existing items
@@ -1059,7 +1318,7 @@ public class AdmindsController {
                 String nama = rs.getString("nama");
                 String display = nama + " (" + userId + ")";
                 waliKelasData.add(new Pair<>(display, userId));
-                newClassWaliKelasChoiceBox.getItems().add(display); // Corrected line
+                newClassWaliKelasChoiceBox.getItems().add(display);
             }
         } catch (SQLException e) {
             AlertClass.ErrorAlert("Database Error", "Failed to load Wali Kelas", e.getMessage());
@@ -1087,6 +1346,86 @@ public class AdmindsController {
             AlertClass.ErrorAlert("Database Error", "Failed to load semesters", e.getMessage());
             e.printStackTrace();
         }
+    }
+
+    private void loadClassesForEdit() {
+        editableClassesMap.clear();
+        editClassChoiceBox.getItems().clear();
+
+        String sql = "SELECT k.kelas_id, k.nama_kelas, k.Users_user_id AS wali_id, u.nama AS wali_name " +
+                "FROM Kelas k JOIN Users u ON k.Users_user_id = u.user_id";
+        try (Connection con = DBS.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                int kelasId = rs.getInt("kelas_id");
+                String namaKelas = rs.getString("nama_kelas");
+                String waliId = rs.getString("wali_id");
+                String waliName = rs.getString("wali_name");
+                String display = namaKelas + " (Wali: " + waliName + ")";
+                String combinedId = kelasId + "-" + waliId; // Store for lookup
+                editableClassesMap.put(display, combinedId);
+                editClassChoiceBox.getItems().add(display);
+            }
+        } catch (SQLException e) {
+            AlertClass.ErrorAlert("Database Error", "Failed to load classes for editing", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void handleClassSelectionForEdit() {
+        String selectedClassDisplay = editClassChoiceBox.getValue();
+        if (selectedClassDisplay == null || selectedClassDisplay.isEmpty()) {
+            clearClassEditFields();
+            return;
+        }
+
+        String combinedId = editableClassesMap.get(selectedClassDisplay);
+        if (combinedId == null) {
+            clearClassEditFields();
+            return;
+        }
+        String[] ids = combinedId.split("-");
+        int kelasId = Integer.parseInt(ids[0]);
+        String waliUserId = ids[1];
+
+        String sql = "SELECT nama_kelas, keterangan, Users_user_id, Semester_semester_id FROM Kelas WHERE kelas_id = ? AND Users_user_id = ?";
+        try (Connection con = DBS.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, kelasId);
+            stmt.setString(2, waliUserId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                newClassNameField.setText(rs.getString("nama_kelas"));
+                newClassDescriptionField.setText(rs.getString("keterangan"));
+
+                String currentWaliId = rs.getString("Users_user_id");
+                waliKelasData.stream()
+                        .filter(p -> p.getValue().equals(currentWaliId))
+                        .findFirst()
+                        .ifPresent(p -> newClassWaliKelasChoiceBox.setValue(p.getKey()));
+
+                int currentSemesterId = rs.getInt("Semester_semester_id");
+                semesterData.stream()
+                        .filter(p -> p.getValue().equals(currentSemesterId))
+                        .findFirst()
+                        .ifPresent(p -> newClassSemesterChoiceBox.setValue(p.getKey()));
+            } else {
+                clearClassEditFields();
+            }
+        } catch (SQLException e) {
+            AlertClass.ErrorAlert("Database Error", "Failed to load class details for editing", e.getMessage());
+            e.printStackTrace();
+            clearClassEditFields();
+        }
+    }
+
+    private void clearClassEditFields() {
+        newClassNameField.clear();
+        newClassDescriptionField.clear();
+        newClassWaliKelasChoiceBox.getSelectionModel().clearSelection();
+        newClassSemesterChoiceBox.getSelectionModel().clearSelection();
     }
 
     @FXML
@@ -1143,6 +1482,7 @@ public class AdmindsController {
                 newClassWaliKelasChoiceBox.getSelectionModel().clearSelection();
                 newClassSemesterChoiceBox.getSelectionModel().clearSelection();
                 loadClassesForChoiceBox(); // Refresh class list in other sections
+                loadClassesForEdit(); // Refresh for edit/delete
             } else {
                 AlertClass.ErrorAlert("Failed", "Class Not Created", "Failed to create class in the database.");
             }
@@ -1151,6 +1491,153 @@ public class AdmindsController {
             e.printStackTrace();
         }
     }
+
+    @FXML
+    void handleUpdateClass() {
+        String selectedClassDisplay = editClassChoiceBox.getValue();
+        if (selectedClassDisplay == null || selectedClassDisplay.isEmpty()) {
+            AlertClass.WarningAlert("Selection Error", "No Class Selected", "Please select a class to update.");
+            return;
+        }
+
+        String className = newClassNameField.getText();
+        String classDescription = newClassDescriptionField.getText();
+        String selectedWaliKelasDisplay = newClassWaliKelasChoiceBox.getValue();
+        String selectedSemesterDisplay = newClassSemesterChoiceBox.getValue();
+
+        if (className.isEmpty() || classDescription.isEmpty() || selectedWaliKelasDisplay == null || selectedSemesterDisplay == null) {
+            AlertClass.WarningAlert("Input Error", "Missing Information", "Please fill in all class details for update.");
+            return;
+        }
+
+        String waliKelasUserId = waliKelasData.stream()
+                .filter(p -> p.getKey().equals(selectedWaliKelasDisplay))
+                .map(Pair::getValue)
+                .findFirst()
+                .orElse(null);
+
+        Integer semesterId = semesterData.stream()
+                .filter(p -> p.getKey().equals(selectedSemesterDisplay))
+                .map(Pair::getValue)
+                .findFirst()
+                .orElse(null);
+
+        if (waliKelasUserId == null || semesterId == null) {
+            AlertClass.ErrorAlert("Selection Error", "Invalid Selection", "Could not retrieve IDs for selected Wali Kelas or Semester.");
+            return;
+        }
+
+        String combinedId = editableClassesMap.get(selectedClassDisplay);
+        if (combinedId == null) {
+            AlertClass.ErrorAlert("Retrieval Error", "Invalid Class Selection", "Could not retrieve class ID for update.");
+            return;
+        }
+        String[] ids = combinedId.split("-");
+        int kelasIdToUpdate = Integer.parseInt(ids[0]);
+        String currentWaliIdForKelasPK = ids[1]; // The original wali_id which is part of the PK
+
+        try (Connection con = DBS.getConnection()) {
+            // If Wali Kelas is changed, it means the primary key (Users_user_id, kelas_id) will change for this class.
+            // This is a complex scenario as it involves updating a composite primary key.
+            // PostgreSQL allows updating columns that are part of a primary key, but it cascades to foreign keys.
+            // If ON UPDATE CASCADE is not set on related tables (Jadwal, Materi, Tugas, Ujian, Student_Class_Enrollment),
+            // this will fail. Based on ProjectBDPBOscript.sql, many FKs are ON UPDATE NO ACTION.
+            // This means we might need to delete and re-insert the class, or manually update all dependent records.
+            // For simplicity and assuming typical database design, we'll try to update the class. If the wali_id changes,
+            // we'll explicitly handle cascading updates or re-creation if necessary.
+
+            String sql = "UPDATE Kelas SET nama_kelas = ?, keterangan = ?, Users_user_id = ?, Semester_semester_id = ? WHERE kelas_id = ? AND Users_user_id = ?";
+            PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setString(1, className);
+            stmt.setString(2, classDescription);
+            stmt.setString(3, waliKelasUserId);
+            stmt.setInt(4, semesterId);
+            stmt.setInt(5, kelasIdToUpdate);
+            stmt.setString(6, currentWaliIdForKelasPK);
+
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                AlertClass.InformationAlert("Success", "Class Updated", "Class '" + className + "' has been updated successfully.");
+                clearClassEditFields();
+                loadClassesForEdit(); // Refresh the choice box
+                loadClassesForChoiceBox(); // Refresh class list in other sections
+                loadSubjectAssignments(); // Refresh assignments if class info changed
+            } else {
+                AlertClass.ErrorAlert("Failed", "Class Not Updated", "Failed to update class. Class ID or Wali Kelas might not exist, or there are unhandled dependencies (e.g., if you tried to change the Wali Kelas and FKs prevent it).");
+            }
+        } catch (SQLException e) {
+            AlertClass.ErrorAlert("Database Error", "Failed to update class", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void handleDeleteClass() {
+        String selectedClassDisplay = editClassChoiceBox.getValue();
+        if (selectedClassDisplay == null || selectedClassDisplay.isEmpty()) {
+            AlertClass.WarningAlert("Selection Error", "No Class Selected", "Please select a class to delete.");
+            return;
+        }
+
+        Optional<ButtonType> result = AlertClass.ConfirmationAlert(
+                "Confirm Deletion",
+                "Delete Class: " + selectedClassDisplay,
+                "Are you sure you want to delete this class? This will also delete all associated schedules, materials, tasks, exams, and student enrollments for this class. This action cannot be undone."
+        );
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            String combinedId = editableClassesMap.get(selectedClassDisplay);
+            if (combinedId == null) {
+                AlertClass.ErrorAlert("Retrieval Error", "Invalid Class Selection", "Could not retrieve class ID for deletion.");
+                return;
+            }
+            String[] ids = combinedId.split("-");
+            int kelasIdToDelete = Integer.parseInt(ids[0]);
+            String waliUserIdToDelete = ids[1];
+
+            try (Connection con = DBS.getConnection()) {
+                // Delete from dependent tables first due to ON DELETE NO ACTION
+                // Order matters: Student_Class_Enrollment, Jadwal, Materi, Tugas, Ujian, Detail_Pengajar
+                String[] dependentTables = {
+                        "Student_Class_Enrollment", "Jadwal", "Materi", "Tugas", "Ujian", "Detail_Pengajar"
+                };
+
+                for (String tableName : dependentTables) {
+                    try {
+                        String deleteSql = "DELETE FROM " + tableName + " WHERE Kelas_kelas_id = ? AND Kelas_Users_user_id = ?";
+                        PreparedStatement delStmt = con.prepareStatement(deleteSql);
+                        delStmt.setInt(1, kelasIdToDelete);
+                        delStmt.setString(2, waliUserIdToDelete);
+                        delStmt.executeUpdate();
+                    } catch (SQLException e) {
+                        System.err.println("Warning: Could not delete from " + tableName + " for class " + kelasIdToDelete + " (Wali: " + waliUserIdToDelete + "): " + e.getMessage());
+                        // Continue even if one table fails, unless it's critical for Kelas table deletion
+                    }
+                }
+
+                // Finally, delete the class itself
+                String sql = "DELETE FROM Kelas WHERE kelas_id = ? AND Users_user_id = ?";
+                PreparedStatement stmt = con.prepareStatement(sql);
+                stmt.setInt(1, kelasIdToDelete);
+                stmt.setString(2, waliUserIdToDelete);
+
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    AlertClass.InformationAlert("Success", "Class Deleted", "Class '" + selectedClassDisplay + "' and all its associated data have been deleted.");
+                    clearClassEditFields();
+                    loadClassesForEdit(); // Refresh the choice box
+                    loadClassesForChoiceBox(); // Refresh class list in other sections
+                    loadSubjectAssignments(); // Refresh subject assignments
+                } else {
+                    AlertClass.ErrorAlert("Failed", "Class Not Deleted", "Failed to delete class. Class might not exist or there are remaining dependencies.");
+                }
+            } catch (SQLException e) {
+                AlertClass.ErrorAlert("Database Error", "Failed to delete class", e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     // NEW: View All Users Methods
     private void initAllUsersTable() {
@@ -1165,13 +1652,38 @@ public class AdmindsController {
         tableRoleColumn.setCellValueFactory(new PropertyValueFactory<>("roleName")); // Display role name
     }
 
-    private void loadAllUsersToTable() {
+    private void loadAllUsersToTable(String roleFilter, String nameFilter) {
         ObservableList<UserTableEntry> userList = FXCollections.observableArrayList();
-        String sql = "SELECT u.user_id, u.username, u.NIS_NIP, u.nama, u.gender, u.alamat, u.email, u.nomer_hp, r.role_name " +
-                "FROM Users u JOIN Role r ON u.Role_role_id = r.role_id ORDER BY u.nama";
+        StringBuilder sqlBuilder = new StringBuilder("SELECT u.user_id, u.username, u.NIS_NIP, u.nama, u.gender, u.alamat, u.email, u.nomer_hp, r.role_name " +
+                "FROM Users u JOIN Role r ON u.Role_role_id = r.role_id WHERE 1=1 "); // Start with 1=1 for easy WHERE clause appending
+
+        if (roleFilter != null && !roleFilter.equals("All Roles")) {
+            String roleId = roleNameToIdMap.get(roleFilter);
+            if (roleId != null) {
+                sqlBuilder.append("AND u.Role_role_id = ? ");
+            }
+        }
+        if (nameFilter != null && !nameFilter.trim().isEmpty()) {
+            sqlBuilder.append("AND (u.nama ILIKE ? OR u.username ILIKE ? OR u.NIS_NIP ILIKE ?) "); // Case-insensitive search
+        }
+        sqlBuilder.append("ORDER BY u.nama");
+
         try (Connection con = DBS.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+             PreparedStatement stmt = con.prepareStatement(sqlBuilder.toString())) {
+            int paramIndex = 1;
+            if (roleFilter != null && !roleFilter.equals("All Roles")) {
+                String roleId = roleNameToIdMap.get(roleFilter);
+                if (roleId != null) {
+                    stmt.setString(paramIndex++, roleId);
+                }
+            }
+            if (nameFilter != null && !nameFilter.trim().isEmpty()) {
+                stmt.setString(paramIndex++, "%" + nameFilter.trim() + "%");
+                stmt.setString(paramIndex++, "%" + nameFilter.trim() + "%");
+                stmt.setString(paramIndex++, "%" + nameFilter.trim() + "%");
+            }
+
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 userList.add(new UserTableEntry(
                         rs.getString("user_id"),
@@ -1192,11 +1704,18 @@ public class AdmindsController {
         }
     }
 
+    @FXML
+    void handleFilterUsers() {
+        String selectedRole = filterRoleChoiceBox.getValue();
+        String nameFilter = filterNameField.getText();
+        loadAllUsersToTable(selectedRole, nameFilter);
+    }
+
 
     @FXML
     void handleLogout() {
         try {
-            HelloApplication.getInstance().changeScene("login-view.fxml", "Login Aplikasi", 1300, 600);
+            HelloApplication.getInstance().changeScene("login-view.fxml", "Login Aplikasi", 1300, 700);
         } catch (IOException e) {
             AlertClass.ErrorAlert("Error", "Logout Failed", "Could not return to login screen.");
             e.printStackTrace();
@@ -1306,5 +1825,39 @@ public class AdmindsController {
         public StringProperty nomerHpProperty() { return nomerHp; }
         public String getRoleName() { return roleName.get(); }
         public StringProperty roleNameProperty() { return roleName; }
+    }
+
+    // NEW: Model Class for SubjectAssignmentEntry
+    public static class SubjectAssignmentEntry {
+        private final StringProperty subjectName;
+        private final StringProperty className;
+        private final StringProperty teacherName;
+        private final String teacherId; // Store actual IDs for deletion
+        private final int subjectId;
+        private final String kelasWaliId;
+        private final int kelasId;
+
+        public SubjectAssignmentEntry(String subjectName, String className, String teacherName,
+                                      String teacherId, int subjectId, String kelasWaliId, int kelasId) {
+            this.subjectName = new SimpleStringProperty(subjectName);
+            this.className = new SimpleStringProperty(className);
+            this.teacherName = new SimpleStringProperty(teacherName);
+            this.teacherId = teacherId;
+            this.subjectId = subjectId;
+            this.kelasWaliId = kelasWaliId;
+            this.kelasId = kelasId;
+        }
+
+        public String getSubjectName() { return subjectName.get(); }
+        public StringProperty subjectNameProperty() { return subjectName; }
+        public String getClassName() { return className.get(); }
+        public StringProperty classNameProperty() { return className; }
+        public String getTeacherName() { return teacherName.get(); }
+        public StringProperty teacherNameProperty() { return teacherName; }
+
+        public String getTeacherId() { return teacherId; }
+        public int getSubjectId() { return subjectId; }
+        public String getKelasWaliId() { return kelasWaliId; }
+        public int getKelasId() { return kelasId; }
     }
 }

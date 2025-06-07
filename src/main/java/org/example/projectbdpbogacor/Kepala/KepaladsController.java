@@ -59,7 +59,8 @@ public class KepaladsController {
         }
 
         try (Connection con = DBS.getConnection()) {
-            String sql = "INSERT INTO Pengumuman (pengumuman, Users_user_id) VALUES (?, ?)";
+            // Updated SQL to include 'waktu' column and set it to NOW()
+            String sql = "INSERT INTO Pengumuman (pengumuman, Users_user_id, waktu) VALUES (?, ?, NOW())";
             PreparedStatement stmt = con.prepareStatement(sql);
             stmt.setString(1, announcementContent);
             stmt.setString(2, loggedInUserId); // Kepala Sekolah's user ID

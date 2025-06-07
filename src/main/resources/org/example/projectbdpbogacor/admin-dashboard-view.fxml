@@ -1,286 +1,424 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.PasswordField?>
+<?import javafx.scene.control.Separator?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
 
-<AnchorPane prefHeight="600.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/8" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.projectbdpbogacor.Admin.AdmindsController">
+<AnchorPane prefHeight="700.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.projectbdpbogacor.Admin.AdmindsController">
     <children>
-        <TabPane fx:id="adminTabPane" prefHeight="600.0" prefWidth="1300.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <tabs>
-                <Tab text="Dashboard">
-                    <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <children>
-                                <Label fx:id="welcomeUserLabel" layoutX="14.0" layoutY="14.0" text="Welcome, Admin!" />
-                                <Button layoutX="1170.0" layoutY="14.0" mnemonicParsing="false" onAction="#handleLogout" text="Logout" />
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-                <Tab text="Manage Users">
-                    <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <children>
-                                <Label layoutX="14.0" layoutY="14.0" text="Add New User" />
-                                <GridPane layoutX="14.0" layoutY="40.0" prefHeight="250.0" prefWidth="400.0">
-                                    <columnConstraints>
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="195.0" minWidth="10.0" prefWidth="120.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="280.0" minWidth="10.0" prefWidth="280.0" />
-                                    </columnConstraints>
-                                    <rowConstraints>
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    </rowConstraints>
-                                    <children>
-                                        <Label text="User ID:" />
-                                        <TextField fx:id="newUserIdField" promptText="e.g., S250001" GridPane.columnIndex="1" />
-                                        <Label text="Username:" GridPane.rowIndex="1" />
-                                        <TextField fx:id="newUsernameField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                        <Label text="Password (8 chars):" GridPane.rowIndex="2" />
-                                        <PasswordField fx:id="newPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                        <Label text="NIS/NIP:" GridPane.rowIndex="3" />
-                                        <TextField fx:id="newNisNipField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                        <Label text="Nama:" GridPane.rowIndex="4" />
-                                        <TextField fx:id="newNameField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                                        <Label text="Gender:" GridPane.rowIndex="5" />
-                                        <ChoiceBox fx:id="newGenderChoiceBox" prefWidth="280.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                                        <Label text="Alamat:" GridPane.rowIndex="6" />
-                                        <TextField fx:id="newAddressField" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                                        <Label text="Email:" GridPane.rowIndex="7" />
-                                        <TextField fx:id="newEmailField" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                                        <Label text="No. HP:" GridPane.rowIndex="8" />
-                                        <TextField fx:id="newPhoneNumberField" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-                                        <Label text="Role:" GridPane.rowIndex="9" />
-                                        <ChoiceBox fx:id="newRoleChoiceBox" prefWidth="280.0" GridPane.columnIndex="1" GridPane.rowIndex="9" />
-                                    </children>
-                                </GridPane>
-                                <Button layoutX="14.0" layoutY="300.0" mnemonicParsing="false" onAction="#handleAddUser" text="Add User" />
+        <VBox alignment="TOP_CENTER" prefHeight="700.0" prefWidth="1300.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <Label fx:id="welcomeUserLabel" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Welcome, Admin!" />
+            <TabPane fx:id="adminTabPane" prefHeight="580.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+                <tabs>
+                    <Tab text="Manage Users">
+                        <content>
+                            <AnchorPane prefHeight="0.0">
+                                <HBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="450.0" prefWidth="1300.0" spacing="20" AnchorPane.leftAnchor="20" AnchorPane.rightAnchor="20" AnchorPane.topAnchor="20">
+                                    <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="500.0" prefWidth="600.0" spacing="10" HBox.hgrow="ALWAYS">
+                                        <GridPane hgap="10" vgap="5">
+                                            <Label text="User ID:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                            <TextField fx:id="newUserIdField" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="20.0" prefWidth="400.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
 
-                                <Separator layoutX="420.0" layoutY="14.0" orientation="VERTICAL" prefHeight="550.0" prefWidth="3.0" />
+                                            <Label text="Username:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                                            <TextField fx:id="newUsernameField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
 
-                                <Label layoutX="430.0" layoutY="14.0" text="Edit / Delete User" />
-                                <Label layoutX="430.0" layoutY="40.0" text="Select User:" />
-                                <ChoiceBox fx:id="editUserChoiceBox" layoutX="520.0" layoutY="36.0" onAction="#handleUserSelectionForEditDelete" prefWidth="280.0" />
-                                <GridPane layoutX="430.0" layoutY="70.0" prefHeight="250.0" prefWidth="400.0">
-                                    <columnConstraints>
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="195.0" minWidth="10.0" prefWidth="120.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="280.0" minWidth="10.0" prefWidth="280.0" />
-                                    </columnConstraints>
-                                    <rowConstraints>
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    </rowConstraints>
-                                    <children>
-                                        <Label text="User ID:" />
-                                        <TextField fx:id="editUserIdField" editable="false" GridPane.columnIndex="1" />
-                                        <Label text="Username:" GridPane.rowIndex="1" />
-                                        <TextField fx:id="editUsernameField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                        <Label text="New Password (optional):" GridPane.rowIndex="2" />
-                                        <PasswordField fx:id="editPasswordField" promptText="Enter new password to change" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                        <Label text="NIS/NIP:" GridPane.rowIndex="3" />
-                                        <TextField fx:id="editNisNipField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                        <Label text="Nama:" GridPane.rowIndex="4" />
-                                        <TextField fx:id="editNameField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                                        <Label text="Gender:" GridPane.rowIndex="5" />
-                                        <ChoiceBox fx:id="editGenderChoiceBox" prefWidth="280.0" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                                        <Label text="Alamat:" GridPane.rowIndex="6" />
-                                        <TextField fx:id="editAddressField" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                                        <Label text="Email:" GridPane.rowIndex="7" />
-                                        <TextField fx:id="editEmailField" GridPane.columnIndex="1" GridPane.rowIndex="7" />
-                                        <Label text="No. HP:" GridPane.rowIndex="8" />
-                                        <TextField fx:id="editPhoneNumberField" GridPane.columnIndex="1" GridPane.rowIndex="8" />
-                                        <Label text="Role:" GridPane.rowIndex="9" />
-                                        <ChoiceBox fx:id="editRoleChoiceBox" prefWidth="280.0" GridPane.columnIndex="1" GridPane.rowIndex="9" />
-                                    </children>
-                                </GridPane>
-                                <Button fx:id="updateUserButton" layoutX="430.0" layoutY="340.0" mnemonicParsing="false" onAction="#handleUpdateUser" text="Update User" />
-                                <Button fx:id="deleteUserButton" layoutX="530.0" layoutY="340.0" mnemonicParsing="false" onAction="#handleDeleteUser" text="Delete User" />
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-                <Tab text="Create Class">
-                    <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <children>
-                                <Label layoutX="14.0" layoutY="14.0" text="Create New Class" />
-                                <GridPane layoutX="14.0" layoutY="40.0" prefHeight="150.0" prefWidth="400.0">
-                                    <columnConstraints>
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="195.0" minWidth="10.0" prefWidth="120.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="280.0" minWidth="10.0" prefWidth="280.0" />
-                                    </columnConstraints>
-                                    <rowConstraints>
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    </rowConstraints>
-                                    <children>
-                                        <Label text="Class Name:" />
-                                        <TextField fx:id="newClassNameField" GridPane.columnIndex="1" />
-                                        <Label text="Description:" GridPane.rowIndex="1" />
-                                        <TextField fx:id="newClassDescriptionField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                        <Label text="Wali Kelas:" GridPane.rowIndex="2" />
-                                        <ChoiceBox fx:id="newClassWaliKelasChoiceBox" prefWidth="280.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                        <Label text="Semester:" GridPane.rowIndex="3" />
-                                        <ChoiceBox fx:id="newClassSemesterChoiceBox" prefWidth="280.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                    </children>
-                                </GridPane>
-                                <Button layoutX="14.0" layoutY="200.0" mnemonicParsing="false" onAction="#handleCreateClass" text="Create Class" />
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-                <Tab text="Manage Schedules &amp; Subjects">
-                    <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <children>
-                                <Label layoutX="14.0" layoutY="14.0" text="Add New Schedule" />
-                                <GridPane layoutX="14.0" layoutY="40.0" prefHeight="150.0" prefWidth="400.0">
-                                    <columnConstraints>
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="195.0" minWidth="10.0" prefWidth="120.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="280.0" minWidth="10.0" prefWidth="280.0" />
-                                    </columnConstraints>
-                                    <rowConstraints>
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    </rowConstraints>
-                                    <children>
-                                        <Label text="Day:" />
-                                        <TextField fx:id="scheduleDayField" promptText="e.g., Senin" GridPane.columnIndex="1" />
-                                        <Label text="Start Time (HH:MM):" GridPane.rowIndex="1" />
-                                        <TextField fx:id="scheduleStartTimeField" promptText="e.g., 08:00" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                        <Label text="End Time (HH:MM):" GridPane.rowIndex="2" />
-                                        <TextField fx:id="scheduleEndTimeField" promptText="e.g., 09:30" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                        <Label text="Subject:" GridPane.rowIndex="3" />
-                                        <ChoiceBox fx:id="scheduleSubjectChoiceBox" prefWidth="280.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                        <Label text="Class:" GridPane.rowIndex="4" />
-                                        <ChoiceBox fx:id="scheduleClassChoiceBox" prefWidth="280.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                                    </children>
-                                </GridPane>
-                                <Button layoutX="14.0" layoutY="200.0" mnemonicParsing="false" onAction="#handleAddSchedule" text="Add Schedule" />
+                                            <Label text="Password:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                                            <PasswordField fx:id="newPasswordField" GridPane.columnIndex="1" GridPane.rowIndex="4" />
 
-                                <Separator layoutX="420.0" layoutY="14.0" orientation="VERTICAL" prefHeight="550.0" prefWidth="3.0" />
+                                            <Label text="NIS/NIP:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                                            <TextField fx:id="newNisNipField" GridPane.columnIndex="1" GridPane.rowIndex="5" />
 
-                                <Label layoutX="430.0" layoutY="14.0" text="Add New Subject" />
-                                <GridPane layoutX="430.0" layoutY="40.0" prefHeight="60.0" prefWidth="400.0">
-                                    <columnConstraints>
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="195.0" minWidth="10.0" prefWidth="120.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="280.0" minWidth="10.0" prefWidth="280.0" />
-                                    </columnConstraints>
-                                    <rowConstraints>
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    </rowConstraints>
+                                            <Label text="Name:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                                            <TextField fx:id="newNameField" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+
+                                            <Label text="Gender:" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+                                            <ChoiceBox fx:id="newGenderChoiceBox" prefWidth="150" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+
+                                            <Label text="Address:" GridPane.columnIndex="0" GridPane.rowIndex="8" />
+                                            <TextField fx:id="newAddressField" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+
+                                            <Label text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="9" />
+                                            <TextField fx:id="newEmailField" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+
+                                            <Label text="Phone Number:" GridPane.columnIndex="0" GridPane.rowIndex="10" />
+                                            <TextField fx:id="newPhoneNumberField" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+
+                                            <Label text="Role:" GridPane.columnIndex="0" GridPane.rowIndex="11" />
+                                            <ChoiceBox fx:id="newRoleChoiceBox" prefWidth="150" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+                                           <Label styleClass="section-title" text="Add New User" />
+                                           <Button maxHeight="-Infinity" onAction="#handleAddUser" prefHeight="30.0" text="Add User" GridPane.rowIndex="12" />
+                                 <columnConstraints>
+                                    <ColumnConstraints />
+                                    <ColumnConstraints />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" prefHeight="25.0" />
+                                    <RowConstraints minHeight="10.0" prefHeight="40.0" />
+                                 </rowConstraints>
+                                        </GridPane>
+                                    </VBox>
+
+                                    <VBox maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="500.0" prefWidth="600.0" spacing="10" HBox.hgrow="ALWAYS">
+
+                                        <GridPane hgap="10" vgap="5">
+                                            <Label text="User ID:" GridPane.columnIndex="0" GridPane.rowIndex="2" />
+                                            <TextField fx:id="editUserIdField" editable="false" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="20.0" prefWidth="400.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+
+                                            <Label text="Username:" GridPane.columnIndex="0" GridPane.rowIndex="3" />
+                                            <TextField fx:id="editUsernameField" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+
+                                            <Label text="Password:" GridPane.columnIndex="0" GridPane.rowIndex="4" />
+                                            <PasswordField fx:id="editPasswordField" promptText="Enter new password (8 chars)" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+
+                                            <Label text="NIS/NIP:" GridPane.columnIndex="0" GridPane.rowIndex="5" />
+                                            <TextField fx:id="editNisNipField" GridPane.columnIndex="1" GridPane.rowIndex="5" />
+
+                                            <Label text="Name:" GridPane.columnIndex="0" GridPane.rowIndex="6" />
+                                            <TextField fx:id="editNameField" GridPane.columnIndex="1" GridPane.rowIndex="6" />
+
+                                            <Label text="Gender:" GridPane.columnIndex="0" GridPane.rowIndex="7" />
+                                            <ChoiceBox fx:id="editGenderChoiceBox" prefWidth="150" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+
+                                            <Label text="Address:" GridPane.columnIndex="0" GridPane.rowIndex="8" />
+                                            <TextField fx:id="editAddressField" GridPane.columnIndex="1" GridPane.rowIndex="8" />
+
+                                            <Label text="Email:" GridPane.columnIndex="0" GridPane.rowIndex="9" />
+                                            <TextField fx:id="editEmailField" GridPane.columnIndex="1" GridPane.rowIndex="9" />
+
+                                            <Label text="Phone Number:" GridPane.columnIndex="0" GridPane.rowIndex="10" />
+                                            <TextField fx:id="editNomerHpField" GridPane.columnIndex="1" GridPane.rowIndex="10" />
+
+                                            <Label text="Role:" GridPane.columnIndex="0" GridPane.rowIndex="11" />
+                                            <ChoiceBox fx:id="editRoleChoiceBox" prefWidth="150" GridPane.columnIndex="1" GridPane.rowIndex="11" />
+                                           <Label styleClass="section-title" text="Edit / Delete User" />
+                                            <Label text="Select User:" GridPane.rowIndex="1" />
+                                            <ChoiceBox fx:id="editUserChoiceBox" maxHeight="25.0" maxWidth="-Infinity" prefHeight="28.0" prefWidth="400.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                            <Button fx:id="updateUserButton" maxHeight="-Infinity" onAction="#handleUpdateUser" prefHeight="30.0" text="Update User" GridPane.rowIndex="12" />
+                                            <Button fx:id="deleteUserButton" maxHeight="-Infinity" onAction="#handleDeleteUser" prefHeight="30.0" text="Delete User" GridPane.columnIndex="1" GridPane.rowIndex="12" />
+                                 <columnConstraints>
+                                    <ColumnConstraints />
+                                    <ColumnConstraints />
+                                 </columnConstraints>
+                                 <rowConstraints>
+                                    <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" prefHeight="25.0" />
+                                    <RowConstraints maxHeight="-Infinity" minHeight="10.0" prefHeight="40.0" />
+                                 </rowConstraints>
+                                        </GridPane>
+                                    </VBox>
+                                </HBox>
+                            </AnchorPane>
+                        </content>
+                    </Tab>
+                    <Tab text="Manage Classes">
+                        <content>
+                            <AnchorPane>
+                                <VBox layoutX="10.0" layoutY="10.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                     <children>
-                                        <Label text="Subject Name:" />
-                                        <TextField fx:id="newSubjectNameField" GridPane.columnIndex="1" />
-                                        <Label text="Category:" GridPane.rowIndex="1" />
-                                        <TextField fx:id="newSubjectCategoryField" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                        <Label style="-fx-font-weight: bold;" text="Create New Class" />
+                                        <GridPane hgap="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="122.0" prefWidth="580.0" vgap="5.0">
+                                            <columnConstraints>
+                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="300.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                                <RowConstraints vgrow="SOMETIMES" />
+                                                <RowConstraints vgrow="SOMETIMES" />
+                                                <RowConstraints vgrow="SOMETIMES" />
+                                                <RowConstraints vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                            <children>
+                                                <Label text="Class Name:" />
+                                                <TextField fx:id="newClassNameField" promptText="e.g., Kelas 10A" GridPane.columnIndex="1" />
+                                                <Label text="Description:" GridPane.rowIndex="1" />
+                                                <TextField fx:id="newClassDescriptionField" promptText="e.g., Students in 10th grade, A section" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <Label text="Wali Kelas:" GridPane.rowIndex="2" />
+                                                <ChoiceBox fx:id="newClassWaliKelasChoiceBox" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <Label text="Semester:" GridPane.rowIndex="3" />
+                                                <ChoiceBox fx:id="newClassSemesterChoiceBox" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                            </children>
+                                        </GridPane>
+                                        <Button onAction="#handleCreateClass" text="Create Class" />
+                                        <Separator orientation="HORIZONTAL" />
+                                        <Label style="-fx-font-weight: bold;" text="Edit / Delete Existing Class" />
+                                        <GridPane hgap="10.0" vgap="5.0">
+                                            <columnConstraints>
+                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="150.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="400.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                                <RowConstraints vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                            <children>
+                                                <Label text="Select Class:" />
+                                                <ChoiceBox fx:id="editClassChoiceBox" onAction="#handleClassSelectionForEdit" prefWidth="300.0" GridPane.columnIndex="1" />
+                                            </children>
+                                        </GridPane>
+                                        <HBox spacing="10.0">
+                                            <children>
+                                                <Button fx:id="updateClassButton" onAction="#handleUpdateClass" text="Update Class" />
+                                                <Button fx:id="deleteClassButton" onAction="#handleDeleteClass" text="Delete Class" />
+                                            </children>
+                                        </HBox>
                                     </children>
-                                </GridPane>
-                                <Button layoutX="430.0" layoutY="110.0" mnemonicParsing="false" onAction="#handleAddSubject" text="Add Subject" />
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-                <Tab text="Assign Students to Classes">
-                    <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <children>
-                                <Label layoutX="14.0" layoutY="14.0" text="Assign Student to Class" />
-                                <GridPane layoutX="14.0" layoutY="40.0" prefHeight="60.0" prefWidth="400.0">
-                                    <columnConstraints>
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="195.0" minWidth="10.0" prefWidth="120.0" />
-                                        <ColumnConstraints hgrow="SOMETIMES" maxWidth="280.0" minWidth="10.0" prefWidth="280.0" />
-                                    </columnConstraints>
-                                    <rowConstraints>
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                        <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                    </rowConstraints>
+                                </VBox>
+                            </AnchorPane>
+                        </content>
+                    </Tab>
+                    <Tab text="Manage Subjects">
+                        <content>
+                            <AnchorPane>
+                        <HBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="1200.0">
+                           <children>
+                                      <VBox maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="500.0" prefWidth="600.0" spacing="10.0">
+                                          <children>
+                                              <Label style="-fx-font-weight: bold;" text="Add New Subject" />
+                                              <GridPane hgap="10.0" maxHeight="-Infinity" maxWidth="-Infinity" prefHeight="56.0" prefWidth="486.0" vgap="5.0">
+                                                  <columnConstraints>
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" prefWidth="150.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" prefWidth="300.0" />
+                                                  </columnConstraints>
+                                                  <rowConstraints>
+                                                      <RowConstraints vgrow="SOMETIMES" />
+                                                      <RowConstraints vgrow="SOMETIMES" />
+                                                  </rowConstraints>
+                                                  <children>
+                                                      <Label text="Subject Name:" />
+                                                      <TextField fx:id="newSubjectNameField" prefHeight="26.0" prefWidth="290.0" promptText="e.g., Mathematics" GridPane.columnIndex="1" />
+                                                      <Label text="Category:" GridPane.rowIndex="1" />
+                                                      <TextField fx:id="newSubjectCategoryField" promptText="e.g., General, Science" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                  </children>
+                                              </GridPane>
+                                              <Button maxHeight="-Infinity" onAction="#handleAddSubject" prefHeight="30.0" text="Add Subject" />
+                                              <Separator orientation="HORIZONTAL" />
+                                              <Label style="-fx-font-weight: bold;" text="Assign Teacher to Subject in Class" />
+                                              <GridPane hgap="10.0" maxWidth="-Infinity" prefHeight="94.0" prefWidth="400.0" vgap="5.0">
+                                                  <columnConstraints>
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" percentWidth="0.0" prefWidth="150.0" />
+                                                      <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="400.0" prefWidth="400.0" />
+                                                  </columnConstraints>
+                                                  <rowConstraints>
+                                                      <RowConstraints vgrow="SOMETIMES" />
+                                                      <RowConstraints vgrow="SOMETIMES" />
+                                                      <RowConstraints vgrow="SOMETIMES" />
+                                                  </rowConstraints>
+                                                  <children>
+                                                      <Label text="Subject:" />
+                                                      <ChoiceBox fx:id="assignTeacherSubjectChoiceBox" prefWidth="300.0" GridPane.columnIndex="1" />
+                                                      <Label text="Class:" GridPane.rowIndex="1" />
+                                                      <ChoiceBox fx:id="assignTeacherClassChoiceBox" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                      <Label text="Teacher (Guru):" GridPane.rowIndex="2" />
+                                                      <ChoiceBox fx:id="assignTeacherGuruChoiceBox" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                  </children>
+                                              </GridPane>
+                                              <Button onAction="#handleAssignTeacherToSubject" text="Assign Teacher" />
+                                              <Separator orientation="HORIZONTAL" />
+                                          </children>
+                                 <padding>
+                                    <Insets left="10.0" />
+                                 </padding>
+                                      </VBox>
+                              <VBox prefHeight="500.0" prefWidth="600.0">
+                                 <children>
+                                              <Label style="-fx-font-weight: bold;" text="Current Subject Assignments">
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                    </Label>
+                                              <TableView fx:id="subjectAssignmentTable" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="400.0" prefWidth="580.0" VBox.vgrow="ALWAYS">
+                                                  <columns>
+                                                      <TableColumn fx:id="assignmentSubjectColumn" prefWidth="160.79998779296875" text="Subject Name" />
+                                                      <TableColumn fx:id="assignmentClassColumn" prefWidth="171.199951171875" text="Class Name" />
+                                                      <TableColumn fx:id="assignmentTeacherColumn" prefWidth="238.40008544921875" text="Assigned Teacher" />
+                                                  </columns>
+                                       <VBox.margin>
+                                          <Insets />
+                                       </VBox.margin>
+                                       <padding>
+                                          <Insets left="10.0" />
+                                       </padding>
+                                              </TableView>
+                                              <Button fx:id="deleteAssignmentButton" onAction="#handleDeleteSubjectAssignment" text="Delete Selected Assignment">
+                                       <padding>
+                                          <Insets left="20.0" />
+                                       </padding>
+                                    </Button>
+                                 </children>
+                                 <padding>
+                                    <Insets left="10.0" />
+                                 </padding>
+                              </VBox>
+                           </children>
+                        </HBox>
+                            </AnchorPane>
+                        </content>
+                    </Tab>
+                    <Tab text="Manage Schedules">
+                        <content>
+                            <AnchorPane>
+                                <VBox layoutX="10.0" layoutY="10.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
                                     <children>
-                                        <Label text="Student:" />
-                                        <ChoiceBox fx:id="assignStudentChoiceBox" prefWidth="280.0" GridPane.columnIndex="1" />
-                                        <Label text="Class:" GridPane.rowIndex="1" />
-                                        <ChoiceBox fx:id="assignClassChoiceBox" prefWidth="280.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                        <Label style="-fx-font-weight: bold;" text="Add New Schedule" />
+                                        <GridPane hgap="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="154.0" prefWidth="675.0" vgap="5.0">
+                                            <columnConstraints>
+                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" percentWidth="0.0" prefWidth="150.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="-Infinity" prefWidth="300.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                                <RowConstraints vgrow="SOMETIMES" />
+                                                <RowConstraints vgrow="SOMETIMES" />
+                                                <RowConstraints vgrow="SOMETIMES" />
+                                                <RowConstraints vgrow="SOMETIMES" />
+                                                <RowConstraints vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                            <children>
+                                                <Label text="Day:" />
+                                                <ChoiceBox fx:id="scheduleDayChoiceBox" prefWidth="300.0" GridPane.columnIndex="1" />
+                                                <Label text="Start Time (HH:MM):" GridPane.rowIndex="1" />
+                                                <TextField fx:id="scheduleStartTimeField" promptText="e.g., 08:00" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <Label text="End Time (HH:MM):" GridPane.rowIndex="2" />
+                                                <TextField fx:id="scheduleEndTimeField" promptText="e.g., 09:30" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <Label text="Subject:" GridPane.rowIndex="3" />
+                                                <ChoiceBox fx:id="scheduleSubjectChoiceBox" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                                <Label text="Class:" GridPane.rowIndex="4" />
+                                                <ChoiceBox fx:id="scheduleClassChoiceBox" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="4" />
+                                            </children>
+                                        </GridPane>
+                                        <Button onAction="#handleAddSchedule" text="Add Schedule" />
                                     </children>
-                                </GridPane>
-                                <Button layoutX="14.0" layoutY="110.0" mnemonicParsing="false" onAction="#handleAssignStudentToClass" text="Assign Student" />
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-                <Tab text="Manage Students in Class">
-                    <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <children>
-                                <Label layoutX="14.0" layoutY="14.0" text="Filter by Class:" />
-                                <ChoiceBox fx:id="studentClassFilterChoiceBox" layoutX="110.0" layoutY="10.0" onAction="#handleClassFilterSelection" prefWidth="200.0" />
-                                <TableView fx:id="studentInClassTableView" layoutX="14.0" layoutY="50.0" prefHeight="400.0" prefWidth="400.0">
-                                    <columns>
-                                        <TableColumn fx:id="studentNameInClassColumn" prefWidth="150.0" text="Student Name" />
-                                        <TableColumn fx:id="nisNipInClassColumn" prefWidth="100.0" text="NIS/NIP" />
-                                        <TableColumn fx:id="studentUserIdInClassColumn" prefWidth="148.0" text="User ID" />
-                                    </columns>
-                                </TableView>
-                                <Button fx:id="deleteStudentFromClassButton" layoutX="14.0" layoutY="460.0" mnemonicParsing="false" onAction="#handleDeleteStudentFromClass" text="Remove Selected Student" />
-                                <Button fx:id="editStudentInClassButton" layoutX="200.0" layoutY="460.0" mnemonicParsing="false" onAction="#handleEditStudentInClass" text="Edit Selected Student" />
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-                <Tab text="Announcements">
-                    <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <children>
-                                <Label layoutX="14.0" layoutY="14.0" text="Create New Announcement" />
-                                <TextArea fx:id="announcementTextArea" layoutX="14.0" layoutY="40.0" prefHeight="200.0" prefWidth="400.0" promptText="Enter announcement content here..." />
-                                <Button layoutX="14.0" layoutY="250.0" mnemonicParsing="false" onAction="#handleCreateAnnouncement" text="Publish Announcement" />
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-                <Tab text="View All Users">
-                    <content>
-                        <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <children>
-                                <TableView fx:id="allUsersTableView" layoutX="14.0" layoutY="14.0" prefHeight="550.0" prefWidth="1270.0">
-                                    <columns>
-                                        <TableColumn fx:id="tableUserIdColumn" prefWidth="75.0" text="User ID" />
-                                        <TableColumn fx:id="tableUsernameColumn" prefWidth="100.0" text="Username" />
-                                        <TableColumn fx:id="tableNisNipColumn" prefWidth="100.0" text="NIS/NIP" />
-                                        <TableColumn fx:id="tableNamaColumn" prefWidth="150.0" text="Nama" />
-                                        <TableColumn fx:id="tableGenderColumn" prefWidth="70.0" text="Gender" />
-                                        <TableColumn fx:id="tableAlamatColumn" prefWidth="200.0" text="Alamat" />
-                                        <TableColumn fx:id="tableEmailColumn" prefWidth="150.0" text="Email" />
-                                        <TableColumn fx:id="tableNomerHpColumn" prefWidth="120.0" text="No. HP" />
-                                        <TableColumn fx:id="tableRoleColumn" prefWidth="100.0" text="Role" />
-                                    </columns>
-                                </TableView>
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-            </tabs>
-        </TabPane>
+                                </VBox>
+                            </AnchorPane>
+                        </content>
+                    </Tab>
+                    <Tab text="Manage Students in Class">
+                        <content>
+                            <AnchorPane>
+                                <VBox layoutX="10.0" layoutY="10.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                                    <children>
+                                        <Label style="-fx-font-weight: bold;" text="Assign Student to Class" />
+                                        <GridPane hgap="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="62.0" prefWidth="484.0" vgap="5.0">
+                                            <columnConstraints>
+                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="150.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                                <RowConstraints vgrow="SOMETIMES" />
+                                                <RowConstraints vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                            <children>
+                                                <Label text="Select Student:" />
+                                                <ChoiceBox fx:id="assignStudentToClassChoiceBox" prefWidth="300.0" GridPane.columnIndex="1" />
+                                                <Label text="Select Class:" GridPane.rowIndex="1" />
+                                                <ChoiceBox fx:id="studentClassFilterChoiceBox" onAction="#handleClassFilterSelection" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                            </children>
+                                        </GridPane>
+                                        <Button fx:id="assignStudentToClassButton" onAction="#handleAssignStudentToClass" text="Assign Student" />
+                                        <Separator orientation="HORIZONTAL" />
+                                        <Label style="-fx-font-weight: bold;" text="Students in Selected Class" />
+                                        <TableView fx:id="studentInClassTableView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="260.0" prefWidth="722.0" VBox.vgrow="ALWAYS">
+                                            <columns>
+                                                <TableColumn fx:id="studentNameInClassColumn" prefWidth="232.8000053167343" text="Student Name" />
+                                                <TableColumn fx:id="nisNipInClassColumn" prefWidth="206.4000244140625" text="NIS/NIP" />
+                                                <TableColumn fx:id="studentUserIdInClassColumn" prefWidth="280.79999389648435" text="User ID" />
+                                            </columns>
+                                        </TableView>
+                                        <HBox spacing="10.0">
+                                            <children>
+                                                <Button fx:id="editStudentInClassButton" onAction="#handleEditStudentInClass" text="Edit Selected Student" />
+                                                <Button fx:id="deleteStudentFromClassButton" onAction="#handleDeleteStudentFromClass" text="Remove From Class" />
+                                            </children>
+                                        </HBox>
+                                    </children>
+                                </VBox>
+                            </AnchorPane>
+                        </content>
+                    </Tab>
+                    <Tab text="View All Users">
+                        <content>
+                            <AnchorPane>
+                                <VBox layoutX="10.0" layoutY="10.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                                    <children>
+                                        <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                            <children>
+                                                <Label text="Filter by Role:" />
+                                                <ChoiceBox fx:id="filterRoleChoiceBox" prefWidth="150.0" />
+                                                <Label text="Filter by Name/Username/NIS/NIP:" />
+                                                <TextField fx:id="filterNameField" promptText="Enter name or ID" />
+                                            </children>
+                                        </HBox>
+                                        <TableView fx:id="allUsersTableView" VBox.vgrow="ALWAYS">
+                                            <columns>
+                                                <TableColumn fx:id="tableUserIdColumn" prefWidth="93.60000455379486" text="User ID" />
+                                                <TableColumn fx:id="tableUsernameColumn" prefWidth="146.4000015258789" text="Username" />
+                                                <TableColumn fx:id="tableNisNipColumn" prefWidth="108.79998779296875" text="NIS/NIP" />
+                                                <TableColumn fx:id="tableNamaColumn" prefWidth="123.199951171875" text="Name" />
+                                                <TableColumn fx:id="tableGenderColumn" prefWidth="80.00003051757812" text="Gender" />
+                                                <TableColumn fx:id="tableAlamatColumn" prefWidth="196.00006103515625" text="Address" />
+                                                <TableColumn fx:id="tableEmailColumn" prefWidth="207.20001220703125" text="Email" />
+                                                <TableColumn fx:id="tableNomerHpColumn" prefWidth="169.5999755859375" text="Phone" />
+                                                <TableColumn fx:id="tableRoleColumn" minWidth="0.0" prefWidth="111.199951171875" text="Role" />
+                                            </columns>
+                                        </TableView>
+                                    </children>
+                                </VBox>
+                            </AnchorPane>
+                        </content>
+                    </Tab>
+                    <Tab text="Announcements">
+                        <content>
+                            <AnchorPane>
+                                <VBox layoutX="10.0" layoutY="10.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                                    <children>
+                                        <Label style="-fx-font-weight: bold;" text="Create New Announcement" />
+                                        <TextArea fx:id="announcementTextArea" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="150.0" prefWidth="687.0" promptText="Enter your announcement here..." />
+                                        <Button onAction="#handleCreateAnnouncement" text="Publish Announcement" />
+                                    </children>
+                                </VBox>
+                            </AnchorPane>
+                        </content>
+                    </Tab>
+                </tabs>
+            </TabPane>
+            <Button onAction="#handleLogout" text="Logout" />
+        </VBox>
     </children>
 </AnchorPane>

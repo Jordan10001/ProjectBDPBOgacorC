@@ -40,7 +40,7 @@ public class HelloApplication extends Application {
 
         // Load the initial login scene
         FXMLLoader fxmlLoader = new FXMLLoader(HelloApplication.class.getResource("login-view.fxml"));
-        scene = new Scene(fxmlLoader.load(), 1300, 600); // Initial scene size
+        scene = new Scene(fxmlLoader.load(), 1300, 700); // Initial scene size
 
         applyCurrentMode(); // Apply theme to the initial scene
 

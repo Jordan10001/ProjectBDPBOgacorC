@@ -539,3 +539,6 @@ ALTER TABLE Student_Class_Enrollment
     )
     ON DELETE CASCADE
     ON UPDATE CASCADE;
+
+ALTER TABLE pengumuman
+ADD COLUMN waktu TIMESTAMP;
