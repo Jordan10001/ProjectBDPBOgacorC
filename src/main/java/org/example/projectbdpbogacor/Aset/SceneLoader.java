@@ -15,7 +15,7 @@ public class SceneLoader {
             FXMLLoader loader = new FXMLLoader(SceneLoader.class.getResource(fxmlFile));
             Parent root = loader.load();
             Stage stage = (Stage) ((Node) event.getSource()).getScene().getWindow();
-            Scene scene = new Scene(root, 1500, 700);
+            Scene scene = new Scene(root, 1300, 600);
             stage.setScene(scene);
             stage.setTitle(title);
             stage.show();

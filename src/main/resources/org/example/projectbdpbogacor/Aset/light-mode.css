@@ -1,0 +1,39 @@
+/* src/main/resources/org/example/projectbdpbogacor/light-mode.css */
+
+.root {
+    -fx-background-color: #f0f0f0; /* Warna latar belakang terang */
+}
+
+.label {
+    -fx-text-fill: #333333; /* Warna teks gelap */
+}
+
+.button {
+    -fx-background-color: #e0e0e0;
+    -fx-text-fill: #333333;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 5px;
+    -fx-padding: 8px 15px;
+}
+
+.text-field {
+    -fx-background-color: #ffffff;
+    -fx-text-fill: #333333;
+    -fx-border-color: #cccccc;
+    -fx-border-radius: 3px;
+}
+
+/* Styles specifically for the login-view.fxml elements */
+#loginPane {
+    -fx-background-color: #f8f8f8;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 10px;
+    -fx-padding: 20px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 0);
+}
+
+#loginTitle {
+    -fx-font-size: 24px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #333333;
+}
