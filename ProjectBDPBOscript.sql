@@ -7,108 +7,108 @@
 
 CREATE TABLE Absensi
     (
-     absensi_id VARCHAR(50) NOT NULL ,
+     absensi_id SERIAL PRIMARY KEY , -- Diubah menjadi SERIAL PRIMARY KEY
      tanggal TIMESTAMP NOT NULL ,
      status VARCHAR(50) NOT NULL ,
-     Users_user_id VARCHAR (7) NOT NULL , -- Changed from User_user_id
-     Jadwal_jadwal_id VARCHAR(50) NOT NULL
+     Users_user_id VARCHAR (7) NOT NULL ,
+     Jadwal_jadwal_id SERIAL NOT NULL -- Diubah menjadi SERIAL (asumsi Jadwal_jadwal_id juga bisa auto-increment)
     );
 
-ALTER TABLE Absensi ADD CONSTRAINT Absensi_PK PRIMARY KEY (absensi_id);
+-- ALTER TABLE Absensi ADD CONSTRAINT Absensi_PK PRIMARY KEY (absensi_id); -- Sudah termasuk dalam SERIAL PRIMARY KEY
 
 CREATE TABLE Detail_Pengajar
     (
-     Users_user_id VARCHAR (7) NOT NULL , -- Changed from User_user_id
-     Kelas_Users_user_id VARCHAR (7) NOT NULL , -- Changed from Kelas_User_user_id
-     Matpel_mapel_id VARCHAR(50) NOT NULL ,
-     Kelas_kelas_id VARCHAR(50) NOT NULL
+     Users_user_id VARCHAR (7) NOT NULL ,
+     Kelas_Users_user_id VARCHAR (7) NOT NULL ,
+     Matpel_mapel_id SERIAL NOT NULL , -- Diubah menjadi SERIAL
+     Kelas_kelas_id SERIAL NOT NULL -- Diubah menjadi SERIAL
     );
 
 CREATE TABLE Feedback
     (
-     feedback_id VARCHAR(50) NOT NULL ,
+     feedback_id SERIAL PRIMARY KEY , -- Diubah menjadi SERIAL PRIMARY KEY
      feedback VARCHAR(255) NOT NULL ,
-     Users_user_id VARCHAR (7) NOT NULL -- Changed from User_user_id
+     Users_user_id VARCHAR (7) NOT NULL
     );
 
-ALTER TABLE Feedback ADD CONSTRAINT Feedback_PK PRIMARY KEY (feedback_id);
+-- ALTER TABLE Feedback ADD CONSTRAINT Feedback_PK PRIMARY KEY (feedback_id); -- Sudah termasuk dalam SERIAL PRIMARY KEY
 
 CREATE TABLE Jadwal
     (
-     jadwal_id VARCHAR(50) NOT NULL ,
+     jadwal_id SERIAL PRIMARY KEY , -- Diubah menjadi SERIAL PRIMARY KEY
      hari VARCHAR(20) NOT NULL ,
      jam_mulai VARCHAR(10) NOT NULL ,
      jam_selsai VARCHAR(10) NOT NULL ,
-     Kelas_Users_user_id VARCHAR (7) NOT NULL , -- Changed from Kelas_User_user_id
-     Matpel_mapel_id VARCHAR(50) NOT NULL ,
-     Kelas_kelas_id VARCHAR(50) NOT NULL
+     Kelas_Users_user_id VARCHAR (7) NOT NULL ,
+     Matpel_mapel_id SERIAL NOT NULL , -- Diubah menjadi SERIAL
+     Kelas_kelas_id SERIAL NOT NULL -- Diubah menjadi SERIAL
     );
 
-ALTER TABLE Jadwal ADD CONSTRAINT Jadwal_PK PRIMARY KEY (jadwal_id);
+-- ALTER TABLE Jadwal ADD CONSTRAINT Jadwal_PK PRIMARY KEY (jadwal_id); -- Sudah termasuk dalam SERIAL PRIMARY KEY
 
 CREATE TABLE Kelas
     (
-     kelas_id VARCHAR(50) NOT NULL ,
+     kelas_id SERIAL NOT NULL , -- Diubah menjadi SERIAL
      nama_kelas VARCHAR(100) NOT NULL ,
      keterangan VARCHAR(255) NOT NULL ,
-     Users_user_id VARCHAR (7) NOT NULL , -- Changed from User_user_id
-     Semester_semester_id VARCHAR(50) NOT NULL
+     Users_user_id VARCHAR (7) NOT NULL ,
+     Semester_semester_id SERIAL NOT NULL -- Diubah menjadi SERIAL
     );
 
-ALTER TABLE Kelas ADD CONSTRAINT Kelas_PK PRIMARY KEY (Users_user_id, kelas_id); -- Changed from User_user_id
+ALTER TABLE Kelas ADD CONSTRAINT Kelas_PK PRIMARY KEY (Users_user_id, kelas_id);
 
 CREATE TABLE Materi
     (
-     materi_id VARCHAR(50) NOT NULL ,
+     materi_id SERIAL PRIMARY KEY , -- Diubah menjadi SERIAL PRIMARY KEY
      nama_materi VARCHAR(255) NOT NULL ,
-     Kelas_Users_user_id VARCHAR (7) NOT NULL , -- Changed from Kelas_User_user_id
-     Matpel_mapel_id VARCHAR(50) NOT NULL ,
-     Kelas_kelas_id VARCHAR(50) NOT NULL
+     Kelas_Users_user_id VARCHAR (7) NOT NULL ,
+     Matpel_mapel_id SERIAL NOT NULL , -- Diubah menjadi SERIAL
+     Kelas_kelas_id SERIAL NOT NULL -- Diubah menjadi SERIAL
     );
 
-ALTER TABLE Materi ADD CONSTRAINT Materi_PK PRIMARY KEY (materi_id);
+-- ALTER TABLE Materi ADD CONSTRAINT Materi_PK PRIMARY KEY (materi_id); -- Sudah termasuk dalam SERIAL PRIMARY KEY
 
 CREATE TABLE Matpel
     (
-     mapel_id VARCHAR(50) NOT NULL ,
+     mapel_id SERIAL PRIMARY KEY , -- Diubah menjadi SERIAL PRIMARY KEY
      nama_mapel VARCHAR(100) NOT NULL ,
      category VARCHAR(50) NOT NULL
     );
 
-ALTER TABLE Matpel ADD CONSTRAINT Matpel_PK PRIMARY KEY (mapel_id);
+-- ALTER TABLE Matpel ADD CONSTRAINT Matpel_PK PRIMARY KEY (mapel_id); -- Sudah termasuk dalam SERIAL PRIMARY KEY
 
 CREATE TABLE Nilai
     (
-     nilai_id VARCHAR(50) NOT NULL ,
+     nilai_id SERIAL PRIMARY KEY , -- Diubah menjadi SERIAL PRIMARY KEY
      nilai BIGINT NOT NULL ,
      jenis_nilai VARCHAR(50) NOT NULL ,
-     Matpel_mapel_id VARCHAR(50) NOT NULL ,
-     Rapor_rapor_id VARCHAR(50) NOT NULL
+     Matpel_mapel_id SERIAL NOT NULL , -- Diubah menjadi SERIAL
+     Rapor_rapor_id SERIAL NOT NULL -- Diubah menjadi SERIAL
     );
 
-ALTER TABLE Nilai ADD CONSTRAINT Nilai_PK PRIMARY KEY (nilai_id);
+-- ALTER TABLE Nilai ADD CONSTRAINT Nilai_PK PRIMARY KEY (nilai_id); -- Sudah termasuk dalam SERIAL PRIMARY KEY
 
 CREATE TABLE Pengumuman
     (
-     pengumuman_id VARCHAR(50) NOT NULL ,
+     pengumuman_id SERIAL PRIMARY KEY , -- Diubah menjadi SERIAL PRIMARY KEY
      pengumuman VARCHAR(255) NOT NULL ,
-     Users_user_id VARCHAR (7) NOT NULL -- Changed from User_user_id
+     Users_user_id VARCHAR (7) NOT NULL
     );
 
-ALTER TABLE Pengumuman ADD CONSTRAINT Pengumuman_PK PRIMARY KEY (pengumuman_id);
+-- ALTER TABLE Pengumuman ADD CONSTRAINT Pengumuman_PK PRIMARY KEY (pengumuman_id); -- Sudah termasuk dalam SERIAL PRIMARY KEY
 
 CREATE TABLE Rapor
     (
-     rapor_id VARCHAR(50) NOT NULL ,
-     Users_user_id VARCHAR (7) NOT NULL , -- Changed from User_user_id
-     Semester_semester_id VARCHAR(50) NOT NULL
+     rapor_id SERIAL PRIMARY KEY , -- Diubah menjadi SERIAL PRIMARY KEY
+     Users_user_id VARCHAR (7) NOT NULL ,
+     Semester_semester_id SERIAL NOT NULL -- Diubah menjadi SERIAL
     );
 
-ALTER TABLE Rapor ADD CONSTRAINT Rapor_PK PRIMARY KEY (rapor_id);
+-- ALTER TABLE Rapor ADD CONSTRAINT Rapor_PK PRIMARY KEY (rapor_id); -- Sudah termasuk dalam SERIAL PRIMARY KEY
 
 CREATE TABLE Role
     (
-     role_id VARCHAR(1) NOT NULL ,
+     role_id VARCHAR(1) NOT NULL , -- Tetap VARCHAR
      role_name VARCHAR(50) NOT NULL
     );
 
@@ -116,44 +116,44 @@ ALTER TABLE Role ADD CONSTRAINT Role_PK PRIMARY KEY (role_id);
 
 CREATE TABLE Semester
     (
-     semester_id VARCHAR(50) NOT NULL ,
+     semester_id SERIAL PRIMARY KEY , -- Diubah menjadi SERIAL PRIMARY KEY
      tahun_ajaran VARCHAR(20) NOT NULL ,
      semester VARCHAR(20) NOT NULL ,
      tahun TIMESTAMP NOT NULL
     );
 
-ALTER TABLE Semester ADD CONSTRAINT Semester_PK PRIMARY KEY (semester_id);
+-- ALTER TABLE Semester ADD CONSTRAINT Semester_PK PRIMARY KEY (semester_id); -- Sudah termasuk dalam SERIAL PRIMARY KEY
 
 CREATE TABLE Tugas
     (
-     tugas_id VARCHAR(50) NOT NULL ,
+     tugas_id SERIAL PRIMARY KEY , -- Diubah menjadi SERIAL PRIMARY KEY
      keterangan VARCHAR(255) NOT NULL ,
      deadline TIMESTAMP NOT NULL ,
      tanggal_direlease TIMESTAMP NOT NULL ,
-     Kelas_Users_user_id VARCHAR (7) NOT NULL , -- Changed from Kelas_User_user_id
-     Matpel_mapel_id VARCHAR(50) NOT NULL ,
-     Kelas_kelas_id VARCHAR(50) NOT NULL
+     Kelas_Users_user_id VARCHAR (7) NOT NULL ,
+     Matpel_mapel_id SERIAL NOT NULL , -- Diubah menjadi SERIAL
+     Kelas_kelas_id SERIAL NOT NULL -- Diubah menjadi SERIAL
     );
 
-ALTER TABLE Tugas ADD CONSTRAINT Tugas_PK PRIMARY KEY (tugas_id);
+-- ALTER TABLE Tugas ADD CONSTRAINT Tugas_PK PRIMARY KEY (tugas_id); -- Sudah termasuk dalam SERIAL PRIMARY KEY
 
 CREATE TABLE Ujian
     (
-     ujian_id VARCHAR(50) NOT NULL ,
+     ujian_id SERIAL PRIMARY KEY , -- Diubah menjadi SERIAL PRIMARY KEY
      jenis_ujian VARCHAR(50) NOT NULL ,
      tanggal TIMESTAMP NOT NULL ,
-     Kelas_Users_user_id VARCHAR (7) NOT NULL , -- Changed from Kelas_User_user_id
-     Matpel_mapel_id VARCHAR(50) NOT NULL ,
-     Kelas_kelas_id VARCHAR(50) NOT NULL
+     Kelas_Users_user_id VARCHAR (7) NOT NULL ,
+     Matpel_mapel_id SERIAL NOT NULL , -- Diubah menjadi SERIAL
+     Kelas_kelas_id SERIAL NOT NULL -- Diubah menjadi SERIAL
     );
 
-ALTER TABLE Ujian ADD CONSTRAINT Ujian_PK PRIMARY KEY (ujian_id);
+-- ALTER TABLE Ujian ADD CONSTRAINT Ujian_PK PRIMARY KEY (ujian_id); -- Sudah termasuk dalam SERIAL PRIMARY KEY
 
-CREATE TABLE Users -- Renamed from "User" and removed quotes
+CREATE TABLE Users
     (
-     user_id VARCHAR (7) NOT NULL ,
+     user_id VARCHAR (7) NOT NULL , -- Tetap VARCHAR
      username VARCHAR(100) NOT NULL ,
-     password VARCHAR(100) NOT NULL ,
+     password VARCHAR(200) NOT NULL ,
      NIS_NIP VARCHAR(50) NOT NULL ,
      nama VARCHAR(100) NOT NULL ,
      gender VARCHAR(10) NOT NULL ,
@@ -163,18 +163,18 @@ CREATE TABLE Users -- Renamed from "User" and removed quotes
      Role_role_id VARCHAR(50) NOT NULL
     );
 
-ALTER TABLE Users ADD CONSTRAINT Users_PK PRIMARY KEY (user_id); -- Changed from User_PK
+ALTER TABLE Users ADD CONSTRAINT Users_PK PRIMARY KEY (user_id);
 
 CREATE TABLE User_Log
     (
-     userlog_id VARCHAR(50) NOT NULL ,
+     userlog_id SERIAL PRIMARY KEY , -- Diubah menjadi SERIAL PRIMARY KEY
      jenis VARCHAR(50) NOT NULL ,
      keterangan VARCHAR(255) NOT NULL ,
      waktu TIMESTAMP NOT NULL ,
-     Users_user_id VARCHAR (7) NOT NULL -- Changed from User_user_id
+     Users_user_id VARCHAR (7) NOT NULL
     );
 
-ALTER TABLE User_Log ADD CONSTRAINT User_Log_PK PRIMARY KEY (userlog_id);
+-- ALTER TABLE User_Log ADD CONSTRAINT User_Log_PK PRIMARY KEY (userlog_id); -- Sudah termasuk dalam SERIAL PRIMARY KEY
 
 ALTER TABLE Absensi
     ADD CONSTRAINT Absensi_Jadwal_FK FOREIGN KEY
@@ -189,11 +189,11 @@ ALTER TABLE Absensi
     ON UPDATE NO ACTION;
 
 ALTER TABLE Absensi
-    ADD CONSTRAINT Absensi_Users_FK FOREIGN KEY -- Changed from Absensi_User_FK
+    ADD CONSTRAINT Absensi_Users_FK FOREIGN KEY
     (
-     Users_user_id -- Changed from User_user_id
+     Users_user_id
     )
-    REFERENCES Users -- Changed from "User"
+    REFERENCES Users
     (
      user_id
     )
@@ -203,12 +203,12 @@ ALTER TABLE Absensi
 ALTER TABLE Detail_Pengajar
     ADD CONSTRAINT Detail_Pengajar_Kelas_FK FOREIGN KEY
     (
-     Kelas_Users_user_id, -- Changed from Kelas_User_user_id
+     Kelas_Users_user_id,
      Kelas_kelas_id
     )
     REFERENCES Kelas
     (
-     Users_user_id , -- Changed from User_user_id
+     Users_user_id ,
      kelas_id
     )
     ON DELETE NO ACTION
@@ -227,11 +227,11 @@ ALTER TABLE Detail_Pengajar
     ON UPDATE NO ACTION;
 
 ALTER TABLE Detail_Pengajar
-    ADD CONSTRAINT Detail_Pengajar_Users_FK FOREIGN KEY -- Changed from Detail_Pengajar_User_FK
+    ADD CONSTRAINT Detail_Pengajar_Users_FK FOREIGN KEY
     (
-     Users_user_id -- Changed from User_user_id
+     Users_user_id
     )
-    REFERENCES Users -- Changed from "User"
+    REFERENCES Users
     (
      user_id
     )
@@ -239,11 +239,11 @@ ALTER TABLE Detail_Pengajar
     ON UPDATE NO ACTION;
 
 ALTER TABLE Feedback
-    ADD CONSTRAINT Feedback_Users_FK FOREIGN KEY -- Changed from Feedback_User_FK
+    ADD CONSTRAINT Feedback_Users_FK FOREIGN KEY
     (
-     Users_user_id -- Changed from User_user_id
+     Users_user_id
     )
-    REFERENCES Users -- Changed from "User"
+    REFERENCES Users
     (
      user_id
     )
@@ -253,12 +253,12 @@ ALTER TABLE Feedback
 ALTER TABLE Jadwal
     ADD CONSTRAINT Jadwal_Kelas_FK FOREIGN KEY
     (
-     Kelas_Users_user_id, -- Changed from Kelas_User_user_id
+     Kelas_Users_user_id,
      Kelas_kelas_id
     )
     REFERENCES Kelas
     (
-     Users_user_id , -- Changed from User_user_id
+     Users_user_id ,
      kelas_id
     )
     ON DELETE NO ACTION
@@ -289,11 +289,11 @@ ALTER TABLE Kelas
     ON UPDATE NO ACTION;
 
 ALTER TABLE Kelas
-    ADD CONSTRAINT Kelas_Users_FK FOREIGN KEY -- Changed from Kelas_User_FK
+    ADD CONSTRAINT Kelas_Users_FK FOREIGN KEY
     (
-     Users_user_id -- Changed from User_user_id
+     Users_user_id
     )
-    REFERENCES Users -- Changed from "User"
+    REFERENCES Users
     (
      user_id
     )
@@ -303,12 +303,12 @@ ALTER TABLE Kelas
 ALTER TABLE Materi
     ADD CONSTRAINT Materi_Kelas_FK FOREIGN KEY
     (
-     Kelas_Users_user_id, -- Changed from Kelas_User_user_id
+     Kelas_Users_user_id,
      Kelas_kelas_id
     )
     REFERENCES Kelas
     (
-     Users_user_id , -- Changed from User_user_id
+     Users_user_id ,
      kelas_id
     )
     ON DELETE NO ACTION
@@ -351,11 +351,11 @@ ALTER TABLE Nilai
     ON UPDATE NO ACTION;
 
 ALTER TABLE Pengumuman
-    ADD CONSTRAINT Pengumuman_Users_FK FOREIGN KEY -- Changed from Pengumuman_User_FK
+    ADD CONSTRAINT Pengumuman_Users_FK FOREIGN KEY
     (
-     Users_user_id -- Changed from User_user_id
+     Users_user_id
     )
-    REFERENCES Users -- Changed from "User"
+    REFERENCES Users
     (
      user_id
     )
@@ -375,11 +375,11 @@ ALTER TABLE Rapor
     ON UPDATE NO ACTION;
 
 ALTER TABLE Rapor
-    ADD CONSTRAINT Rapor_Users_FK FOREIGN KEY -- Changed from Rapor_User_FK
+    ADD CONSTRAINT Rapor_Users_FK FOREIGN KEY
     (
-     Users_user_id -- Changed from User_user_id
+     Users_user_id
     )
-    REFERENCES Users -- Changed from "User"
+    REFERENCES Users
     (
      user_id
     )
@@ -389,12 +389,12 @@ ALTER TABLE Rapor
 ALTER TABLE Tugas
     ADD CONSTRAINT Tugas_Kelas_FK FOREIGN KEY
     (
-     Kelas_Users_user_id, -- Changed from Kelas_User_user_id
+     Kelas_Users_user_id,
      Kelas_kelas_id
     )
     REFERENCES Kelas
     (
-     Users_user_id , -- Changed from User_user_id
+     Users_user_id ,
      kelas_id
     )
     ON DELETE NO ACTION
@@ -415,12 +415,12 @@ ALTER TABLE Tugas
 ALTER TABLE Ujian
     ADD CONSTRAINT Ujian_Kelas_FK FOREIGN KEY
     (
-     Kelas_Users_user_id, -- Changed from Kelas_User_user_id
+     Kelas_Users_user_id,
      Kelas_kelas_id
     )
     REFERENCES Kelas
     (
-     Users_user_id , -- Changed from User_user_id
+     Users_user_id ,
      kelas_id
     )
     ON DELETE NO ACTION
@@ -439,19 +439,19 @@ ALTER TABLE Ujian
     ON UPDATE NO ACTION;
 
 ALTER TABLE User_Log
-    ADD CONSTRAINT User_Log_Users_FK FOREIGN KEY -- Changed from User_Log_User_FK
+    ADD CONSTRAINT User_Log_Users_FK FOREIGN KEY
     (
-     Users_user_id -- Changed from User_user_id
+     Users_user_id
     )
-    REFERENCES Users -- Changed from "User"
+    REFERENCES Users
     (
      user_id
     )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION;
 
-ALTER TABLE Users -- Changed from "User"
-    ADD CONSTRAINT Users_Role_FK FOREIGN KEY -- Changed from User_Role_FK
+ALTER TABLE Users
+    ADD CONSTRAINT Users_Role_FK FOREIGN KEY
     (
      Role_role_id
     )
