@@ -1,14 +1,155 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<?import java.lang.*?>
-<?import java.util.*?>
-<?import javafx.scene.*?>
-<?import javafx.scene.control.*?>
-<?import javafx.scene.layout.*?>
+<?import javafx.geometry.Insets?>
+<?import javafx.scene.control.Button?>
+<?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.Label?>
+<?import javafx.scene.control.Tab?>
+<?import javafx.scene.control.TabPane?>
+<?import javafx.scene.control.TableColumn?>
+<?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextField?>
+<?import javafx.scene.layout.AnchorPane?>
+<?import javafx.scene.layout.ColumnConstraints?>
+<?import javafx.scene.layout.GridPane?>
+<?import javafx.scene.layout.HBox?>
+<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.VBox?>
+<?import javafx.scene.text.Font?>
 
-<AnchorPane xmlns="http://javafx.com/javafx"
-            xmlns:fx="http://javafx.com/fxml"
-            fx:controller="org.example.projectbdpbogacor.Guru.GurudsController"
-            prefHeight="400.0" prefWidth="600.0">
-
+<AnchorPane prefHeight="600.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.projectbdpbogacor.Guru.GurudsController">
+    <children>
+        <TabPane fx:id="guruTabPane" prefHeight="600.0" prefWidth="1300.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <tabs>
+                <Tab text="Dashboard">
+                    <content>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                            <children>
+                                <VBox alignment="CENTER" layoutX="492.0" layoutY="184.0" prefHeight="200.0" prefWidth="315.0" spacing="20.0">
+                                    <children>
+                                        <Label text="Welcome, Guru!">
+                                            <font>
+                                                <Font name="System Bold" size="24.0" />
+                                            </font>
+                                        </Label>
+                                        <Label fx:id="welcomeUserLabel" text="[Guru Name]">
+                                            <font>
+                                                <Font size="18.0" />
+                                            </font>
+                                        </Label>
+                                        <Button mnemonicParsing="false" onAction="#handleLogout" text="Logout" />
+                                    </children>
+                                </VBox>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
+                <Tab text="Class Schedule">
+                    <content>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                            <children>
+                                <VBox alignment="TOP_CENTER" layoutX="14.0" layoutY="14.0" prefHeight="552.0" prefWidth="1268.0" spacing="10.0">
+                                    <children>
+                                        <Label text="My Class Schedule">
+                                            <font>
+                                                <Font name="System Bold" size="20.0" />
+                                            </font>
+                                        </Label>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" spacing="10.0">
+                                            <children>
+                                                <Label text="Select Class:" />
+                                                <ChoiceBox fx:id="scheduleClassChoiceBox" onAction="#loadJadwalKelas" prefWidth="200.0" />
+                                                <Label text="Select Subject:" />
+                                                <ChoiceBox fx:id="scheduleSubjectChoiceBox" onAction="#loadJadwalKelas" prefWidth="200.0" />
+                                                <Button mnemonicParsing="false" onAction="#loadJadwalKelas" text="Refresh" />
+                                            </children>
+                                            <padding>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                            </padding>
+                                        </HBox>
+                                        <TableView fx:id="jadwalKelasTable" prefHeight="480.0" prefWidth="1268.0">
+                                            <columns>
+                                                <TableColumn fx:id="hariColumn" prefWidth="100.0" text="Hari" />
+                                                <TableColumn fx:id="jamMulaiColumn" prefWidth="120.0" text="Jam Mulai" />
+                                                <TableColumn fx:id="jamSelesaiColumn" prefWidth="120.0" text="Jam Selesai" />
+                                                <TableColumn fx:id="namaMapelColumn" prefWidth="300.0" text="Mata Pelajaran" />
+                                                <TableColumn fx:id="namaKelasJadwalColumn" prefWidth="300.0" text="Kelas" />
+                                            </columns>
+                                        </TableView>
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </padding>
+                                </VBox>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
+                <Tab text="Input Grades">
+                    <content>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                            <children>
+                                <VBox alignment="TOP_CENTER" layoutX="14.0" layoutY="14.0" prefHeight="552.0" prefWidth="1268.0" spacing="10.0">
+                                    <children>
+                                        <Label text="Input Student Grades">
+                                            <font>
+                                                <Font name="System Bold" size="20.0" />
+                                            </font>
+                                        </Label>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" spacing="10.0">
+                                            <children>
+                                                <Label text="Select Class:" />
+                                                <ChoiceBox fx:id="gradeClassChoiceBox" onAction="#handleGradeClassSelection" prefWidth="200.0" />
+                                                <Label text="Select Subject:" />
+                                                <ChoiceBox fx:id="gradeSubjectChoiceBox" onAction="#handleGradeSubjectSelection" prefWidth="200.0" />
+                                                <Label text="Select Student:" />
+                                                <ChoiceBox fx:id="gradeStudentChoiceBox" prefWidth="200.0" />
+                                                <Label text="Select Semester:" />
+                                                <ChoiceBox fx:id="gradeSemesterChoiceBox" prefWidth="200.0" />
+                                            </children>
+                                            <padding>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                            </padding>
+                                        </HBox>
+                                        <GridPane hgap="10.0" vgap="10.0">
+                                            <columnConstraints>
+                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="200.0" minWidth="10.0" prefWidth="120.0" />
+                                                <ColumnConstraints hgrow="SOMETIMES" maxWidth="350.0" minWidth="10.0" prefWidth="300.0" />
+                                            </columnConstraints>
+                                            <rowConstraints>
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
+                                            </rowConstraints>
+                                            <children>
+                                                <Label text="Grade Type:" />
+                                                <Label text="Score:" GridPane.rowIndex="1" />
+                                                <TextField fx:id="gradeTypeField" promptText="e.g., UTS, UAS, Harian" GridPane.columnIndex="1" />
+                                                <TextField fx:id="scoreField" promptText="0-100" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                            </children>
+                                            <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                            </padding>
+                                        </GridPane>
+                                        <Button mnemonicParsing="false" onAction="#handleSubmitGrade" text="Submit Grade" />
+                                        <Label style="-fx-font-weight: bold;" text="Existing Grades (for selected student/subject/semester):" />
+                                        <TableView fx:id="existingGradesTable" prefHeight="250.0" prefWidth="1268.0">
+                                            <columns>
+                                                <TableColumn fx:id="existingJenisNilaiColumn" prefWidth="200.0" text="Jenis Nilai" />
+                                                <TableColumn fx:id="existingNamaMapelColumn" prefWidth="400.0" text="Mata Pelajaran" />
+                                                <TableColumn fx:id="existingNilaiColumn" prefWidth="200.0" text="Nilai" />
+                                            </columns>
+                                        </TableView>
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </padding>
+                                </VBox>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
+            </tabs>
+        </TabPane>
+    </children>
 </AnchorPane>

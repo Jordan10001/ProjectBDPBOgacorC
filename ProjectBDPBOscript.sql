@@ -4,6 +4,9 @@
 --   type:      SQL Server 2012
 
 -- Disesuaikan untuk PostgreSQL
+--Tabahan fitur
+
+
 
 CREATE TABLE Absensi
     (
@@ -175,6 +178,17 @@ CREATE TABLE User_Log
     );
 
 -- ALTER TABLE User_Log ADD CONSTRAINT User_Log_PK PRIMARY KEY (userlog_id); -- Sudah termasuk dalam SERIAL PRIMARY KEY
+
+-- NEW TABLE: Student_Class_Enrollment
+CREATE TABLE Student_Class_Enrollment
+    (
+     Users_user_id VARCHAR (7) NOT NULL ,
+     Kelas_kelas_id SERIAL NOT NULL ,
+     Kelas_Users_user_id VARCHAR (7) NOT NULL
+    );
+
+ALTER TABLE Student_Class_Enrollment ADD CONSTRAINT Student_Class_Enrollment_PK PRIMARY KEY (Users_user_id, Kelas_kelas_id, Kelas_Users_user_id);
+
 
 ALTER TABLE Absensi
     ADD CONSTRAINT Absensi_Jadwal_FK FOREIGN KEY
@@ -461,3 +475,67 @@ ALTER TABLE Users
     )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION;
+
+-- Foreign Keys for Student_Class_Enrollment
+ALTER TABLE Student_Class_Enrollment
+    ADD CONSTRAINT Student_Class_Enrollment_Users_FK FOREIGN KEY
+    (
+     Users_user_id
+    )
+    REFERENCES Users
+    (
+     user_id
+    )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE;
+
+ALTER TABLE Student_Class_Enrollment
+    ADD CONSTRAINT Student_Class_Enrollment_Kelas_FK FOREIGN KEY
+    (
+     Kelas_Users_user_id,
+     Kelas_kelas_id
+    )
+    REFERENCES Kelas
+    (
+     Users_user_id ,
+     kelas_id
+    )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE;
+
+-- NEW TABLE: Student_Class_Enrollment
+CREATE TABLE Student_Class_Enrollment
+    (
+     Users_user_id VARCHAR (7) NOT NULL ,
+     Kelas_kelas_id SERIAL NOT NULL ,
+     Kelas_Users_user_id VARCHAR (7) NOT NULL
+    );
+
+ALTER TABLE Student_Class_Enrollment ADD CONSTRAINT Student_Class_Enrollment_PK PRIMARY KEY (Users_user_id, Kelas_kelas_id, Kelas_Users_user_id);
+
+-- Foreign Keys for Student_Class_Enrollment
+ALTER TABLE Student_Class_Enrollment
+    ADD CONSTRAINT Student_Class_Enrollment_Users_FK FOREIGN KEY
+    (
+     Users_user_id
+    )
+    REFERENCES Users
+    (
+     user_id
+    )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE;
+
+ALTER TABLE Student_Class_Enrollment
+    ADD CONSTRAINT Student_Class_Enrollment_Kelas_FK FOREIGN KEY
+    (
+     Kelas_Users_user_id,
+     Kelas_kelas_id
+    )
+    REFERENCES Kelas
+    (
+     Users_user_id ,
+     kelas_id
+    )
+    ON DELETE CASCADE
+    ON UPDATE CASCADE;

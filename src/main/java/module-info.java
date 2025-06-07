@@ -1,3 +1,4 @@
+// ProjectBDPBOgacor/src/main/java/module-info.java
 module org.example.projectbdpbogacor {
     requires javafx.controls;
     requires javafx.fxml;
@@ -10,9 +11,10 @@ module org.example.projectbdpbogacor {
     opens org.example.projectbdpbogacor.Guru to javafx.fxml;
     opens org.example.projectbdpbogacor.Wali to javafx.fxml;
     opens org.example.projectbdpbogacor.Siswa to javafx.fxml;
+    opens org.example.projectbdpbogacor.model to javafx.base; // Make sure this line exists
 
     exports org.example.projectbdpbogacor;
-    exports org.example.projectbdpbogacor.Admin; // Export if you have classes in these packages that need to be accessed
+    exports org.example.projectbdpbogacor.Admin;
     exports org.example.projectbdpbogacor.Kepala;
     exports org.example.projectbdpbogacor.Guru;
     exports org.example.projectbdpbogacor.Wali;
