@@ -16,13 +16,24 @@
     -fx-padding: 8px 15px;
 }
 
-.text-field {
-    -fx-background-color: #444444;
+#usernameField {
+    -fx-background-color: #3a3a3a;
     -fx-text-fill: #e0e0e0;
-    -fx-border-color: #666666;
-    -fx-border-radius: 3px;
+
+
 }
 
+#passwordField {
+    -fx-background-color: #3a3a3a;
+    -fx-text-fill: #e0e0e0;
+
+}
+
+#selectRole {
+    -fx-background-color: #3a3a3a;
+    -fx-text-fill: #e0e0e0;
+
+}
 /* Styles specifically for the login-view.fxml elements in dark mode */
 #loginPane {
     -fx-background-color: #3a3a3a;
@@ -37,3 +48,6 @@
     -fx-font-weight: bold;
     -fx-text-fill: #f0f0f0;
 }
+
+
+

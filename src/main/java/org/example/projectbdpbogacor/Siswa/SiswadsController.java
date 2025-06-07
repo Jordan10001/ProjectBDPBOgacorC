@@ -19,12 +19,14 @@ import org.example.projectbdpbogacor.model.MateriEntry;
 import org.example.projectbdpbogacor.model.NilaiEntry;
 import org.example.projectbdpbogacor.model.TugasEntry;
 import org.example.projectbdpbogacor.model.UjianEntry;
+import org.example.projectbdpbogacor.model.PengumumanEntry; // Import the new model
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Timestamp; // Import Timestamp
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 
@@ -138,7 +140,11 @@ public class SiswadsController {
 
     // Announcements
     @FXML
-    private TextArea announcementDisplayArea;
+    private TableView<PengumumanEntry> announcementTable; // Changed to TableView
+    @FXML
+    private TableColumn<PengumumanEntry, String> announcementWaktuColumn; // New column for time
+    @FXML
+    private TableColumn<PengumumanEntry, String> announcementContentColumn; // Column for content
 
     private String loggedInUserId;
 
@@ -154,6 +160,7 @@ public class SiswadsController {
         initMateriTable();
         initUjianTable();
         initAbsensiTable();
+        initAnnouncementTable(); // Initialize new announcement table
 
         // Load data when tabs are selected
         siswaTabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
@@ -239,26 +246,11 @@ public class SiswadsController {
 
     private void loadJadwalKelas() {
         ObservableList<JadwalEntry> jadwalList = FXCollections.observableArrayList();
-        // Assuming there's a Student_Class_Enrollment table to link students to classes
-        // Or that a student's class can be determined by their user_id in the Kelas table (less likely for students)
-        // For simplicity, let's assume a student is linked to a class via a hypothetical enrollment table
-        // For now, I'll provide a generic query that assumes student's class_id is known or can be found.
-        // A more robust solution would involve a join with a dedicated student-class enrollment table.
-
-        // SQL query to get the class_id(s) for the loggedInUserId (Siswa)
-        // THIS IS A CRITICAL ASSUMPTION: You need a way to link students to their classes.
-        // If your database has a 'Student_Class_Enrollment' table, use it.
-        // For example:
-        // SELECT ske.Kelas_Users_user_id, ske.Kelas_kelas_id FROM Student_Class_Enrollment ske WHERE ske.Users_user_id = ?
-        // If there's no such table, you might need to add it or define how students are assigned to classes.
-        // For the example, I'm assuming a direct link or that all classes are shown (which is not ideal).
-        // I will use a simplified query that might need adjustment based on your actual student-class assignment logic.
-
         String sql = "SELECT j.hari, j.jam_mulai, j.jam_selsai, m.nama_mapel, k.nama_kelas, u.nama AS nama_pengajar " +
                 "FROM Jadwal j " +
                 "JOIN Matpel m ON j.Matpel_mapel_id = m.mapel_id " +
                 "JOIN Kelas k ON j.Kelas_Users_user_id = k.Users_user_id AND j.Kelas_kelas_id = k.kelas_id " +
-                "JOIN Users u ON k.Users_user_id = u.user_id " + // Joining with Users to get teacher's name
+                "JOIN Users u ON k.Users_user_id = u.user_id " +
                 "WHERE EXISTS (SELECT 1 FROM Student_Class_Enrollment sce WHERE sce.Users_user_id = ? AND sce.Kelas_kelas_id = k.kelas_id AND sce.Kelas_Users_user_id = k.Users_user_id)";
 
         try (Connection con = DBS.getConnection();
@@ -476,28 +468,35 @@ public class SiswadsController {
     }
 
     // --- Announcements Methods ---
+    private void initAnnouncementTable() {
+        announcementWaktuColumn.setCellValueFactory(new PropertyValueFactory<>("waktu"));
+        announcementContentColumn.setCellValueFactory(new PropertyValueFactory<>("pengumuman"));
+    }
+
     private void loadAnnouncements() {
-        StringBuilder announcements = new StringBuilder();
+        ObservableList<PengumumanEntry> announcementList = FXCollections.observableArrayList();
         String sql = "SELECT pengumuman, waktu FROM Pengumuman ORDER BY waktu DESC"; // Order by time to show newest first
         try (Connection con = DBS.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
-            if (!rs.isBeforeFirst()) { // Check if there are any rows
-                announcements.append("Tidak ada pengumuman saat ini.");
-            } else {
-                while (rs.next()) {
-                    // Format the timestamp to a more readable string
-                    String waktu = rs.getTimestamp("waktu").toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-                    announcements.append("Tanggal: ").append(waktu).append("\n");
-                    announcements.append("Pengumuman: ").append(rs.getString("pengumuman")).append("\n");
-                    announcements.append("------------------------------------\n");
+            while (rs.next()) {
+                Timestamp timestamp = rs.getTimestamp("waktu");
+                String waktuFormatted;
+                if (timestamp != null) {
+                    waktuFormatted = timestamp.toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+                } else {
+                    waktuFormatted = "N/A"; // Or any other placeholder for null timestamps
                 }
+
+                announcementList.add(new PengumumanEntry(
+                        waktuFormatted,
+                        rs.getString("pengumuman")
+                ));
             }
-            announcementDisplayArea.setText(announcements.toString());
+            announcementTable.setItems(announcementList);
         } catch (SQLException e) {
             AlertClass.ErrorAlert("Database Error", "Failed to load announcements", e.getMessage());
             e.printStackTrace();
-            announcementDisplayArea.setText("Gagal memuat pengumuman.");
         }
     }
 

@@ -15,31 +15,12 @@
 
 <AnchorPane prefHeight="600.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.projectbdpbogacor.Wali.WalidsController">
     <children>
-        <TabPane fx:id="waliTabPane" prefHeight="600.0" prefWidth="1300.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <tabs>
-                <Tab text="Dashboard">
-                    <content>
-                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                            <children>
-                                <VBox alignment="CENTER" layoutX="492.0" layoutY="184.0" prefHeight="200.0" prefWidth="315.0" spacing="20.0">
-                                    <children>
-                                        <Label text="Welcome, Wali Kelas!">
-                                            <font>
-                                                <Font name="System Bold" size="24.0" />
-                                            </font>
-                                        </Label>
-                                        <Label fx:id="welcomeUserLabel" text="[Wali Kelas Name]">
-                                            <font>
-                                                <Font size="18.0" />
-                                            </font>
-                                        </Label>
-                                        <Button mnemonicParsing="false" onAction="#handleLogout" text="Logout" />
-                                    </children>
-                                </VBox>
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
+        <VBox alignment="TOP_CENTER" prefHeight="700.0" prefWidth="1300.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <Label fx:id="welcomeUserLabel" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Welcome, Admin!" />
+            <TabPane fx:id="waliTabPane" prefHeight="570.0" style="-fx-background-color: #8cff00; -fx-background-radius: 15px; -fx-border-radius: 15px;" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
                 <Tab text="Student Attendance">
                     <content>
                         <AnchorPane prefHeight="200.0" prefWidth="200.0">
@@ -124,7 +105,10 @@
                         </AnchorPane>
                     </content>
                 </Tab>
-            </tabs>
-        </TabPane>
+            </TabPane>
+            <Button onAction="#handleLogout" text="Logout" />
+        </VBox>
     </children>
 </AnchorPane>
+
+

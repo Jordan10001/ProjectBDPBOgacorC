@@ -18,31 +18,12 @@
 <?import javafx.scene.layout.RowConstraints?>
 <AnchorPane prefHeight="600.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.projectbdpbogacor.Siswa.SiswadsController">
     <children>
-        <TabPane fx:id="siswaTabPane" prefHeight="600.0" prefWidth="1300.0" tabClosingPolicy="UNAVAILABLE" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <tabs>
-                <Tab text="Dashboard">
-                    <content>
-                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                            <children>
-                                <VBox alignment="CENTER" layoutX="492.0" layoutY="184.0" prefHeight="200.0" prefWidth="315.0" spacing="20.0">
-                                    <children>
-                                        <Label text="Welcome, Siswa!">
-                                            <font>
-                                                <Font name="System Bold" size="24.0" />
-                                            </font>
-                                        </Label>
-                                        <Label fx:id="welcomeUserLabel" text="[Student Name]">
-                                            <font>
-                                                <Font size="18.0" />
-                                            </font>
-                                        </Label>
-                                        <Button mnemonicParsing="false" onAction="#handleLogout" text="Logout" />
-                                    </children>
-                                </VBox>
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
+        <VBox alignment="TOP_CENTER" prefHeight="700.0" prefWidth="1300.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
+            <padding>
+                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
+            </padding>
+            <Label fx:id="welcomeUserLabel" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Welcome, Admin!" />
+            <TabPane fx:id="siswaTabPane" prefHeight="570.0" style="-fx-background-color: #8cff00; -fx-background-radius: 15px; -fx-border-radius: 15px;" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
                 <Tab text="Biodata">
                     <content>
                         <AnchorPane prefHeight="200.0" prefWidth="200.0">
@@ -248,13 +229,21 @@
                 <Tab text="Pengumuman">
                     <content>
                         <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                            <children>
-                                <TextArea fx:id="announcementDisplayArea" editable="false" layoutX="100.0" layoutY="50.0" prefHeight="400.0" prefWidth="800.0" AnchorPane.bottomAnchor="20.0" AnchorPane.leftAnchor="20.0" AnchorPane.rightAnchor="20.0" AnchorPane.topAnchor="20.0" styleClass="text-field" />
-                            </children>
+                            <TableView fx:id="announcementTable" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                                <columns>
+                                    <TableColumn fx:id="announcementWaktuColumn" prefWidth="150.0" text="Waktu" />
+                                    <TableColumn fx:id="announcementContentColumn" prefWidth="600.0" text="Isi Pengumuman" />
+                                </columns>
+                                <columnResizePolicy>
+                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                </columnResizePolicy>
+                            </TableView>
                         </AnchorPane>
                     </content>
                 </Tab>
-            </tabs>
-        </TabPane>
+            </TabPane>
+            <Button onAction="#handleLogout" text="Logout" />
+        </VBox>
     </children>
 </AnchorPane>
+
