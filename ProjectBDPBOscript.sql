@@ -7,189 +7,174 @@
 
 CREATE TABLE Absensi
     (
-     absensi_id VARCHAR(50) NOT NULL , -- Menambahkan panjang, asumsi ID tidak terlalu panjang
-     tanggal TIMESTAMP NOT NULL ,       -- Mengganti DATETIME menjadi TIMESTAMP
-     status VARCHAR(50) NOT NULL ,     -- Menambahkan panjang
-     User_user_id VARCHAR (7) NOT NULL ,
-     Jadwal_jadwal_id VARCHAR(50) NOT NULL -- Menambahkan panjang
+     absensi_id VARCHAR(50) NOT NULL ,
+     tanggal TIMESTAMP NOT NULL ,
+     status VARCHAR(50) NOT NULL ,
+     Users_user_id VARCHAR (7) NOT NULL , -- Changed from User_user_id
+     Jadwal_jadwal_id VARCHAR(50) NOT NULL
     );
 
 ALTER TABLE Absensi ADD CONSTRAINT Absensi_PK PRIMARY KEY (absensi_id);
--- Menghapus CLUSTERED dan klausa WITH (ALLOW_PAGE_LOCKS = ON, ALLOW_ROW_LOCKS = ON)
 
 CREATE TABLE Detail_Pengajar
     (
-     User_user_id VARCHAR (7) NOT NULL ,
-     Kelas_User_user_id VARCHAR (7) NOT NULL ,
-     Matpel_mapel_id VARCHAR(50) NOT NULL , -- Menambahkan panjang
+     Users_user_id VARCHAR (7) NOT NULL , -- Changed from User_user_id
+     Kelas_Users_user_id VARCHAR (7) NOT NULL , -- Changed from Kelas_User_user_id
+     Matpel_mapel_id VARCHAR(50) NOT NULL ,
      Kelas_kelas_id VARCHAR(50) NOT NULL
     );
 
 CREATE TABLE Feedback
     (
-     feedback_id VARCHAR(50) NOT NULL , -- Menambahkan panjang
-     feedback VARCHAR(255) NOT NULL ,   -- Menambahkan panjang, asumsi feedback bisa panjang
-     User_user_id VARCHAR (7) NOT NULL
+     feedback_id VARCHAR(50) NOT NULL ,
+     feedback VARCHAR(255) NOT NULL ,
+     Users_user_id VARCHAR (7) NOT NULL -- Changed from User_user_id
     );
 
 ALTER TABLE Feedback ADD CONSTRAINT Feedback_PK PRIMARY KEY (feedback_id);
--- Menghapus CLUSTERED dan klausa WITH
 
 CREATE TABLE Jadwal
     (
-     jadwal_id VARCHAR(50) NOT NULL , -- Menambahkan panjang
-     hari VARCHAR(20) NOT NULL ,      -- Menambahkan panjang, asumsi nama hari
-     jam_mulai VARCHAR(10) NOT NULL , -- Menambahkan panjang, asumsi format jam (e.g., "08:00")
-     jam_selsai VARCHAR(10) NOT NULL , -- Menambahkan panjang
-     Kelas_User_user_id VARCHAR (7) NOT NULL ,
-     Matpel_mapel_id VARCHAR(50) NOT NULL , -- Menambahkan panjang
+     jadwal_id VARCHAR(50) NOT NULL ,
+     hari VARCHAR(20) NOT NULL ,
+     jam_mulai VARCHAR(10) NOT NULL ,
+     jam_selsai VARCHAR(10) NOT NULL ,
+     Kelas_Users_user_id VARCHAR (7) NOT NULL , -- Changed from Kelas_User_user_id
+     Matpel_mapel_id VARCHAR(50) NOT NULL ,
      Kelas_kelas_id VARCHAR(50) NOT NULL
     );
 
 ALTER TABLE Jadwal ADD CONSTRAINT Jadwal_PK PRIMARY KEY (jadwal_id);
--- Menghapus CLUSTERED dan klausa WITH
 
 CREATE TABLE Kelas
     (
-     kelas_id VARCHAR(50) NOT NULL , -- Menambahkan panjang
-     nama_kelas VARCHAR(100) NOT NULL , -- Menambahkan panjang
-     keterangan VARCHAR(255) NOT NULL , -- Menambahkan panjang
-     User_user_id VARCHAR (7) NOT NULL ,
-     Semester_semester_id VARCHAR(50) NOT NULL -- Menambahkan panjang
+     kelas_id VARCHAR(50) NOT NULL ,
+     nama_kelas VARCHAR(100) NOT NULL ,
+     keterangan VARCHAR(255) NOT NULL ,
+     Users_user_id VARCHAR (7) NOT NULL , -- Changed from User_user_id
+     Semester_semester_id VARCHAR(50) NOT NULL
     );
 
-ALTER TABLE Kelas ADD CONSTRAINT Kelas_PK PRIMARY KEY (User_user_id, kelas_id);
--- Menghapus CLUSTERED dan klausa WITH
+ALTER TABLE Kelas ADD CONSTRAINT Kelas_PK PRIMARY KEY (Users_user_id, kelas_id); -- Changed from User_user_id
 
 CREATE TABLE Materi
     (
-     materi_id VARCHAR(50) NOT NULL , -- Menambahkan panjang
-     nama_materi VARCHAR(255) NOT NULL , -- Menambahkan panjang
-     Kelas_User_user_id VARCHAR (7) NOT NULL ,
-     Matpel_mapel_id VARCHAR(50) NOT NULL , -- Menambahkan panjang
+     materi_id VARCHAR(50) NOT NULL ,
+     nama_materi VARCHAR(255) NOT NULL ,
+     Kelas_Users_user_id VARCHAR (7) NOT NULL , -- Changed from Kelas_User_user_id
+     Matpel_mapel_id VARCHAR(50) NOT NULL ,
      Kelas_kelas_id VARCHAR(50) NOT NULL
     );
 
 ALTER TABLE Materi ADD CONSTRAINT Materi_PK PRIMARY KEY (materi_id);
--- Menghapus CLUSTERED dan klausa WITH
 
 CREATE TABLE Matpel
     (
-     mapel_id VARCHAR(50) NOT NULL , -- Menambahkan panjang
-     nama_mapel VARCHAR(100) NOT NULL , -- Menambahkan panjang
+     mapel_id VARCHAR(50) NOT NULL ,
+     nama_mapel VARCHAR(100) NOT NULL ,
      category VARCHAR(50) NOT NULL
     );
 
 ALTER TABLE Matpel ADD CONSTRAINT Matpel_PK PRIMARY KEY (mapel_id);
--- Menghapus CLUSTERED dan klausa WITH
 
 CREATE TABLE Nilai
     (
-     nilai_id VARCHAR(50) NOT NULL , -- Menambahkan panjang
+     nilai_id VARCHAR(50) NOT NULL ,
      nilai BIGINT NOT NULL ,
-     jenis_nilai VARCHAR(50) NOT NULL , -- Menambahkan panjang
-     Matpel_mapel_id VARCHAR(50) NOT NULL , -- Menambahkan panjang
-     Rapor_rapor_id VARCHAR(50) NOT NULL -- Menambahkan panjang
+     jenis_nilai VARCHAR(50) NOT NULL ,
+     Matpel_mapel_id VARCHAR(50) NOT NULL ,
+     Rapor_rapor_id VARCHAR(50) NOT NULL
     );
 
 ALTER TABLE Nilai ADD CONSTRAINT Nilai_PK PRIMARY KEY (nilai_id);
--- Menghapus CLUSTERED dan klausa WITH
 
 CREATE TABLE Pengumuman
     (
-     pengumuman_id VARCHAR(50) NOT NULL , -- Menambahkan panjang
-     pengumuman VARCHAR(255) NOT NULL , -- Menambahkan panjang
-     User_user_id VARCHAR (7) NOT NULL
+     pengumuman_id VARCHAR(50) NOT NULL ,
+     pengumuman VARCHAR(255) NOT NULL ,
+     Users_user_id VARCHAR (7) NOT NULL -- Changed from User_user_id
     );
 
 ALTER TABLE Pengumuman ADD CONSTRAINT Pengumuman_PK PRIMARY KEY (pengumuman_id);
--- Menghapus CLUSTERED dan klausa WITH
 
 CREATE TABLE Rapor
     (
-     rapor_id VARCHAR(50) NOT NULL , -- Menambahkan panjang
-     User_user_id VARCHAR (7) NOT NULL ,
-     Semester_semester_id VARCHAR(50) NOT NULL -- Menambahkan panjang
+     rapor_id VARCHAR(50) NOT NULL ,
+     Users_user_id VARCHAR (7) NOT NULL , -- Changed from User_user_id
+     Semester_semester_id VARCHAR(50) NOT NULL
     );
 
 ALTER TABLE Rapor ADD CONSTRAINT Rapor_PK PRIMARY KEY (rapor_id);
--- Menghapus CLUSTERED dan klausa WITH
 
 CREATE TABLE Role
     (
-     role_id VARCHAR(50) NOT NULL , -- Menambahkan panjang
+     role_id VARCHAR(1) NOT NULL ,
      role_name VARCHAR(50) NOT NULL
     );
 
 ALTER TABLE Role ADD CONSTRAINT Role_PK PRIMARY KEY (role_id);
--- Menghapus CLUSTERED dan klausa WITH
 
 CREATE TABLE Semester
     (
-     semester_id VARCHAR(50) NOT NULL , -- Menambahkan panjang
-     tahun_ajaran VARCHAR(20) NOT NULL , -- Menambahkan panjang (e.g., "2024/2025")
-     semester VARCHAR(20) NOT NULL ,    -- Menambahkan panjang (e.g., "Ganjil", "Genap")
-     tahun TIMESTAMP NOT NULL           -- Mengganti DATETIME menjadi TIMESTAMP
+     semester_id VARCHAR(50) NOT NULL ,
+     tahun_ajaran VARCHAR(20) NOT NULL ,
+     semester VARCHAR(20) NOT NULL ,
+     tahun TIMESTAMP NOT NULL
     );
 
 ALTER TABLE Semester ADD CONSTRAINT Semester_PK PRIMARY KEY (semester_id);
--- Menghapus CLUSTERED dan klausa WITH
 
 CREATE TABLE Tugas
     (
-     tugas_id VARCHAR(50) NOT NULL , -- Menambahkan panjang
-     keterangan VARCHAR(255) NOT NULL , -- Menambahkan panjang
-     deadline TIMESTAMP NOT NULL ,      -- Mengganti DATETIME menjadi TIMESTAMP
-     tanggal_direlease TIMESTAMP NOT NULL , -- Mengganti DATETIME menjadi TIMESTAMP
-     Kelas_User_user_id VARCHAR (7) NOT NULL ,
-     Matpel_mapel_id VARCHAR(50) NOT NULL , -- Menambahkan panjang
+     tugas_id VARCHAR(50) NOT NULL ,
+     keterangan VARCHAR(255) NOT NULL ,
+     deadline TIMESTAMP NOT NULL ,
+     tanggal_direlease TIMESTAMP NOT NULL ,
+     Kelas_Users_user_id VARCHAR (7) NOT NULL , -- Changed from Kelas_User_user_id
+     Matpel_mapel_id VARCHAR(50) NOT NULL ,
      Kelas_kelas_id VARCHAR(50) NOT NULL
     );
 
 ALTER TABLE Tugas ADD CONSTRAINT Tugas_PK PRIMARY KEY (tugas_id);
--- Menghapus CLUSTERED dan klausa WITH
 
 CREATE TABLE Ujian
     (
-     ujian_id VARCHAR(50) NOT NULL , -- Menambahkan panjang
-     jenis_ujian VARCHAR(50) NOT NULL , -- Menambahkan panjang
-     tanggal TIMESTAMP NOT NULL ,       -- Mengganti DATETIME menjadi TIMESTAMP
-     Kelas_User_user_id VARCHAR (7) NOT NULL ,
-     Matpel_mapel_id VARCHAR(50) NOT NULL , -- Menambahkan panjang
+     ujian_id VARCHAR(50) NOT NULL ,
+     jenis_ujian VARCHAR(50) NOT NULL ,
+     tanggal TIMESTAMP NOT NULL ,
+     Kelas_Users_user_id VARCHAR (7) NOT NULL , -- Changed from Kelas_User_user_id
+     Matpel_mapel_id VARCHAR(50) NOT NULL ,
      Kelas_kelas_id VARCHAR(50) NOT NULL
     );
 
 ALTER TABLE Ujian ADD CONSTRAINT Ujian_PK PRIMARY KEY (ujian_id);
--- Menghapus CLUSTERED dan klausa WITH
 
-CREATE TABLE "User"
+CREATE TABLE Users -- Renamed from "User" and removed quotes
     (
      user_id VARCHAR (7) NOT NULL ,
-     username VARCHAR(100) NOT NULL , -- Menambahkan panjang
-     password VARCHAR(100) NOT NULL , -- Menambahkan panjang
-     NIS_NIP VARCHAR(50) NOT NULL ,   -- Menambahkan panjang
-     nama VARCHAR(100) NOT NULL ,     -- Menambahkan panjang
-     gender VARCHAR(10) NOT NULL ,    -- Menambahkan panjang (e.g., "Laki-laki", "Perempuan")
-     alamat VARCHAR(255) NOT NULL ,   -- Menambahkan panjang
-     email VARCHAR(100) NOT NULL ,    -- Menambahkan panjang
-     nomer_hp VARCHAR(20) NOT NULL ,   -- Menambahkan panjang
-     Role_role_id VARCHAR(50) NOT NULL -- Menambahkan panjang
+     username VARCHAR(100) NOT NULL ,
+     password VARCHAR(100) NOT NULL ,
+     NIS_NIP VARCHAR(50) NOT NULL ,
+     nama VARCHAR(100) NOT NULL ,
+     gender VARCHAR(10) NOT NULL ,
+     alamat VARCHAR(255) NOT NULL ,
+     email VARCHAR(100) NOT NULL ,
+     nomer_hp VARCHAR(20) NOT NULL ,
+     Role_role_id VARCHAR(50) NOT NULL
     );
 
-ALTER TABLE "User" ADD CONSTRAINT User_PK PRIMARY KEY (user_id);
--- Menghapus CLUSTERED dan klausa WITH
+ALTER TABLE Users ADD CONSTRAINT Users_PK PRIMARY KEY (user_id); -- Changed from User_PK
 
 CREATE TABLE User_Log
     (
-     userlog_id VARCHAR(50) NOT NULL , -- Menambahkan panjang
-     jenis VARCHAR(50) NOT NULL ,     -- Menambahkan panjang
-     keterangan VARCHAR(255) NOT NULL , -- Menambahkan panjang
-     waktu TIMESTAMP NOT NULL ,         -- Mengganti VARCHAR menjadi TIMESTAMP (asumsi waktu adalah datetime)
-     User_user_id VARCHAR (7) NOT NULL
+     userlog_id VARCHAR(50) NOT NULL ,
+     jenis VARCHAR(50) NOT NULL ,
+     keterangan VARCHAR(255) NOT NULL ,
+     waktu TIMESTAMP NOT NULL ,
+     Users_user_id VARCHAR (7) NOT NULL -- Changed from User_user_id
     );
 
 ALTER TABLE User_Log ADD CONSTRAINT User_Log_PK PRIMARY KEY (userlog_id);
--- Menghapus CLUSTERED dan klausa WITH
 
 ALTER TABLE Absensi
     ADD CONSTRAINT Absensi_Jadwal_FK FOREIGN KEY
@@ -204,11 +189,11 @@ ALTER TABLE Absensi
     ON UPDATE NO ACTION;
 
 ALTER TABLE Absensi
-    ADD CONSTRAINT Absensi_User_FK FOREIGN KEY
+    ADD CONSTRAINT Absensi_Users_FK FOREIGN KEY -- Changed from Absensi_User_FK
     (
-     User_user_id
+     Users_user_id -- Changed from User_user_id
     )
-    REFERENCES "User" -- Perbaikan pengutipan
+    REFERENCES Users -- Changed from "User"
     (
      user_id
     )
@@ -218,12 +203,12 @@ ALTER TABLE Absensi
 ALTER TABLE Detail_Pengajar
     ADD CONSTRAINT Detail_Pengajar_Kelas_FK FOREIGN KEY
     (
-     Kelas_User_user_id,
+     Kelas_Users_user_id, -- Changed from Kelas_User_user_id
      Kelas_kelas_id
     )
     REFERENCES Kelas
     (
-     User_user_id ,
+     Users_user_id , -- Changed from User_user_id
      kelas_id
     )
     ON DELETE NO ACTION
@@ -242,11 +227,11 @@ ALTER TABLE Detail_Pengajar
     ON UPDATE NO ACTION;
 
 ALTER TABLE Detail_Pengajar
-    ADD CONSTRAINT Detail_Pengajar_User_FK FOREIGN KEY
+    ADD CONSTRAINT Detail_Pengajar_Users_FK FOREIGN KEY -- Changed from Detail_Pengajar_User_FK
     (
-     User_user_id
+     Users_user_id -- Changed from User_user_id
     )
-    REFERENCES "User" -- Perbaikan pengutipan
+    REFERENCES Users -- Changed from "User"
     (
      user_id
     )
@@ -254,11 +239,11 @@ ALTER TABLE Detail_Pengajar
     ON UPDATE NO ACTION;
 
 ALTER TABLE Feedback
-    ADD CONSTRAINT Feedback_User_FK FOREIGN KEY
+    ADD CONSTRAINT Feedback_Users_FK FOREIGN KEY -- Changed from Feedback_User_FK
     (
-     User_user_id
+     Users_user_id -- Changed from User_user_id
     )
-    REFERENCES "User" -- Perbaikan pengutipan
+    REFERENCES Users -- Changed from "User"
     (
      user_id
     )
@@ -268,12 +253,12 @@ ALTER TABLE Feedback
 ALTER TABLE Jadwal
     ADD CONSTRAINT Jadwal_Kelas_FK FOREIGN KEY
     (
-     Kelas_User_user_id,
+     Kelas_Users_user_id, -- Changed from Kelas_User_user_id
      Kelas_kelas_id
     )
     REFERENCES Kelas
     (
-     User_user_id ,
+     Users_user_id , -- Changed from User_user_id
      kelas_id
     )
     ON DELETE NO ACTION
@@ -304,11 +289,11 @@ ALTER TABLE Kelas
     ON UPDATE NO ACTION;
 
 ALTER TABLE Kelas
-    ADD CONSTRAINT Kelas_User_FK FOREIGN KEY
+    ADD CONSTRAINT Kelas_Users_FK FOREIGN KEY -- Changed from Kelas_User_FK
     (
-     User_user_id
+     Users_user_id -- Changed from User_user_id
     )
-    REFERENCES "User" -- Perbaikan pengutipan
+    REFERENCES Users -- Changed from "User"
     (
      user_id
     )
@@ -318,12 +303,12 @@ ALTER TABLE Kelas
 ALTER TABLE Materi
     ADD CONSTRAINT Materi_Kelas_FK FOREIGN KEY
     (
-     Kelas_User_user_id,
+     Kelas_Users_user_id, -- Changed from Kelas_User_user_id
      Kelas_kelas_id
     )
     REFERENCES Kelas
     (
-     User_user_id ,
+     Users_user_id , -- Changed from User_user_id
      kelas_id
     )
     ON DELETE NO ACTION
@@ -366,11 +351,11 @@ ALTER TABLE Nilai
     ON UPDATE NO ACTION;
 
 ALTER TABLE Pengumuman
-    ADD CONSTRAINT Pengumuman_User_FK FOREIGN KEY
+    ADD CONSTRAINT Pengumuman_Users_FK FOREIGN KEY -- Changed from Pengumuman_User_FK
     (
-     User_user_id
+     Users_user_id -- Changed from User_user_id
     )
-    REFERENCES "User" -- Perbaikan pengutipan
+    REFERENCES Users -- Changed from "User"
     (
      user_id
     )
@@ -390,11 +375,11 @@ ALTER TABLE Rapor
     ON UPDATE NO ACTION;
 
 ALTER TABLE Rapor
-    ADD CONSTRAINT Rapor_User_FK FOREIGN KEY
+    ADD CONSTRAINT Rapor_Users_FK FOREIGN KEY -- Changed from Rapor_User_FK
     (
-     User_user_id
+     Users_user_id -- Changed from User_user_id
     )
-    REFERENCES "User" -- Perbaikan pengutipan
+    REFERENCES Users -- Changed from "User"
     (
      user_id
     )
@@ -404,12 +389,12 @@ ALTER TABLE Rapor
 ALTER TABLE Tugas
     ADD CONSTRAINT Tugas_Kelas_FK FOREIGN KEY
     (
-     Kelas_User_user_id,
+     Kelas_Users_user_id, -- Changed from Kelas_User_user_id
      Kelas_kelas_id
     )
     REFERENCES Kelas
     (
-     User_user_id ,
+     Users_user_id , -- Changed from User_user_id
      kelas_id
     )
     ON DELETE NO ACTION
@@ -430,12 +415,12 @@ ALTER TABLE Tugas
 ALTER TABLE Ujian
     ADD CONSTRAINT Ujian_Kelas_FK FOREIGN KEY
     (
-     Kelas_User_user_id,
+     Kelas_Users_user_id, -- Changed from Kelas_User_user_id
      Kelas_kelas_id
     )
     REFERENCES Kelas
     (
-     User_user_id ,
+     Users_user_id , -- Changed from User_user_id
      kelas_id
     )
     ON DELETE NO ACTION
@@ -454,19 +439,19 @@ ALTER TABLE Ujian
     ON UPDATE NO ACTION;
 
 ALTER TABLE User_Log
-    ADD CONSTRAINT User_Log_User_FK FOREIGN KEY
+    ADD CONSTRAINT User_Log_Users_FK FOREIGN KEY -- Changed from User_Log_User_FK
     (
-     User_user_id
+     Users_user_id -- Changed from User_user_id
     )
-    REFERENCES "User" -- Perbaikan pengutipan
+    REFERENCES Users -- Changed from "User"
     (
      user_id
     )
     ON DELETE NO ACTION
     ON UPDATE NO ACTION;
 
-ALTER TABLE "User"
-    ADD CONSTRAINT User_Role_FK FOREIGN KEY
+ALTER TABLE Users -- Changed from "User"
+    ADD CONSTRAINT Users_Role_FK FOREIGN KEY -- Changed from User_Role_FK
     (
      Role_role_id
     )

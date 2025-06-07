@@ -86,7 +86,7 @@ public class LoginController {
                 AlertClass.ErrorAlert("Connection Error", "Database Connection Failed", "Could not establish a connection to the database.");
                 return false;
             }
-            String sql = "SELECT user_id, password FROM \"User\" WHERE Username = ? AND Role_role_id = ?";
+            String sql = "SELECT user_id, password FROM Users WHERE Username = ? AND Role_role_id = ?";
             PreparedStatement stmt = con.prepareStatement(sql);
             stmt.setString(1, username);
             stmt.setString(2, roleId); // Use the single-character role ID here
@@ -124,6 +124,10 @@ public class LoginController {
         }
         if (role == null || role.equals("Choice Role")) {
             AlertClass.WarningAlert("Input Error", "Role Not Selected", "Please select a role.");
+            return;
+        }
+        if (password.length()!=8) {
+            AlertClass.WarningAlert("Input Error", "Password Length Error", "Password must be exactly 8 characters long.");
             return;
         }
 
