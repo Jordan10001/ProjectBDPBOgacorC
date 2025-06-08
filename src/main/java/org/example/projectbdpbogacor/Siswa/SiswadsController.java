@@ -316,7 +316,7 @@ public class SiswadsController {
 
     private void loadTugas() {
         ObservableList<TugasEntry> tugasList = FXCollections.observableArrayList();
-        String sql = "SELECT t.keterangan, t.deadline, t.tanggal_direlease, m.nama_mapel, k.nama_kelas " +
+        String sql = "SELECT t.keterangan, t.deadline, t.tanggal_direlease, m.nama_mapel, k.nama_kelas " + // Removed tugas_id, kelas_Users_user_id, kelas_kelas_id
                 "FROM Tugas t " +
                 "JOIN Matpel m ON t.Matpel_mapel_id = m.mapel_id " +
                 "JOIN Kelas k ON t.Kelas_Users_user_id = k.Users_user_id AND t.Kelas_kelas_id = k.kelas_id " +
@@ -349,7 +349,7 @@ public class SiswadsController {
 
     private void loadMateri() {
         ObservableList<MateriEntry> materiList = FXCollections.observableArrayList();
-        String sql = "SELECT mt.nama_materi, m.nama_mapel, k.nama_kelas " +
+        String sql = "SELECT mt.nama_materi, m.nama_mapel, k.nama_kelas " + // Removed materi_id, kelas_Users_user_id, kelas_kelas_id
                 "FROM Materi mt " +
                 "JOIN Matpel m ON mt.Matpel_mapel_id = m.mapel_id " +
                 "JOIN Kelas k ON mt.Kelas_Users_user_id = k.Users_user_id AND mt.Kelas_kelas_id = k.kelas_id " +
@@ -381,7 +381,7 @@ public class SiswadsController {
 
     private void loadUjian() {
         ObservableList<UjianEntry> ujianList = FXCollections.observableArrayList();
-        String sql = "SELECT u.jenis_ujian, u.tanggal, m.nama_mapel, k.nama_kelas " +
+        String sql = "SELECT u.jenis_ujian, u.tanggal, m.nama_mapel, k.nama_kelas " + // Removed ujian_id, kelas_Users_user_id, kelas_kelas_id
                 "FROM Ujian u " +
                 "JOIN Matpel m ON u.Matpel_mapel_id = m.mapel_id " +
                 "JOIN Kelas k ON u.Kelas_Users_user_id = k.Users_user_id AND u.Kelas_kelas_id = k.kelas_id " +
@@ -475,7 +475,8 @@ public class SiswadsController {
 
     private void loadAnnouncements() {
         ObservableList<PengumumanEntry> announcementList = FXCollections.observableArrayList();
-        String sql = "SELECT pengumuman, waktu FROM Pengumuman ORDER BY waktu DESC"; // Order by time to show newest first
+        // Updated SQL to include pengumuman_id
+        String sql = "SELECT pengumuman_id, pengumuman, waktu FROM Pengumuman ORDER BY waktu DESC";
         try (Connection con = DBS.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -488,7 +489,9 @@ public class SiswadsController {
                     waktuFormatted = "N/A"; // Or any other placeholder for null timestamps
                 }
 
+                // Updated constructor call to include pengumuman_id
                 announcementList.add(new PengumumanEntry(
+                        rs.getInt("pengumuman_id"), // Fetch and pass pengumuman_id
                         waktuFormatted,
                         rs.getString("pengumuman")
                 ));

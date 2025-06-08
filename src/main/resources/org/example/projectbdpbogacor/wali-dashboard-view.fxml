@@ -13,7 +13,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.projectbdpbogacor.Wali.WalidsController">
+<AnchorPane prefHeight="600.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.projectbdpbogacor.Wali.WalidsController">
     <children>
         <VBox alignment="TOP_CENTER" prefHeight="700.0" prefWidth="1300.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <padding>
@@ -83,7 +83,7 @@
                                                 <ChoiceBox fx:id="raporStudentChoiceBox" onAction="#loadNilaiData" prefWidth="200.0" />
                                                 <Label text="Select Semester:" />
                                                 <ChoiceBox fx:id="raporSemesterChoiceBox" onAction="#loadNilaiData" prefWidth="200.0" />
-                                                <Button mnemonicParsing="false" onAction="#loadNilaiData" text="Generate Report" />
+                                                <Button mnemonicParsing="false" onAction="#handlePrintReportCard" text="Generate Report" />
                                             </children>
                                             <padding>
                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
@@ -110,5 +110,3 @@
         </VBox>
     </children>
 </AnchorPane>
-
-

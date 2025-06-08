@@ -3,6 +3,7 @@ module org.example.projectbdpbogacor {
     requires javafx.controls;
     requires javafx.fxml;
     requires java.sql;
+    requires java.desktop;
     requires java.prefs;
 
     opens org.example.projectbdpbogacor to javafx.fxml;

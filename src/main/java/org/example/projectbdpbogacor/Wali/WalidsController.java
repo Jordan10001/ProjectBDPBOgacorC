@@ -13,17 +13,20 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.example.projectbdpbogacor.Aset.AlertClass;
 import org.example.projectbdpbogacor.DBSource.DBS;
 import org.example.projectbdpbogacor.HelloApplication;
-import org.example.projectbdpbogacor.model.AbsensiWaliEntry;
+import org.example.projectbdpbogacor.model.AbsensiWaliEntry; // Use the specific model for Wali
 import org.example.projectbdpbogacor.model.NilaiEntry;
 
+import java.io.File;
+import java.io.FileWriter;
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.awt.Desktop; // Required for opening file
+import java.time.LocalDateTime; // For accurate time handling
+import java.time.temporal.TemporalAdjusters; // For end of month/year
+
 
 public class WalidsController {
 
@@ -90,19 +93,51 @@ public class WalidsController {
         loadClassesForWaliKelas();
         loadSemesters();
 
+        // Add listeners to tab and choice boxes
+        attendanceClassChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> handleClassSelectionForAttendance());
+        attendanceStudentChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> loadAbsensiData());
+
+        raporClassChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> handleClassSelectionForRapor());
+        raporStudentChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> loadNilaiData());
+        raporSemesterChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> loadNilaiData());
+
         // Add listeners to tabs to load data when selected
         waliTabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if (newTab != null) {
                 if (newTab.getText().equals("Student Attendance")) {
                     loadClassesForWaliKelas(); // Refresh classes
-                    // Students are loaded based on class selection
+                    if (!attendanceClassChoiceBox.getItems().isEmpty()) {
+                        attendanceClassChoiceBox.setValue(attendanceClassChoiceBox.getItems().get(0)); // Select first class by default
+                    }
                 } else if (newTab.getText().equals("Print Report Card")) {
                     loadClassesForWaliKelas(); // Refresh classes
                     loadSemesters(); // Refresh semesters
-                    // Students are loaded based on class selection
+                    if (!raporClassChoiceBox.getItems().isEmpty()) {
+                        raporClassChoiceBox.setValue(raporClassChoiceBox.getItems().get(0)); // Select first class by default
+                    }
+                    if (!raporSemesterChoiceBox.getItems().isEmpty()) {
+                        raporSemesterChoiceBox.setValue(raporSemesterChoiceBox.getItems().get(0)); // Select first semester by default
+                    }
                 }
             }
         });
+
+        // Load initial data for the currently selected tab (which is usually the first one)
+        if (waliTabPane.getSelectionModel().getSelectedItem().getText().equals("Student Attendance")) {
+            loadClassesForWaliKelas();
+            if (!attendanceClassChoiceBox.getItems().isEmpty()) {
+                attendanceClassChoiceBox.setValue(attendanceClassChoiceBox.getItems().get(0));
+            }
+        } else if (waliTabPane.getSelectionModel().getSelectedItem().getText().equals("Print Report Card")) {
+            loadClassesForWaliKelas();
+            loadSemesters();
+            if (!raporClassChoiceBox.getItems().isEmpty()) {
+                raporClassChoiceBox.setValue(raporClassChoiceBox.getItems().get(0));
+            }
+            if (!raporSemesterChoiceBox.getItems().isEmpty()) {
+                raporSemesterChoiceBox.setValue(raporSemesterChoiceBox.getItems().get(0));
+            }
+        }
     }
 
     private void loadWaliKelasName() {
@@ -135,7 +170,8 @@ public class WalidsController {
             while (rs.next()) {
                 int kelasId = rs.getInt("kelas_id");
                 String namaKelas = rs.getString("nama_kelas");
-                String combinedId = loggedInUserId + "-" + kelasId; // Store as "WaliID-KelasID"
+                // Store as "WaliID-KelasID" since Kelas has a composite primary key
+                String combinedId = loggedInUserId + "-" + kelasId;
                 classesMap.put(namaKelas, combinedId); // Store display name -> combined ID
                 attendanceClassChoiceBox.getItems().add(namaKelas);
                 raporClassChoiceBox.getItems().add(namaKelas);
@@ -244,8 +280,6 @@ public class WalidsController {
             String combinedClassId = classesMap.get(selectedClassDisplay);
             if (combinedClassId != null) {
                 String[] ids = combinedClassId.split("-");
-                String waliIdFromKelas = ids[0];
-                int kelasId = Integer.parseInt(ids[1]);
                 sql += " AND k.kelas_id = ? AND k.Users_user_id = ?";
             }
         }
@@ -351,6 +385,252 @@ public class WalidsController {
             e.printStackTrace();
         }
     }
+
+    @FXML
+    void handlePrintReportCard() {
+        String selectedClassDisplay = raporClassChoiceBox.getValue();
+        String selectedStudentDisplay = raporStudentChoiceBox.getValue();
+        String selectedSemesterDisplay = raporSemesterChoiceBox.getValue();
+
+        if (selectedClassDisplay == null || selectedStudentDisplay == null || selectedSemesterDisplay == null) {
+            AlertClass.WarningAlert("Input Error", "Missing Information", "Please select a class, student, and semester to print the report card.");
+            return;
+        }
+
+        String studentUserId = studentsMap.get(selectedStudentDisplay);
+        Integer semesterId = semestersMap.get(selectedSemesterDisplay);
+
+        if (studentUserId == null || semesterId == null) {
+            AlertClass.ErrorAlert("Selection Error", "Invalid Selection", "Could not retrieve IDs for selected student or semester.");
+            return;
+        }
+
+        try {
+            // 1. Fetch student biodata
+            Map<String, String> studentBiodata = getStudentBiodata(studentUserId);
+
+            // 2. Fetch grades (already loaded in nilaiUjianTable, but we can re-fetch for robustness)
+            ObservableList<NilaiEntry> grades = nilaiUjianTable.getItems(); // Use the already loaded data
+
+            // 3. Fetch attendance summary (e.g., total Hadir, Alpha, Ijin for the selected student and semester)
+            Map<String, Integer> attendanceSummary = getAttendanceSummary(studentUserId, semesterId);
+
+            // 4. Generate HTML content
+            String htmlContent = generateReportCardHtml(studentBiodata, grades, attendanceSummary, selectedClassDisplay, selectedSemesterDisplay);
+
+            // 5. Save to a temporary HTML file
+            // Create the "rapor" directory if it doesn't exist
+            File raporDir = new File("Rapor");
+            if (!raporDir.exists()) {
+                raporDir.mkdirs(); // Creates the directory and any necessary but nonexistent parent directories.
+            }
+
+            // Save the file inside the "rapor" directory
+            File outputFile = new File(raporDir, "rapor_" + studentUserId + "_" + semesterId + ".html");
+            try (FileWriter writer = new FileWriter(outputFile)) {
+                writer.write(htmlContent);
+            }
+
+            // 6. Open the file in the default browser
+            if (Desktop.isDesktopSupported()) {
+                Desktop.getDesktop().browse(outputFile.toURI());
+                AlertClass.InformationAlert("Report Card Generated", "Report card saved and opened.", "The report card for " + studentBiodata.get("nama") + " has been generated and opened in your browser.");
+            } else {
+                AlertClass.InformationAlert("Report Card Generated", "Report card saved.", "The report card for " + studentBiodata.get("nama") + " has been generated at: " + outputFile.getAbsolutePath() + "\nYou can open it manually.");
+            }
+
+        } catch (IOException e) {
+            AlertClass.ErrorAlert("File Error", "Failed to generate report card file", e.getMessage());
+            e.printStackTrace();
+        } catch (SQLException e) {
+            AlertClass.ErrorAlert("Database Error", "Failed to retrieve data for report card", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    private Map<String, String> getStudentBiodata(String userId) throws SQLException {
+        Map<String, String> biodata = new HashMap<>();
+        String sql = "SELECT user_id, username, NIS_NIP, nama, gender, alamat, email, nomer_hp FROM Users WHERE user_id = ?";
+        try (Connection con = DBS.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                biodata.put("user_id", rs.getString("user_id"));
+                biodata.put("username", rs.getString("username"));
+                biodata.put("NIS_NIP", rs.getString("NIS_NIP"));
+                biodata.put("nama", rs.getString("nama"));
+                biodata.put("gender", rs.getString("gender").equals("L") ? "Laki-laki" : "Perempuan");
+                biodata.put("alamat", rs.getString("alamat"));
+                biodata.put("email", rs.getString("email"));
+                biodata.put("nomer_hp", rs.getString("nomer_hp"));
+            }
+        }
+        return biodata;
+    }
+
+    private Map<String, Integer> getAttendanceSummary(String studentUserId, int semesterId) throws SQLException {
+        Map<String, Integer> summary = new HashMap<>();
+        summary.put("Hadir", 0);
+        summary.put("Alpha", 0);
+        summary.put("Ijin", 0);
+
+        // Fetch the semester's start date
+        String semesterDateSql = "SELECT tahun_ajaran, semester, tahun FROM Semester WHERE semester_id = ?";
+        LocalDateTime semesterStart = null;
+        String semesterName = null;
+        String tahunAjaran = null;
+
+        try (Connection con = DBS.getConnection();
+             PreparedStatement stmt = con.prepareStatement(semesterDateSql)) {
+            stmt.setInt(1, semesterId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                semesterStart = rs.getTimestamp("tahun").toLocalDateTime();
+                semesterName = rs.getString("semester");
+                tahunAjaran = rs.getString("tahun_ajaran");
+            } else {
+                System.err.println("Semester with ID " + semesterId + " not found.");
+                return summary; // No semester found, return empty summary
+            }
+        }
+
+        if (semesterStart == null) {
+            return summary;
+        }
+
+        // Determine semester end date based on semester name and start year
+        LocalDateTime semesterEnd;
+        if ("Ganjil".equalsIgnoreCase(semesterName)) {
+            // Ganjil semester typically ends in December of the same year
+            semesterEnd = LocalDateTime.of(semesterStart.getYear(), 12, 31, 23, 59, 59);
+        } else if ("Genap".equalsIgnoreCase(semesterName)) {
+            // Genap semester typically starts in Jan-Feb of the next year (if tahun_ajaran spans two years)
+            // and ends around June-July of that next year.
+            // For simplicity, let's assume it ends in June of the year it's primarily in.
+            // A more robust solution might involve storing explicit start/end dates for semesters.
+            int endYear = semesterStart.getYear();
+            if (tahunAjaran != null && tahunAjaran.contains("/")) {
+                try {
+                    String[] years = tahunAjaran.split("/");
+                    if (years.length == 2) {
+                        endYear = Integer.parseInt(years[1]); // End year of the academic year
+                    }
+                } catch (NumberFormatException e) {
+                    System.err.println("Error parsing tahun_ajaran: " + e.getMessage());
+                }
+            }
+            semesterEnd = LocalDateTime.of(endYear, 6, 30, 23, 59, 59); // Assuming end of June
+        } else {
+            // Fallback: assume 6 months duration if semester name is not Ganjil/Genap
+            semesterEnd = semesterStart.plusMonths(6).minusDays(1).withHour(23).withMinute(59).withSecond(59).withNano(999999999);
+        }
+
+        System.out.println("Calculating attendance for student: " + studentUserId +
+                " from " + semesterStart.format(DateTimeFormatter.ISO_LOCAL_DATE) +
+                " to " + semesterEnd.format(DateTimeFormatter.ISO_LOCAL_DATE));
+
+        String sql = "SELECT a.status, COUNT(a.status) AS count " +
+                "FROM Absensi a " +
+                "WHERE a.Users_user_id = ? " +
+                "AND a.tanggal >= ? AND a.tanggal <= ? " +
+                "GROUP BY a.status";
+
+        try (Connection con = DBS.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, studentUserId);
+            stmt.setTimestamp(2, Timestamp.valueOf(semesterStart));
+            stmt.setTimestamp(3, Timestamp.valueOf(semesterEnd));
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                summary.put(rs.getString("status"), rs.getInt("count"));
+            }
+        }
+        return summary;
+    }
+
+
+    private String generateReportCardHtml(Map<String, String> biodata, ObservableList<NilaiEntry> grades, Map<String, Integer> attendance, String className, String semesterName) {
+        StringBuilder html = new StringBuilder();
+        html.append("<!DOCTYPE html>\n");
+        html.append("<html lang=\"en\">\n");
+        html.append("<head>\n");
+        html.append("    <meta charset=\"UTF-8\">\n");
+        html.append("    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n");
+        html.append("    <title>Report Card - ").append(biodata.get("nama")).append("</title>\n");
+        html.append("    <style>\n");
+        html.append("        body { font-family: Arial, sans-serif; margin: 20px; }\n");
+        html.append("        .container { width: 800px; margin: 0 auto; border: 1px solid #ccc; padding: 20px; box-shadow: 2px 2px 8px rgba(0,0,0,0.1); }\n");
+        html.append("        h1, h2 { text-align: center; color: #333; }\n");
+        html.append("        .info-section, .grades-section, .attendance-section { margin-bottom: 20px; }\n");
+        html.append("        .info-section p { margin: 5px 0; }\n");
+        html.append("        table { width: 100%; border-collapse: collapse; margin-top: 10px; }\n");
+        html.append("        th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }\n");
+        html.append("        th { background-color: #f2f2f2; }\n");
+        html.append("        .footer { text-align: right; margin-top: 30px; font-size: 0.9em; color: #555; }\n");
+        html.append("    </style>\n");
+        html.append("</head>\n");
+        html.append("<body>\n");
+        html.append("    <div class=\"container\">\n");
+        html.append("        <h1>School Report Card</h1>\n");
+        html.append("        <h2>").append(semesterName).append("</h2>\n");
+
+        html.append("        <div class=\"info-section\">\n");
+        html.append("            <h3>Student Information:</h3>\n");
+        html.append("            <p><strong>Name:</strong> ").append(biodata.get("nama")).append("</p>\n");
+        html.append("            <p><strong>Student ID (NIS/NIP):</strong> ").append(biodata.get("NIS_NIP")).append("</p>\n");
+        html.append("            <p><strong>Class:</strong> ").append(className).append("</p>\n");
+        html.append("            <p><strong>Gender:</strong> ").append(biodata.get("gender")).append("</p>\n");
+        html.append("            <p><strong>Email:</strong> ").append(biodata.get("email")).append("</p>\n");
+        html.append("            <p><strong>Phone:</strong> ").append(biodata.get("nomer_hp")).append("</p>\n");
+        html.append("            <p><strong>Address:</strong> ").append(biodata.get("alamat")).append("</p>\n");
+        html.append("        </div>\n");
+
+        html.append("        <div class=\"grades-section\">\n");
+        html.append("            <h3>Academic Grades:</h3>\n");
+        html.append("            <table>\n");
+        html.append("                <thead>\n");
+        html.append("                    <tr>\n");
+        html.append("                        <th>Subject</th>\n");
+        html.append("                        <th>Type of Grade</th>\n");
+        html.append("                        <th>Score</th>\n");
+        html.append("                    </tr>\n");
+        html.append("                </thead>\n");
+        html.append("                <tbody>\n");
+        if (grades != null && !grades.isEmpty()) {
+            for (NilaiEntry grade : grades) {
+                html.append("                    <tr>\n");
+                html.append("                        <td>").append(grade.getNamaMapel()).append("</td>\n");
+                html.append("                        <td>").append(grade.getJenisNilai()).append("</td>\n");
+                html.append("                        <td>").append(grade.getNilai()).append("</td>\n");
+                html.append("                    </tr>\n");
+            }
+        } else {
+            html.append("                    <tr><td colspan=\"3\">No grades available for this semester.</td></tr>\n");
+        }
+        html.append("                </tbody>\n");
+        html.append("            </table>\n");
+        html.append("        </div>\n");
+
+        html.append("        <div class=\"attendance-section\">\n");
+        html.append("            <h3>Attendance Summary:</h3>\n");
+        html.append("            <p><strong>Hadir (Present):</strong> ").append(attendance.getOrDefault("Hadir", 0)).append(" days</p>\n");
+        html.append("            <p><strong>Alpha (Absent without leave):</strong> ").append(attendance.getOrDefault("Alpha", 0)).append(" days</p>\n");
+        html.append("            <p><strong>Ijin (Excused):</strong> ").append(attendance.getOrDefault("Ijin", 0)).append(" days</p>\n");
+        html.append("        </div>\n");
+
+        html.append("        <div class=\"footer\">\n");
+        html.append("            <p>Generated on: ").append(java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))).append("</p>\n");
+        html.append("            <p>Wali Kelas: ").append(welcomeUserLabel.getText().replace("Welcome, ", "")).append("</p>\n"); // Get Wali Kelas name from welcome label
+        html.append("        </div>\n");
+
+        html.append("    </div>\n");
+        html.append("</body>\n");
+        html.append("</html>");
+
+        return html.toString();
+    }
+
 
     @FXML
     void handleLogout() {

@@ -17,6 +17,10 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
+<?import javafx.scene.control.ContextMenu?>
+<?import javafx.scene.control.MenuItem?>
+<?import javafx.scene.control.TextArea?>
+<?import javafx.scene.control.DatePicker?>
 <AnchorPane prefHeight="600.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.projectbdpbogacor.Guru.GurudsController">
     <children>
         <VBox alignment="TOP_CENTER" prefHeight="700.0" prefWidth="1300.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
@@ -105,7 +109,7 @@
                                             <children>
                                                 <Label text="Grade Type:" />
                                                 <Label text="Score:" GridPane.rowIndex="1" />
-                                                <TextField fx:id="gradeTypeField" promptText="e.g., UTS, UAS, Harian" GridPane.columnIndex="1" />
+                                                <ChoiceBox fx:id="gradeTypeChoiseBox"  GridPane.columnIndex="1" />
                                                 <TextField fx:id="scoreField" promptText="0-100" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                             </children>
                                             <padding>
@@ -128,6 +132,191 @@
                                 </VBox>
                             </children>
                         </AnchorPane>
+                    </content>
+                </Tab>
+                <Tab text="Manage Assignments">
+                    <content>
+                        <VBox alignment="TOP_CENTER" spacing="10.0">
+                            <padding>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                            </padding>
+                            <HBox alignment="CENTER" spacing="10.0">
+                                <Label text="Select Class:" />
+                                <ChoiceBox fx:id="tugasClassChoiceBox" prefWidth="200.0" />
+                                <Label text="Select Subject:" />
+                                <ChoiceBox fx:id="tugasSubjectChoiceBox" prefWidth="200.0" />
+                            </HBox>
+                            <HBox alignment="CENTER" spacing="10.0">
+                                <Label text="Description:" />
+                                <TextArea fx:id="tugasKeteranganArea" prefHeight="60.0" prefWidth="400.0" promptText="Enter assignment description" />
+                                <Label text="Deadline:" />
+                                <DatePicker fx:id="tugasDeadlinePicker" />
+                                <Button fx:id="addTugasButton" onAction="#handleAddTugas" text="Add Assignment" />
+                            </HBox>
+                            <TableView fx:id="tugasTable" prefHeight="400.0" prefWidth="1240.0">
+                                <columns>
+                                    <TableColumn fx:id="tugasKeteranganColumn" prefWidth="300.0" text="Description" />
+                                    <TableColumn fx:id="tugasDeadlineColumn" prefWidth="150.0" text="Deadline" />
+                                    <TableColumn fx:id="tugasTanggalRilisColumn" prefWidth="150.0" text="Release Date" />
+                                    <TableColumn fx:id="tugasMapelColumn" prefWidth="200.0" text="Subject" />
+                                    <TableColumn fx:id="tugasKelasColumn" prefWidth="150.0" text="Class" />
+                                </columns>
+                                <contextMenu>
+                                    <ContextMenu>
+                                        <items>
+                                            <MenuItem fx:id="deleteTugasButton" onAction="#handleDeleteTugas" text="Delete Assignment" />
+                                        </items>
+                                    </ContextMenu>
+                                </contextMenu>
+                            </TableView>
+                        </VBox>
+                    </content>
+                </Tab>
+                <Tab text="Manage Materials">
+                    <content>
+                        <VBox alignment="TOP_CENTER" spacing="10.0">
+                            <padding>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                            </padding>
+                            <HBox alignment="CENTER" spacing="10.0">
+                                <Label text="Select Class:" />
+                                <ChoiceBox fx:id="materiClassChoiceBox" prefWidth="200.0" />
+                                <Label text="Select Subject:" />
+                                <ChoiceBox fx:id="materiSubjectChoiceBox" prefWidth="200.0" />
+                            </HBox>
+                            <HBox alignment="CENTER" spacing="10.0">
+                                <Label text="Material Name:" />
+                                <TextField fx:id="materiNamaMateriField" prefWidth="300.0" promptText="Enter material name/title" />
+                                <Button fx:id="addMateriButton" onAction="#handleAddMateri" text="Add Material" />
+                            </HBox>
+                            <TableView fx:id="materiTable" prefHeight="400.0" prefWidth="1240.0">
+                                <columns>
+                                    <TableColumn fx:id="materiNamaMateriColumn" prefWidth="400.0" text="Material Name" />
+                                    <TableColumn fx:id="materiMapelColumn" prefWidth="250.0" text="Subject" />
+                                    <TableColumn fx:id="materiKelasColumn" prefWidth="200.0" text="Class" />
+                                </columns>
+                                <contextMenu>
+                                    <ContextMenu>
+                                        <items>
+                                            <MenuItem fx:id="deleteMateriButton" onAction="#handleDeleteMateri" text="Delete Material" />
+                                        </items>
+                                    </ContextMenu>
+                                </contextMenu>
+                            </TableView>
+                        </VBox>
+                    </content>
+                </Tab>
+
+                <Tab text="Manage Exams">
+                    <content>
+                        <VBox alignment="TOP_CENTER" spacing="10.0">
+                            <padding>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                            </padding>
+                            <HBox alignment="CENTER" spacing="10.0">
+                                <Label text="Select Class:" />
+                                <ChoiceBox fx:id="ujianClassChoiceBox" prefWidth="200.0" />
+                                <Label text="Select Subject:" />
+                                <ChoiceBox fx:id="ujianSubjectChoiceBox" prefWidth="200.0" />
+                            </HBox>
+                            <HBox alignment="CENTER" spacing="10.0">
+                                <Label text="Exam Type:" />
+                                <ChoiceBox fx:id="ujianJenisUjianChoiceBox" prefWidth="150.0" />
+                                <Label text="Exam Date:" />
+                                <DatePicker fx:id="ujianTanggalPicker" />
+                                <Button fx:id="addUjianButton" onAction="#handleAddUjian" text="Add Exam" />
+                            </HBox>
+                            <TableView fx:id="ujianTable" prefHeight="400.0" prefWidth="1240.0">
+                                <columns>
+                                    <TableColumn fx:id="ujianJenisColumn" prefWidth="150.0" text="Exam Type" />
+                                    <TableColumn fx:id="ujianTanggalColumn" prefWidth="150.0" text="Date" />
+                                    <TableColumn fx:id="ujianMapelColumn" prefWidth="250.0" text="Subject" />
+                                    <TableColumn fx:id="ujianKelasColumn" prefWidth="200.0" text="Class" />
+                                </columns>
+                                <contextMenu>
+                                    <ContextMenu>
+                                        <items>
+                                            <MenuItem fx:id="deleteUjianButton" onAction="#handleDeleteUjian" text="Delete Exam" />
+                                        </items>
+                                    </ContextMenu>
+                                </contextMenu>
+                            </TableView>
+                        </VBox>
+                    </content>
+                </Tab>
+                <Tab text="Manage Absensi">
+                    <content>
+                        <VBox alignment="TOP_CENTER" spacing="10.0">
+                            <padding>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                            </padding>
+                            <Label text="Manage Student Attendance">
+                                <font>
+                                    <Font name="System Bold" size="20.0" />
+                                </font>
+                            </Label>
+                            <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" spacing="10.0">
+                                <children>
+                                    <Label text="Select Class:" />
+                                    <ChoiceBox fx:id="absensiClassChoiceBox" onAction="#handleAbsensiClassSelection" prefWidth="200.0" />
+                                    <Label text="Select Subject:" />
+                                    <ChoiceBox fx:id="absensiSubjectChoiceBox" prefWidth="200.0" />
+                                </children>
+                                <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </padding>
+                            </HBox>
+                            <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" spacing="10.0">
+                                <children>
+                                    <Label text="Select Student:" />
+                                    <ChoiceBox fx:id="absensiStudentChoiceBox" prefWidth="200.0" />
+                                    <Label text="Date:" />
+                                    <DatePicker fx:id="absensiDatePicker" prefWidth="150.0" />
+                                    <Label text="Status:" />
+                                    <ChoiceBox fx:id="absensiStatusChoiceBox" prefWidth="100.0" />
+                                    <Button fx:id="recordAbsensiButton" onAction="#recordAbsensi" text="Record Attendance" />
+                                </children>
+                                <padding>
+                                    <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                </padding>
+                            </HBox>
+                            <TableView fx:id="absensiTable" prefHeight="400.0" prefWidth="1240.0">
+                                <columns>
+                                    <TableColumn fx:id="absensiTanggalColumn" prefWidth="150.0" text="Tanggal" />
+                                    <TableColumn fx:id="absensiStatusColumn" prefWidth="100.0" text="Status" />
+                                    <TableColumn fx:id="absensiMapelColumn" prefWidth="200.0" text="Mata Pelajaran" />
+                                    <TableColumn fx:id="absensiKelasColumn" prefWidth="150.0" text="Kelas" />
+                                    <TableColumn fx:id="absensiJamMulaiColumn" prefWidth="100.0" text="Jam Mulai" />
+                                    <TableColumn fx:id="absensiJamSelesaiColumn" prefWidth="100.0" text="Jam Selesai" />
+                                </columns>
+                            </TableView>
+                        </VBox>
+                    </content>
+                </Tab>
+                <Tab text="Announcements">
+                    <content>
+                        <VBox alignment="TOP_CENTER" spacing="10.0">
+                            <padding>
+                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                            </padding>
+                            <Label text="Manage Announcements">
+                                <font>
+                                    <Font name="System Bold" size="20.0" />
+                                </font>
+                            </Label>
+                            <TextArea fx:id="announcementTextArea" prefHeight="100.0" promptText="Enter announcement content here..." />
+                            <HBox alignment="CENTER" spacing="10.0">
+                                <Button fx:id="createAnnouncementButton" onAction="#handleCreateGuruAnnouncement" text="Create Announcement" />
+                                <Button fx:id="guruUpdateAnnouncementButton" onAction="#handleUpdateGuruAnnouncement" text="Update Selected" />
+                                <Button fx:id="guruDeleteAnnouncementButton" onAction="#handleDeleteGuruAnnouncement" text="Delete Selected" />
+                            </HBox>
+                            <TableView fx:id="guruAnnouncementTable" prefHeight="300.0" prefWidth="1240.0">
+                                <columns>
+                                    <TableColumn fx:id="guruAnnouncementWaktuColumn" prefWidth="150.0" text="Date/Time" />
+                                    <TableColumn fx:id="guruAnnouncementContentColumn" prefWidth="800.0" text="Announcement Content" />
+                                </columns>
+                            </TableView>
+                        </VBox>
                     </content>
                 </Tab>
             </TabPane>

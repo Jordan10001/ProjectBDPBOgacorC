@@ -12,6 +12,7 @@ import org.example.projectbdpbogacor.Aset.AlertClass;
 import org.example.projectbdpbogacor.Aset.HashGenerator;
 import org.example.projectbdpbogacor.DBSource.DBS;
 import org.example.projectbdpbogacor.HelloApplication;
+import org.example.projectbdpbogacor.model.PengumumanEntry; // Import the PengumumanEntry model
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -19,6 +20,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.sql.Timestamp;
+import java.time.LocalDateTime;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
@@ -119,6 +123,13 @@ public class AdmindsController {
     // Announcements
     @FXML
     private TextArea announcementTextArea;
+    @FXML
+    private TableView<PengumumanEntry> announcementTable; // Table to view announcements
+    @FXML
+    private TableColumn<PengumumanEntry, String> announcementWaktuColumn; // Column for announcement time
+    @FXML
+    private TableColumn<PengumumanEntry, String> announcementContentColumn; // Column for announcement content
+
 
     // Manage Class
     @FXML
@@ -276,6 +287,17 @@ public class AdmindsController {
         // loadSubjectsForAssignmentChoiceBox(); // Re-use existing loadSubjectsForChoiceBox
         // loadClassesForAssignmentChoiceBox(); // Re-use existing loadClassesForChoiceBox
 
+        // Initialize announcement table
+        initAnnouncementTable();
+        // Add listener for announcement table selection
+        announcementTable.getSelectionModel().selectedItemProperty().addListener((observable, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                announcementTextArea.setText(newSelection.getPengumuman()); // Populate text area with selected announcement content
+            } else {
+                announcementTextArea.clear(); // Clear text area if no selection
+            }
+        });
+
         // Add listeners to tabs to load data when selected
         adminTabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if (newTab != null) {
@@ -310,6 +332,9 @@ public class AdmindsController {
                         loadGuruForChoiceBox(); // Populate assignTeacherGuruChoiceBox
                         loadSubjectAssignments(); // Load existing assignments
                         break;
+                    case "Announcements": // Handle "Announcements" tab selection
+                        loadAnnouncements(); // Load announcements when the tab is selected
+                        break;
                 }
             }
         });
@@ -320,6 +345,7 @@ public class AdmindsController {
 
         // Load all users initially
         loadAllUsersToTable(filterRoleChoiceBox.getValue(), filterNameField.getText());
+        loadAnnouncements(); // Load announcements initially
     }
 
     private void loadAdminName() {
@@ -1159,6 +1185,7 @@ public class AdmindsController {
             if (rowsAffected > 0) {
                 AlertClass.InformationAlert("Success", "Announcement Published", "Announcement has been published successfully.");
                 announcementTextArea.clear();
+                loadAnnouncements(); // Refresh the table after creation
             } else {
                 AlertClass.ErrorAlert("Failed", "Announcement Not Published", "Failed to publish announcement.");
             }
@@ -1167,6 +1194,117 @@ public class AdmindsController {
             e.printStackTrace();
         }
     }
+
+    // --- Announcements Methods ---
+    private void initAnnouncementTable() {
+        announcementWaktuColumn.setCellValueFactory(new PropertyValueFactory<>("waktu"));
+        announcementContentColumn.setCellValueFactory(new PropertyValueFactory<>("pengumuman"));
+    }
+
+    private void loadAnnouncements() {
+        ObservableList<PengumumanEntry> announcementList = FXCollections.observableArrayList();
+        // SELECT pengumuman_id is added to fetch the ID for the model
+        String sql = "SELECT pengumuman_id, pengumuman, waktu FROM Pengumuman ORDER BY waktu DESC";
+        try (Connection con = DBS.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Timestamp timestamp = rs.getTimestamp("waktu");
+                String waktuFormatted;
+                if (timestamp != null) {
+                    waktuFormatted = timestamp.toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+                } else {
+                    waktuFormatted = "N/A";
+                }
+
+                announcementList.add(new PengumumanEntry(
+                        rs.getInt("pengumuman_id"), // Pass the ID to the constructor
+                        waktuFormatted,
+                        rs.getString("pengumuman")
+                ));
+            }
+            announcementTable.setItems(announcementList);
+        } catch (SQLException e) {
+            AlertClass.ErrorAlert("Database Error", "Failed to load announcements", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void handleUpdateAnnouncement() {
+        PengumumanEntry selectedAnnouncement = announcementTable.getSelectionModel().getSelectedItem();
+        if (selectedAnnouncement == null) {
+            AlertClass.WarningAlert("Selection Error", "No Announcement Selected", "Please select an announcement to update.");
+            return;
+        }
+
+        String updatedContent = announcementTextArea.getText();
+        if (updatedContent.isEmpty()) {
+            AlertClass.WarningAlert("Input Error", "Announcement Content Empty", "Please enter content for the announcement.");
+            return;
+        }
+
+        // Use the pengumuman_id directly from the selected object
+        int pengumumanId = selectedAnnouncement.getPengumumanId();
+
+        try (Connection con = DBS.getConnection()) {
+            String sql = "UPDATE Pengumuman SET pengumuman = ?, waktu = NOW() WHERE pengumuman_id = ?";
+            PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setString(1, updatedContent);
+            stmt.setInt(2, pengumumanId);
+
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                AlertClass.InformationAlert("Success", "Announcement Updated", "Announcement updated successfully.");
+                announcementTextArea.clear();
+                loadAnnouncements(); // Refresh the table
+            } else {
+                AlertClass.ErrorAlert("Failed", "Announcement Not Updated", "Failed to update announcement.");
+            }
+        } catch (SQLException e) {
+            AlertClass.ErrorAlert("Database Error", "Failed to update announcement", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void handleDeleteAnnouncement() {
+        PengumumanEntry selectedAnnouncement = announcementTable.getSelectionModel().getSelectedItem();
+        if (selectedAnnouncement == null) {
+            AlertClass.WarningAlert("Selection Error", "No Announcement Selected", "Please select an announcement to delete.");
+            return;
+        }
+
+        Optional<ButtonType> result = AlertClass.ConfirmationAlert(
+                "Confirm Deletion",
+                "Delete Announcement",
+                "Are you sure you want to delete this announcement? This action cannot be undone."
+        );
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            // Use the pengumuman_id directly from the selected object
+            int pengumumanId = selectedAnnouncement.getPengumumanId();
+
+            try (Connection con = DBS.getConnection()) {
+                String sql = "DELETE FROM Pengumuman WHERE pengumuman_id = ?";
+                PreparedStatement stmt = con.prepareStatement(sql);
+                stmt.setInt(1, pengumumanId);
+
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    AlertClass.InformationAlert("Success", "Announcement Deleted", "Announcement deleted successfully.");
+                    announcementTextArea.clear();
+                    loadAnnouncements(); // Refresh the table
+                } else {
+                    AlertClass.ErrorAlert("Failed", "Announcement Not Deleted", "Failed to delete announcement.");
+                }
+            } catch (SQLException e) {
+                AlertClass.ErrorAlert("Database Error", "Failed to delete announcement", e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
 
     // --- Manage Students in Class Methods ---
     private void initStudentInClassTable() {
