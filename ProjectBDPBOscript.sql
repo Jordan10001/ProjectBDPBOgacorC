@@ -27,14 +27,7 @@ CREATE TABLE Detail_Pengajar
      Kelas_kelas_id SERIAL NOT NULL -- Diubah menjadi SERIAL
     );
 
-CREATE TABLE Feedback
-    (
-     feedback_id SERIAL PRIMARY KEY , -- Diubah menjadi SERIAL PRIMARY KEY
-     feedback VARCHAR(255) NOT NULL ,
-     Users_user_id VARCHAR (7) NOT NULL
-    );
-
--- ALTER TABLE Feedback ADD CONSTRAINT Feedback_PK PRIMARY KEY (feedback_id); -- Sudah termasuk dalam SERIAL PRIMARY KEY
+-- Feedback table removed
 
 CREATE TABLE Jadwal
     (
@@ -168,16 +161,7 @@ CREATE TABLE Users
 
 ALTER TABLE Users ADD CONSTRAINT Users_PK PRIMARY KEY (user_id);
 
-CREATE TABLE User_Log
-    (
-     userlog_id SERIAL PRIMARY KEY , -- Diubah menjadi SERIAL PRIMARY KEY
-     jenis VARCHAR(50) NOT NULL ,
-     keterangan VARCHAR(255) NOT NULL ,
-     waktu TIMESTAMP NOT NULL ,
-     Users_user_id VARCHAR (7) NOT NULL
-    );
-
--- ALTER TABLE User_Log ADD CONSTRAINT User_Log_PK PRIMARY KEY (userlog_id); -- Sudah termasuk dalam SERIAL PRIMARY KEY
+-- User_Log table removed
 
 -- NEW TABLE: Student_Class_Enrollment
 CREATE TABLE Student_Class_Enrollment
@@ -252,17 +236,7 @@ ALTER TABLE Detail_Pengajar
     ON DELETE NO ACTION
     ON UPDATE NO ACTION;
 
-ALTER TABLE Feedback
-    ADD CONSTRAINT Feedback_Users_FK FOREIGN KEY
-    (
-     Users_user_id
-    )
-    REFERENCES Users
-    (
-     user_id
-    )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION;
+-- Feedback_Users_FK constraint removed
 
 ALTER TABLE Jadwal
     ADD CONSTRAINT Jadwal_Kelas_FK FOREIGN KEY
@@ -452,17 +426,7 @@ ALTER TABLE Ujian
     ON DELETE NO ACTION
     ON UPDATE NO ACTION;
 
-ALTER TABLE User_Log
-    ADD CONSTRAINT User_Log_Users_FK FOREIGN KEY
-    (
-     Users_user_id
-    )
-    REFERENCES Users
-    (
-     user_id
-    )
-    ON DELETE NO ACTION
-    ON UPDATE NO ACTION;
+-- User_Log_Users_FK constraint removed
 
 ALTER TABLE Users
     ADD CONSTRAINT Users_Role_FK FOREIGN KEY
@@ -503,42 +467,46 @@ ALTER TABLE Student_Class_Enrollment
     ON DELETE CASCADE
     ON UPDATE CASCADE;
 
--- NEW TABLE: Student_Class_Enrollment
-CREATE TABLE Student_Class_Enrollment
-    (
-     Users_user_id VARCHAR (7) NOT NULL ,
-     Kelas_kelas_id SERIAL NOT NULL ,
-     Kelas_Users_user_id VARCHAR (7) NOT NULL
-    );
+-- The following section is a duplicate and was likely an error in the original script.
+-- It's being removed to prevent redundant table creation and foreign key additions.
+-- If this was intentional, please clarify.
 
-ALTER TABLE Student_Class_Enrollment ADD CONSTRAINT Student_Class_Enrollment_PK PRIMARY KEY (Users_user_id, Kelas_kelas_id, Kelas_Users_user_id);
+-- NEW TABLE: Student_Class_Enrollment
+-- CREATE TABLE Student_Class_Enrollment
+--     (
+--      Users_user_id VARCHAR (7) NOT NULL ,
+--      Kelas_kelas_id SERIAL NOT NULL ,
+--      Kelas_Users_user_id VARCHAR (7) NOT NULL
+--     );
+
+-- ALTER TABLE Student_Class_Enrollment ADD CONSTRAINT Student_Class_Enrollment_PK PRIMARY KEY (Users_user_id, Kelas_kelas_id, Kelas_Users_user_id);
 
 -- Foreign Keys for Student_Class_Enrollment
-ALTER TABLE Student_Class_Enrollment
-    ADD CONSTRAINT Student_Class_Enrollment_Users_FK FOREIGN KEY
-    (
-     Users_user_id
-    )
-    REFERENCES Users
-    (
-     user_id
-    )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE;
+-- ALTER TABLE Student_Class_Enrollment
+--     ADD CONSTRAINT Student_Class_Enrollment_Users_FK FOREIGN KEY
+--     (
+--      Users_user_id
+--     )
+--     REFERENCES Users
+--     (
+--      user_id
+--     )
+--     ON DELETE CASCADE
+--     ON UPDATE CASCADE;
 
-ALTER TABLE Student_Class_Enrollment
-    ADD CONSTRAINT Student_Class_Enrollment_Kelas_FK FOREIGN KEY
-    (
-     Kelas_Users_user_id,
-     Kelas_kelas_id
-    )
-    REFERENCES Kelas
-    (
-     Users_user_id ,
-     kelas_id
-    )
-    ON DELETE CASCADE
-    ON UPDATE CASCADE;
+-- ALTER TABLE Student_Class_Enrollment
+--     ADD CONSTRAINT Student_Class_Enrollment_Kelas_FK FOREIGN KEY
+--     (
+--      Kelas_Users_user_id,
+--      Kelas_kelas_id
+--     )
+--     REFERENCES Kelas
+--     (
+--      Users_user_id ,
+--      kelas_id
+--     )
+--     ON DELETE CASCADE
+--    ON UPDATE CASCADE;
 
 ALTER TABLE pengumuman
 ADD COLUMN waktu TIMESTAMP;
