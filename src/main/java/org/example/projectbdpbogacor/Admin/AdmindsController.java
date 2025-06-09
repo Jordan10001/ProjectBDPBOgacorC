@@ -13,6 +13,8 @@ import org.example.projectbdpbogacor.Aset.HashGenerator;
 import org.example.projectbdpbogacor.DBSource.DBS;
 import org.example.projectbdpbogacor.HelloApplication;
 import org.example.projectbdpbogacor.model.PengumumanEntry; // Import the PengumumanEntry model
+import org.example.projectbdpbogacor.model.SubjectAssignmentEntry;
+import org.example.projectbdpbogacor.model.UserTableEntry;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -2123,80 +2125,8 @@ public class AdmindsController {
     }
 
     // NEW: Model Class for UserTableEntry (for "View All Users" table)
-    public static class UserTableEntry {
-        private final StringProperty userId;
-        private final StringProperty username;
-        private final StringProperty nisNip;
-        private final StringProperty nama;
-        private final StringProperty gender;
-        private final StringProperty alamat;
-        private final StringProperty email;
-        private final StringProperty nomerHp;
-        private final StringProperty roleName; // Full role name
 
-        public UserTableEntry(String userId, String username, String nisNip, String nama, String gender, String alamat, String email, String nomerHp, String roleName) {
-            this.userId = new SimpleStringProperty(userId);
-            this.username = new SimpleStringProperty(username);
-            this.nisNip = new SimpleStringProperty(nisNip);
-            this.nama = new SimpleStringProperty(nama);
-            this.gender = new SimpleStringProperty(gender);
-            this.alamat = new SimpleStringProperty(alamat);
-            this.email = new SimpleStringProperty(email);
-            this.nomerHp = new SimpleStringProperty(nomerHp);
-            this.roleName = new SimpleStringProperty(roleName);
-        }
-
-        public String getUserId() { return userId.get(); }
-        public StringProperty userIdProperty() { return userId; }
-        public String getUsername() { return username.get(); }
-        public StringProperty usernameProperty() { return username; }
-        public String getNisNip() { return nisNip.get(); }
-        public StringProperty nisNipProperty() { return nisNip; }
-        public String getNama() { return nama.get(); }
-        public StringProperty namaProperty() { return nama; }
-        public String getGender() { return gender.get(); }
-        public StringProperty genderProperty() { return gender; }
-        public String getAlamat() { return alamat.get(); }
-        public StringProperty alamatProperty() { return alamat; }
-        public String getEmail() { return email.get(); }
-        public StringProperty emailProperty() { return email; }
-        public String getNomerHp() { return nomerHp.get(); }
-        public StringProperty nomerHpProperty() { return nomerHp; }
-        public String getRoleName() { return roleName.get(); }
-        public StringProperty roleNameProperty() { return roleName; }
-    }
 
     // NEW: Model Class for SubjectAssignmentEntry
-    public static class SubjectAssignmentEntry {
-        private final StringProperty subjectName;
-        private final StringProperty className;
-        private final StringProperty teacherName;
-        private final String teacherId; // Store actual IDs for deletion
-        private final int subjectId;
-        private final String kelasWaliId;
-        private final int kelasId;
 
-        public SubjectAssignmentEntry(String subjectName, String className, String teacherName,
-                                      String teacherId, int subjectId, String kelasWaliId, int kelasId) {
-            this.subjectName = new SimpleStringProperty(subjectName);
-            this.className = new SimpleStringProperty(className);
-            this.teacherName = new SimpleStringProperty(teacherName);
-            this.teacherId = teacherId;
-            this.subjectId = subjectId;
-            this.kelasWaliId = kelasWaliId;
-            this.kelasId = kelasId;
-        }
-
-        public String getSubjectName() { return subjectName.get(); }
-        public StringProperty subjectNameProperty() { return subjectName; }
-        public String getClassName() { return className.get(); }
-        public StringProperty classNameProperty() { return className; }
-        public String getTeacherName() { return teacherName.get(); }
-        public StringProperty teacherNameProperty() { return teacherName; }
-
-        public String getTeacherId() { return teacherId; }
-        public int getSubjectId() { return subjectId; }
-        public String getKelasWaliId() { return kelasWaliId; }
-        public int getKelasId() { return kelasId; }
-    }
 }
