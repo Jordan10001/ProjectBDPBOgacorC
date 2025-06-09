@@ -36,6 +36,12 @@ public class KepaladsController {
     private TableColumn<PengumumanEntry, String> announcementWaktuColumn; // Column for announcement time
     @FXML
     private TableColumn<PengumumanEntry, String> announcementContentColumn; // Column for announcement content
+    @FXML
+    private Button createAnnouncementButton; // Assuming you have a button to create
+    @FXML
+    private Button updateAnnouncementButton; // Assuming you have a button to update
+    @FXML
+    private Button deleteAnnouncementButton; // Assuming you have a button to delete
 
 
     // View All Users (NEW FXML elements)
@@ -92,10 +98,18 @@ public class KepaladsController {
         announcementTable.getSelectionModel().selectedItemProperty().addListener((observable, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 announcementTextArea.setText(newSelection.getPengumuman()); // Populate text area with selected announcement content
+                updateAnnouncementButton.setDisable(false); // Enable update
+                deleteAnnouncementButton.setDisable(false); // Enable delete
+                createAnnouncementButton.setDisable(true); // Disable create
             } else {
                 announcementTextArea.clear(); // Clear text area if no selection
+                updateAnnouncementButton.setDisable(true); // Disable update
+                deleteAnnouncementButton.setDisable(true); // Disable delete
+                createAnnouncementButton.setDisable(false); // Enable create
             }
         });
+        updateAnnouncementButton.setDisable(true); // Disable initially
+        deleteAnnouncementButton.setDisable(true); // Disable initially
 
 
         // Add listeners to tabs to load data when selected
@@ -105,6 +119,9 @@ public class KepaladsController {
                     loadAllUsersToTable(filterRoleChoiceBox.getValue(), filterNameField.getText());
                 } else if (newTab.getText().equals("Announcements")) { // Added this case
                     loadAnnouncements();
+                    updateAnnouncementButton.setDisable(true); // Ensure disabled on tab change
+                    deleteAnnouncementButton.setDisable(true); // Ensure disabled on tab change
+                    createAnnouncementButton.setDisable(false); // Ensure enabled on tab change
                 }
             }
         });

@@ -132,6 +132,12 @@ public class AdmindsController {
     private TableColumn<PengumumanEntry, String> announcementWaktuColumn; // Column for announcement time
     @FXML
     private TableColumn<PengumumanEntry, String> announcementContentColumn; // Column for announcement content
+    @FXML
+    private Button createAnnouncementButton; // Assuming you have a button to create
+    @FXML
+    private Button updateAnnouncementButton; // Assuming you have a button to update
+    @FXML
+    private Button deleteAnnouncementButton; // Assuming you have a button to delete
 
 
     // Manage Class
@@ -184,11 +190,15 @@ public class AdmindsController {
     @FXML
     private ChoiceBox newCategoryChoiceBox; // Category for the new subject
     @FXML
+    private Button addSubjectButton; // Assuming a button for adding subject
+    @FXML
     private ChoiceBox<String> assignTeacherSubjectChoiceBox; // Subject to assign
     @FXML
     private ChoiceBox<String> assignTeacherClassChoiceBox; // Class for the assignment
     @FXML
     private ChoiceBox<String> assignTeacherGuruChoiceBox; // Teacher to assign
+    @FXML
+    private Button assignTeacherButton; // Assuming a button for assigning teacher
     @FXML
     private TableView<SubjectAssignmentEntry> subjectAssignmentTable; // Table to view assignments
     @FXML
@@ -233,6 +243,7 @@ public class AdmindsController {
         loadRolesForChoiceBox(); // Load roles into the newRoleChoiceBox
         newRoleChoiceBox.setValue("Siswa"); // Default to student for adding users
 
+
         // Add listener to newRoleChoiceBox to auto-fill newUserIdField
         newRoleChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
@@ -268,6 +279,15 @@ public class AdmindsController {
         // Initialize Student in Class Table
         initStudentInClassTable();
         loadClassesForStudentFilter(); // Load classes for the filter dropdown
+        // Listener for Student in Class Table selection
+        studentInClassTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            boolean isSelected = newValue != null;
+            deleteStudentFromClassButton.setDisable(!isSelected);
+            editStudentInClassButton.setDisable(!isSelected);
+        });
+        deleteStudentFromClassButton.setDisable(true); // Disable initially
+        editStudentInClassButton.setDisable(true); // Disable initially
+
 
         // Initialize elements for Manage Class
         loadWaliKelasForChoiceBox();
@@ -276,10 +296,16 @@ public class AdmindsController {
         editClassChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 handleClassSelectionForEdit();
+                updateClassButton.setDisable(false); // Enable update
+                deleteClassButton.setDisable(false); // Enable delete
             } else {
                 clearClassEditFields();
+                updateClassButton.setDisable(true); // Disable update
+                deleteClassButton.setDisable(true); // Disable delete
             }
         });
+        updateClassButton.setDisable(true); // Disable initially
+        deleteClassButton.setDisable(true); // Disable initially
 
 
         // Initialize all users table
@@ -295,16 +321,33 @@ public class AdmindsController {
         // loadSubjectsForAssignmentChoiceBox(); // Re-use existing loadSubjectsForChoiceBox
         // loadClassesForAssignmentChoiceBox(); // Re-use existing loadClassesForChoiceBox
 
+        // Listener for Subject Assignment Table selection
+        subjectAssignmentTable.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+            boolean isSelected = newValue != null;
+            deleteAssignmentButton.setDisable(!isSelected);
+        });
+        deleteAssignmentButton.setDisable(true); // Disable initially
+
+
         // Initialize announcement table
         initAnnouncementTable();
         // Add listener for announcement table selection
         announcementTable.getSelectionModel().selectedItemProperty().addListener((observable, oldSelection, newSelection) -> {
             if (newSelection != null) {
                 announcementTextArea.setText(newSelection.getPengumuman()); // Populate text area with selected announcement content
+                updateAnnouncementButton.setDisable(false); // Enable update
+                deleteAnnouncementButton.setDisable(false); // Enable delete
+                createAnnouncementButton.setDisable(true); // Disable create
             } else {
                 announcementTextArea.clear(); // Clear text area if no selection
+                updateAnnouncementButton.setDisable(true); // Disable update
+                deleteAnnouncementButton.setDisable(true); // Disable delete
+                createAnnouncementButton.setDisable(false); // Enable create
             }
         });
+        updateAnnouncementButton.setDisable(true); // Disable initially
+        deleteAnnouncementButton.setDisable(true); // Disable initially
+
 
         // Add listeners to tabs to load data when selected
         adminTabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
@@ -319,17 +362,23 @@ public class AdmindsController {
                         // Clear selected user fields when switching to this tab
                         editUserChoiceBox.getSelectionModel().clearSelection();
                         clearEditUserFields();
+                        updateUserButton.setDisable(true); // Ensure disabled on tab change
+                        deleteUserButton.setDisable(true); // Ensure disabled on tab change
                         break;
                     case "Manage Students in Class": // This tab now includes student assignment
                         loadStudentsForChoiceBox(); // Refresh students
                         loadClassesForStudentFilter(); // Refresh classes for filter and assignment
                         studentInClassTableView.getItems().clear(); // Clear table until a class is selected
+                        deleteStudentFromClassButton.setDisable(true); // Ensure disabled on tab change
+                        editStudentInClassButton.setDisable(true); // Ensure disabled on tab change
                         break;
                     case "Manage Classes":
                         loadWaliKelasForChoiceBox(); // Refresh wali kelas list
                         loadSemestersForChoiceBox(); // Refresh semester list
                         loadClassesForEdit(); // Refresh classes for edit/delete
                         clearClassEditFields();
+                        updateClassButton.setDisable(true); // Ensure disabled on tab change
+                        deleteClassButton.setDisable(true); // Ensure disabled on tab change
                         break;
                     case "View All Users":
                         loadAllUsersToTable(filterRoleChoiceBox.getValue(), filterNameField.getText()); // Load all users to the table with current filters
@@ -339,9 +388,13 @@ public class AdmindsController {
                         loadClassesForChoiceBox(); // Populate assignTeacherClassChoiceBox
                         loadGuruForChoiceBox(); // Populate assignTeacherGuruChoiceBox
                         loadSubjectAssignments(); // Load existing assignments
+                        deleteAssignmentButton.setDisable(true); // Ensure disabled on tab change
                         break;
                     case "Announcements": // Handle "Announcements" tab selection
                         loadAnnouncements(); // Load announcements when the tab is selected
+                        updateAnnouncementButton.setDisable(true); // Ensure disabled on tab change
+                        deleteAnnouncementButton.setDisable(true); // Ensure disabled on tab change
+                        createAnnouncementButton.setDisable(false); // Ensure enabled on tab change
                         break;
                 }
             }
@@ -354,6 +407,10 @@ public class AdmindsController {
         // Load all users initially
         loadAllUsersToTable(filterRoleChoiceBox.getValue(), filterNameField.getText());
         loadAnnouncements(); // Load announcements initially
+
+        // Set initial state for Manage Users (Edit/Delete) buttons
+        updateUserButton.setDisable(true);
+        deleteUserButton.setDisable(true);
     }
 
     private void loadAdminName() {
@@ -555,6 +612,8 @@ public class AdmindsController {
         loadUsersForEditDelete(editUserFilterRoleChoiceBox.getValue());
         clearEditUserFields(); // Clear fields when filter changes
         editUserChoiceBox.getSelectionModel().clearSelection(); // Clear selection
+        updateUserButton.setDisable(true); // Disable update
+        deleteUserButton.setDisable(true); // Disable delete
     }
 
     @FXML
@@ -562,6 +621,8 @@ public class AdmindsController {
         String selectedUserDisplay = editUserChoiceBox.getValue();
         if (selectedUserDisplay == null || selectedUserDisplay.isEmpty()) {
             clearEditUserFields();
+            updateUserButton.setDisable(true);
+            deleteUserButton.setDisable(true);
             return;
         }
 
@@ -573,6 +634,8 @@ public class AdmindsController {
 
         if (userIdToEdit == null) {
             clearEditUserFields();
+            updateUserButton.setDisable(true);
+            deleteUserButton.setDisable(true);
             return;
         }
 
@@ -593,13 +656,19 @@ public class AdmindsController {
                 editNomerHpField.setText(rs.getString("nomer_hp"));
                 String roleId = rs.getString("Role_role_id");
                 editRoleChoiceBox.setValue(roleIdToNameMap.get(roleId));
+                updateUserButton.setDisable(false); // Enable update
+                deleteUserButton.setDisable(false); // Enable delete
             } else {
                 clearEditUserFields();
+                updateUserButton.setDisable(true);
+                deleteUserButton.setDisable(true);
             }
         } catch (SQLException e) {
             AlertClass.ErrorAlert("Database Error", "Failed to load user details", e.getMessage());
             e.printStackTrace();
             clearEditUserFields();
+            updateUserButton.setDisable(true);
+            deleteUserButton.setDisable(true);
         }
     }
 
@@ -688,6 +757,8 @@ public class AdmindsController {
                 loadClassesForChoiceBox(); // Refresh classes if wali kelas info changed
                 loadAllUsersToTable(filterRoleChoiceBox.getValue(), filterNameField.getText()); // Refresh all users table
                 loadSubjectAssignments(); // Refresh subject assignments if a guru was updated
+                updateUserButton.setDisable(true); // Disable update after success
+                deleteUserButton.setDisable(true); // Disable delete after success
             } else {
                 AlertClass.ErrorAlert("Failed", "User Not Updated", "Failed to update user. User ID might not exist.");
             }
@@ -782,6 +853,8 @@ public class AdmindsController {
                     loadClassesForChoiceBox(); // Refresh classes if wali kelas deleted
                     loadAllUsersToTable(filterRoleChoiceBox.getValue(), filterNameField.getText()); // Refresh all users table
                     loadSubjectAssignments(); // Refresh subject assignments
+                    updateUserButton.setDisable(true); // Disable update after success
+                    deleteUserButton.setDisable(true); // Disable delete after success
                 } else {
                     AlertClass.ErrorAlert("Failed", "User Not Deleted", "Failed to delete user. User ID might not exist or there are other dependencies.");
                 }
@@ -1132,6 +1205,7 @@ public class AdmindsController {
                 if (rowsAffected > 0) {
                     AlertClass.InformationAlert("Success", "Assignment Deleted", "Subject assignment has been deleted.");
                     loadSubjectAssignments(); // Refresh the table
+                    deleteAssignmentButton.setDisable(true); // Disable delete after success
                 } else {
                     AlertClass.ErrorAlert("Failed", "Deletion Failed", "Failed to delete subject assignment. It might not exist.");
                 }
@@ -1538,6 +1612,8 @@ public class AdmindsController {
                 if (rowsAffected > 0) {
                     AlertClass.InformationAlert("Success", "Student Removed", "'" + selectedStudent.getStudentName() + "' has been removed from the class.");
                     loadStudentsInSelectedClass(); // Refresh table
+                    deleteStudentFromClassButton.setDisable(true); // Disable after success
+                    editStudentInClassButton.setDisable(true); // Disable after success
                 } else {
                     AlertClass.ErrorAlert("Failed", "Removal Failed", "Failed to remove student from class. Enrollment might not exist.");
                 }
@@ -1637,12 +1713,16 @@ public class AdmindsController {
         String selectedClassDisplay = editClassChoiceBox.getValue();
         if (selectedClassDisplay == null || selectedClassDisplay.isEmpty()) {
             clearClassEditFields();
+            updateClassButton.setDisable(true);
+            deleteClassButton.setDisable(true);
             return;
         }
 
         String combinedId = editableClassesMap.get(selectedClassDisplay);
         if (combinedId == null) {
             clearClassEditFields();
+            updateClassButton.setDisable(true);
+            deleteClassButton.setDisable(true);
             return;
         }
         String[] ids = combinedId.split("-");
@@ -1670,13 +1750,19 @@ public class AdmindsController {
                         .filter(p -> p.getValue().equals(currentSemesterId))
                         .findFirst()
                         .ifPresent(p -> newClassSemesterChoiceBox.setValue(p.getKey()));
+                updateClassButton.setDisable(false);
+                deleteClassButton.setDisable(false);
             } else {
                 clearClassEditFields();
+                updateClassButton.setDisable(true);
+                deleteClassButton.setDisable(true);
             }
         } catch (SQLException e) {
             AlertClass.ErrorAlert("Database Error", "Failed to load class details for editing", e.getMessage());
             e.printStackTrace();
             clearClassEditFields();
+            updateClassButton.setDisable(true);
+            deleteClassButton.setDisable(true);
         }
     }
 
@@ -1812,6 +1898,8 @@ public class AdmindsController {
                 loadClassesForEdit(); // Refresh the choice box
                 loadClassesForChoiceBox(); // Refresh class list in other sections
                 loadSubjectAssignments(); // Refresh assignments if class info changed
+                updateClassButton.setDisable(true); // Disable after success
+                deleteClassButton.setDisable(true); // Disable after success
             } else {
                 AlertClass.ErrorAlert("Failed", "Class Not Updated", "Failed to update class. Class ID or Wali Kelas might not exist, or there are unhandled dependencies (e.g., if you tried to change the Wali Kelas and FKs prevent it).");
             }
@@ -1878,6 +1966,8 @@ public class AdmindsController {
                     loadClassesForEdit(); // Refresh the choice box
                     loadClassesForChoiceBox(); // Refresh class list in other sections
                     loadSubjectAssignments(); // Refresh subject assignments
+                    updateClassButton.setDisable(true); // Disable after success
+                    deleteClassButton.setDisable(true); // Disable after success
                 } else {
                     AlertClass.ErrorAlert("Failed", "Class Not Deleted", "Failed to delete class. Class might not exist or there are remaining dependencies.");
                 }

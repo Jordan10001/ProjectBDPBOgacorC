@@ -431,9 +431,9 @@
                                 </Label>
                                 <TextArea fx:id="announcementTextArea" prefHeight="100.0" promptText="Enter announcement content here..." />
                                 <HBox alignment="CENTER" spacing="10.0">
-                                    <Button onAction="#handleCreateAnnouncement" text="Publish Announcement" />
-                                    <Button onAction="#handleUpdateAnnouncement" text="Update Selected" />
-                                    <Button onAction="#handleDeleteAnnouncement" text="Delete Selected" />
+                                    <Button fx:id="createAnnouncementButton" onAction="#handleCreateAnnouncement" text="Publish Announcement" />
+                                    <Button fx:id="updateAnnouncementButton" onAction="#handleUpdateAnnouncement" text="Update Selected" />
+                                    <Button fx:id="deleteAnnouncementButton" onAction="#handleDeleteAnnouncement" text="Delete Selected" />
                                 </HBox>
                                 <TableView fx:id="announcementTable" prefHeight="300.0" prefWidth="1240.0">
                                     <columns>
