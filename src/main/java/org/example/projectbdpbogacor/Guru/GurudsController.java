@@ -24,7 +24,7 @@ import org.example.projectbdpbogacor.model.AbsensiEntry;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Button;
-import javafx.scene.control.MenuItem;
+import javafx.scene.control.MenuItem; // For ContextMenu items
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -74,7 +74,7 @@ public class GurudsController {
     @FXML
     private ChoiceBox<String> gradeSemesterChoiceBox; // Display: "Tahun Ajaran - Semester"
     @FXML
-    private ChoiceBox<String> gradeTypeChoiseBox; // TextField for jenis nilai
+    private ChoiceBox<String> gradeTypeChoiseBox; // ChoiceBox for jenis nilai
     @FXML
     private TextField scoreField;
     @FXML
@@ -85,6 +85,14 @@ public class GurudsController {
     private TableColumn<NilaiEntry, String> existingNamaMapelColumn;
     @FXML
     private TableColumn<NilaiEntry, Integer> existingNilaiColumn;
+    // New Buttons for Grades
+    @FXML
+    private Button submitGradeButton; // Assuming you have a submit button
+    @FXML
+    private Button updateGradeButton;
+    @FXML
+    private Button deleteGradeButton;
+
 
     // Manage Assignments (New FXML Elements)
     @FXML
@@ -98,6 +106,10 @@ public class GurudsController {
     @FXML
     private Button addTugasButton;
     @FXML
+    private Button updateTugasButton; // New Update Button
+    @FXML
+    private Button deleteTugasButton; // New Delete Button
+    @FXML
     private TableView<TugasEntry> tugasTable;
     @FXML
     private TableColumn<TugasEntry, String> tugasKeteranganColumn;
@@ -109,8 +121,7 @@ public class GurudsController {
     private TableColumn<TugasEntry, String> tugasMapelColumn;
     @FXML
     private TableColumn<TugasEntry, String> tugasKelasColumn;
-    @FXML
-    private MenuItem deleteTugasButton;
+    // Removed MenuItem as we're adding direct buttons
 
     // Manage Materials (New FXML Elements)
     @FXML
@@ -122,6 +133,10 @@ public class GurudsController {
     @FXML
     private Button addMateriButton;
     @FXML
+    private Button updateMateriButton; // New Update Button
+    @FXML
+    private Button deleteMateriButton; // New Delete Button
+    @FXML
     private TableView<MateriEntry> materiTable;
     @FXML
     private TableColumn<MateriEntry, String> materiNamaMateriColumn;
@@ -129,8 +144,7 @@ public class GurudsController {
     private TableColumn<MateriEntry, String> materiMapelColumn;
     @FXML
     private TableColumn<MateriEntry, String> materiKelasColumn;
-    @FXML
-    private MenuItem deleteMateriButton;
+    // Removed MenuItem as we're adding direct buttons
 
     // Manage Exams (New FXML Elements)
     @FXML
@@ -144,6 +158,10 @@ public class GurudsController {
     @FXML
     private Button addUjianButton;
     @FXML
+    private Button updateUjianButton; // New Update Button
+    @FXML
+    private Button deleteUjianButton; // New Delete Button
+    @FXML
     private TableView<UjianEntry> ujianTable;
     @FXML
     private TableColumn<UjianEntry, String> ujianJenisColumn;
@@ -153,8 +171,7 @@ public class GurudsController {
     private TableColumn<UjianEntry, String> ujianMapelColumn;
     @FXML
     private TableColumn<UjianEntry, String> ujianKelasColumn;
-    @FXML
-    private MenuItem deleteUjianButton;
+    // Removed MenuItem as we're adding direct buttons
 
     // Announcements (Updated FXML Elements for Guru to only view announcements)
     @FXML
@@ -238,6 +255,11 @@ public class GurudsController {
         gradeTypeChoiseBox.getItems().addAll("UTS", "UAS", "TUGAS 1", "TUGAS 2", "TUGAS 3", "TUGAS 4");
         gradeTypeChoiseBox.setValue("Tugas 1");
 
+        // Add listeners for table selections to enable edit/delete buttons and populate fields
+        setupGradeTableSelectionListener();
+        setupTugasTableSelectionListener();
+        setupMateriTableSelectionListener();
+        setupUjianTableSelectionListener();
 
 
         // NEW: Absensi ChoiceBox listeners
@@ -361,6 +383,9 @@ public class GurudsController {
                 classesMap.put(display, combinedId);
                 scheduleClassChoiceBox.getItems().add(display);
                 gradeClassChoiceBox.getItems().add(display);
+                tugasClassChoiceBox.getItems().add(display); // Populate for Tugas
+                materiClassChoiceBox.getItems().add(display); // Populate for Materi
+                ujianClassChoiceBox.getItems().add(display); // Populate for Ujian
                 absensiClassChoiceBox.getItems().add(display);
             }
         } catch (SQLException e) {
@@ -390,6 +415,9 @@ public class GurudsController {
                 subjectsMap.put(namaMapel, mapelId);
                 scheduleSubjectChoiceBox.getItems().add(namaMapel);
                 gradeSubjectChoiceBox.getItems().add(namaMapel);
+                tugasSubjectChoiceBox.getItems().add(namaMapel); // Populate for Tugas
+                materiSubjectChoiceBox.getItems().add(namaMapel); // Populate for Materi
+                ujianSubjectChoiceBox.getItems().add(namaMapel); // Populate for Ujian
                 absensiSubjectChoiceBox.getItems().add(namaMapel);
             }
         } catch (SQLException e) {
@@ -469,6 +497,34 @@ public class GurudsController {
         existingJenisNilaiColumn.setCellValueFactory(new PropertyValueFactory<>("jenisNilai"));
         existingNamaMapelColumn.setCellValueFactory(new PropertyValueFactory<>("namaMapel"));
         existingNilaiColumn.setCellValueFactory(new PropertyValueFactory<>("nilai"));
+    }
+
+    private void setupGradeTableSelectionListener() {
+        existingGradesTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                // Populate fields when a row is selected
+                gradeTypeChoiseBox.setValue(newSelection.getJenisNilai());
+                // For subject, we need to map mapel_id back to display name or select from existing choices
+                // This might be tricky if a teacher teaches the same subject in multiple classes and the mapel_id isn't unique across them
+                // For simplicity, we'll assume the subject choice box is already populated with relevant subjects
+                gradeSubjectChoiceBox.setValue(newSelection.getNamaMapel());
+                scoreField.setText(String.valueOf(newSelection.getNilai()));
+
+                // Enable update/delete buttons
+                updateGradeButton.setDisable(false);
+                deleteGradeButton.setDisable(false);
+                submitGradeButton.setDisable(true); // Disable submit when editing
+            } else {
+                // Clear fields and disable buttons when no row is selected
+                gradeTypeChoiseBox.getSelectionModel().clearSelection();
+                gradeSubjectChoiceBox.getSelectionModel().clearSelection();
+                scoreField.clear();
+
+                updateGradeButton.setDisable(true);
+                deleteGradeButton.setDisable(true);
+                submitGradeButton.setDisable(false); // Enable submit when not editing
+            }
+        });
     }
 
     private void loadSemesters() {
@@ -644,6 +700,93 @@ public class GurudsController {
         }
     }
 
+    @FXML
+    void handleUpdateGrade() {
+        NilaiEntry selectedGrade = existingGradesTable.getSelectionModel().getSelectedItem();
+        if (selectedGrade == null) {
+            AlertClass.WarningAlert("Selection Error", "No Grade Selected", "Please select a grade to update.");
+            return;
+        }
+
+        String jenisNilai = gradeTypeChoiseBox.getValue();
+        String scoreText = scoreField.getText();
+
+        if (jenisNilai == null || scoreText.isEmpty()) {
+            AlertClass.WarningAlert("Input Error", "Missing Information", "Please fill in all grade details.");
+            return;
+        }
+
+        int score;
+        try {
+            score = Integer.parseInt(scoreText);
+            if (score < 0 || score > 100) {
+                AlertClass.WarningAlert("Input Error", "Invalid Score", "Score must be between 0 and 100.");
+                return;
+            }
+        } catch (NumberFormatException e) {
+            AlertClass.WarningAlert("Input Error", "Invalid Score", "Please enter a valid number for the score.");
+            return;
+        }
+
+        try (Connection con = DBS.getConnection()) {
+            String sql = "UPDATE Nilai SET jenis_nilai = ?, nilai = ? WHERE nilai_id = ?";
+            PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setString(1, jenisNilai);
+            stmt.setInt(2, score);
+            stmt.setInt(3, selectedGrade.getNilaiId());
+
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                AlertClass.InformationAlert("Success", "Grade Updated", "Grade updated successfully.");
+                scoreField.clear();
+                existingGradesTable.getSelectionModel().clearSelection(); // Clear selection after update
+                loadExistingGrades();
+            } else {
+                AlertClass.ErrorAlert("Failed", "Grade Not Updated", "Failed to update grade.");
+            }
+        } catch (SQLException e) {
+            AlertClass.ErrorAlert("Database Error", "Failed to update grade", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void handleDeleteGrade() {
+        NilaiEntry selectedGrade = existingGradesTable.getSelectionModel().getSelectedItem();
+        if (selectedGrade == null) {
+            AlertClass.WarningAlert("Selection Error", "No Grade Selected", "Please select a grade to delete.");
+            return;
+        }
+
+        Optional<javafx.scene.control.ButtonType> result = AlertClass.ConfirmationAlert(
+                "Confirm Deletion",
+                "Delete Grade",
+                "Are you sure you want to delete this grade? This action cannot be undone."
+        );
+
+        if (result.isPresent() && result.get() == javafx.scene.control.ButtonType.OK) {
+            try (Connection con = DBS.getConnection()) {
+                String sql = "DELETE FROM Nilai WHERE nilai_id = ?";
+                PreparedStatement stmt = con.prepareStatement(sql);
+                stmt.setInt(1, selectedGrade.getNilaiId());
+
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    AlertClass.InformationAlert("Success", "Grade Deleted", "Grade deleted successfully.");
+                    scoreField.clear();
+                    existingGradesTable.getSelectionModel().clearSelection(); // Clear selection after delete
+                    loadExistingGrades();
+                } else {
+                    AlertClass.ErrorAlert("Failed", "Deletion Failed", "Failed to delete grade.");
+                }
+            } catch (SQLException e) {
+                AlertClass.ErrorAlert("Database Error", "Failed to delete grade", e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+
     private void loadExistingGrades() {
         ObservableList<NilaiEntry> existingGrades = FXCollections.observableArrayList();
         String selectedStudentDisplay = gradeStudentChoiceBox.getValue();
@@ -664,7 +807,7 @@ public class GurudsController {
             return;
         }
 
-        String sql = "SELECT n.jenis_nilai, m.nama_mapel, n.nilai " +
+        String sql = "SELECT n.nilai_id, n.jenis_nilai, m.nama_mapel, n.nilai " + // Select nilai_id
                 "FROM Nilai n " +
                 "JOIN Matpel m ON n.Matpel_mapel_id = m.mapel_id " +
                 "JOIN Rapor r ON n.Rapor_rapor_id = r.rapor_id " +
@@ -677,6 +820,7 @@ public class GurudsController {
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 existingGrades.add(new NilaiEntry(
+                        rs.getInt("nilai_id"), // Pass nilai_id to the constructor
                         rs.getString("jenis_nilai"),
                         rs.getString("nama_mapel"),
                         rs.getInt("nilai")
@@ -696,6 +840,30 @@ public class GurudsController {
         tugasTanggalRilisColumn.setCellValueFactory(new PropertyValueFactory<>("tanggalDirelease"));
         tugasMapelColumn.setCellValueFactory(new PropertyValueFactory<>("namaMapel"));
         tugasKelasColumn.setCellValueFactory(new PropertyValueFactory<>("namaKelas"));
+    }
+
+    private void setupTugasTableSelectionListener() {
+        tugasTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                tugasKeteranganArea.setText(newSelection.getKeterangan());
+                tugasDeadlinePicker.setValue(LocalDate.parse(newSelection.getDeadline().substring(0, 10))); // Parse only date part
+                tugasClassChoiceBox.setValue(newSelection.getNamaKelas()); // This might need mapping if display is complex
+                tugasSubjectChoiceBox.setValue(newSelection.getNamaMapel()); // This might need mapping
+
+                updateTugasButton.setDisable(false);
+                deleteTugasButton.setDisable(false);
+                addTugasButton.setDisable(true);
+            } else {
+                tugasKeteranganArea.clear();
+                tugasDeadlinePicker.setValue(null);
+                tugasClassChoiceBox.getSelectionModel().clearSelection();
+                tugasSubjectChoiceBox.getSelectionModel().clearSelection();
+
+                updateTugasButton.setDisable(true);
+                deleteTugasButton.setDisable(true);
+                addTugasButton.setDisable(false);
+            }
+        });
     }
 
     @FXML
@@ -766,6 +934,49 @@ public class GurudsController {
     }
 
     @FXML
+    void handleUpdateTugas() {
+        TugasEntry selectedTugas = tugasTable.getSelectionModel().getSelectedItem();
+        if (selectedTugas == null) {
+            AlertClass.WarningAlert("Selection Error", "No Assignment Selected", "Please select an assignment to update.");
+            return;
+        }
+
+        String keterangan = tugasKeteranganArea.getText();
+        LocalDate deadlineDate = tugasDeadlinePicker.getValue();
+
+        if (keterangan.isEmpty() || deadlineDate == null) {
+            AlertClass.WarningAlert("Input Error", "Missing Information", "Please fill in all assignment details.");
+            return;
+        }
+
+        LocalDateTime deadline = deadlineDate.atTime(23, 59, 59);
+
+        try (Connection con = DBS.getConnection()) {
+            String sql = "UPDATE Tugas SET keterangan = ?, deadline = ? WHERE tugas_id = ? AND Kelas_Users_user_id = ? AND Kelas_kelas_id = ?";
+            PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setString(1, keterangan);
+            stmt.setTimestamp(2, Timestamp.valueOf(deadline));
+            stmt.setInt(3, selectedTugas.getTugasId());
+            stmt.setString(4, selectedTugas.getKelasWaliId());
+            stmt.setInt(5, selectedTugas.getKelasId());
+
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                AlertClass.InformationAlert("Success", "Assignment Updated", "Assignment updated successfully.");
+                tugasKeteranganArea.clear();
+                tugasDeadlinePicker.setValue(null);
+                tugasTable.getSelectionModel().clearSelection();
+                loadTugas();
+            } else {
+                AlertClass.ErrorAlert("Failed", "Assignment Not Updated", "Failed to update assignment. It might not exist or you lack permission.");
+            }
+        } catch (SQLException e) {
+            AlertClass.ErrorAlert("Database Error", "Failed to update assignment", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
     void loadTugas() {
         ObservableList<TugasEntry> tugasList = FXCollections.observableArrayList();
         String sql = "SELECT t.tugas_id, t.keterangan, t.deadline, t.tanggal_direlease, m.nama_mapel, k.nama_kelas, t.Kelas_Users_user_id, t.Kelas_kelas_id " +
@@ -823,6 +1034,9 @@ public class GurudsController {
                 int rowsAffected = stmt.executeUpdate();
                 if (rowsAffected > 0) {
                     AlertClass.InformationAlert("Success", "Assignment Deleted", "Assignment deleted successfully.");
+                    tugasKeteranganArea.clear();
+                    tugasDeadlinePicker.setValue(null);
+                    tugasTable.getSelectionModel().clearSelection();
                     loadTugas();
                 } else {
                     AlertClass.ErrorAlert("Failed", "Deletion Failed", "Failed to delete assignment. It might not exist or you lack permission.");
@@ -840,6 +1054,28 @@ public class GurudsController {
         materiNamaMateriColumn.setCellValueFactory(new PropertyValueFactory<>("namaMateri"));
         materiMapelColumn.setCellValueFactory(new PropertyValueFactory<>("namaMapel"));
         materiKelasColumn.setCellValueFactory(new PropertyValueFactory<>("namaKelas"));
+    }
+
+    private void setupMateriTableSelectionListener() {
+        materiTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                materiNamaMateriField.setText(newSelection.getNamaMateri());
+                materiClassChoiceBox.setValue(newSelection.getNamaKelas());
+                materiSubjectChoiceBox.setValue(newSelection.getNamaMapel());
+
+                updateMateriButton.setDisable(false);
+                deleteMateriButton.setDisable(false);
+                addMateriButton.setDisable(true);
+            } else {
+                materiNamaMateriField.clear();
+                materiClassChoiceBox.getSelectionModel().clearSelection();
+                materiSubjectChoiceBox.getSelectionModel().clearSelection();
+
+                updateMateriButton.setDisable(true);
+                deleteMateriButton.setDisable(true);
+                addMateriButton.setDisable(false);
+            }
+        });
     }
 
     @FXML
@@ -903,6 +1139,44 @@ public class GurudsController {
     }
 
     @FXML
+    void handleUpdateMateri() {
+        MateriEntry selectedMateri = materiTable.getSelectionModel().getSelectedItem();
+        if (selectedMateri == null) {
+            AlertClass.WarningAlert("Selection Error", "No Material Selected", "Please select a material to update.");
+            return;
+        }
+
+        String namaMateri = materiNamaMateriField.getText();
+
+        if (namaMateri.isEmpty()) {
+            AlertClass.WarningAlert("Input Error", "Missing Information", "Please enter material name.");
+            return;
+        }
+
+        try (Connection con = DBS.getConnection()) {
+            String sql = "UPDATE Materi SET nama_materi = ? WHERE materi_id = ? AND Kelas_Users_user_id = ? AND Kelas_kelas_id = ?";
+            PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setString(1, namaMateri);
+            stmt.setInt(2, selectedMateri.getMateriId());
+            stmt.setString(3, selectedMateri.getKelasWaliId());
+            stmt.setInt(4, selectedMateri.getKelasId());
+
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                AlertClass.InformationAlert("Success", "Material Updated", "Material updated successfully.");
+                materiNamaMateriField.clear();
+                materiTable.getSelectionModel().clearSelection();
+                loadMateri();
+            } else {
+                AlertClass.ErrorAlert("Failed", "Material Not Updated", "Failed to update material. It might not exist or you lack permission.");
+            }
+        } catch (SQLException e) {
+            AlertClass.ErrorAlert("Database Error", "Failed to update material", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
     void loadMateri() {
         ObservableList<MateriEntry> materiList = FXCollections.observableArrayList();
         String sql = "SELECT mt.materi_id, mt.nama_materi, m.nama_mapel, k.nama_kelas, mt.Kelas_Users_user_id, mt.Kelas_kelas_id " +
@@ -958,6 +1232,8 @@ public class GurudsController {
                 int rowsAffected = stmt.executeUpdate();
                 if (rowsAffected > 0) {
                     AlertClass.InformationAlert("Success", "Material Deleted", "Material deleted successfully.");
+                    materiNamaMateriField.clear();
+                    materiTable.getSelectionModel().clearSelection();
                     loadMateri();
                 } else {
                     AlertClass.ErrorAlert("Failed", "Deletion Failed", "Failed to delete material. It might not exist or you lack permission.");
@@ -975,6 +1251,30 @@ public class GurudsController {
         ujianTanggalColumn.setCellValueFactory(new PropertyValueFactory<>("tanggal"));
         ujianMapelColumn.setCellValueFactory(new PropertyValueFactory<>("namaMapel"));
         ujianKelasColumn.setCellValueFactory(new PropertyValueFactory<>("namaKelas"));
+    }
+
+    private void setupUjianTableSelectionListener() {
+        ujianTable.getSelectionModel().selectedItemProperty().addListener((obs, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                ujianJenisUjianChoiceBox.setValue(newSelection.getJenisUjian());
+                ujianTanggalPicker.setValue(LocalDate.parse(newSelection.getTanggal().substring(0, 10)));
+                ujianClassChoiceBox.setValue(newSelection.getNamaKelas());
+                ujianSubjectChoiceBox.setValue(newSelection.getNamaMapel());
+
+                updateUjianButton.setDisable(false);
+                deleteUjianButton.setDisable(false);
+                addUjianButton.setDisable(true);
+            } else {
+                ujianJenisUjianChoiceBox.getSelectionModel().clearSelection();
+                ujianTanggalPicker.setValue(null);
+                ujianClassChoiceBox.getSelectionModel().clearSelection();
+                ujianSubjectChoiceBox.getSelectionModel().clearSelection();
+
+                updateUjianButton.setDisable(true);
+                deleteUjianButton.setDisable(true);
+                addUjianButton.setDisable(false);
+            }
+        });
     }
 
     @FXML
@@ -1043,6 +1343,49 @@ public class GurudsController {
     }
 
     @FXML
+    void handleUpdateUjian() {
+        UjianEntry selectedUjian = ujianTable.getSelectionModel().getSelectedItem();
+        if (selectedUjian == null) {
+            AlertClass.WarningAlert("Selection Error", "No Exam Selected", "Please select an exam to update.");
+            return;
+        }
+
+        String jenisUjian = ujianJenisUjianChoiceBox.getValue();
+        LocalDate tanggalUjianDate = ujianTanggalPicker.getValue();
+
+        if (jenisUjian == null || tanggalUjianDate == null) {
+            AlertClass.WarningAlert("Input Error", "Missing Information", "Please fill in all exam details.");
+            return;
+        }
+
+        LocalDateTime tanggalUjian = tanggalUjianDate.atTime(8, 0, 0);
+
+        try (Connection con = DBS.getConnection()) {
+            String sql = "UPDATE Ujian SET jenis_ujian = ?, tanggal = ? WHERE ujian_id = ? AND Kelas_Users_user_id = ? AND Kelas_kelas_id = ?";
+            PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setString(1, jenisUjian);
+            stmt.setTimestamp(2, Timestamp.valueOf(tanggalUjian));
+            stmt.setInt(3, selectedUjian.getUjianId());
+            stmt.setString(4, selectedUjian.getKelasWaliId());
+            stmt.setInt(5, selectedUjian.getKelasId());
+
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                AlertClass.InformationAlert("Success", "Exam Updated", "Exam updated successfully.");
+                ujianJenisUjianChoiceBox.getSelectionModel().clearSelection();
+                ujianTanggalPicker.setValue(null);
+                ujianTable.getSelectionModel().clearSelection();
+                loadUjian();
+            } else {
+                AlertClass.ErrorAlert("Failed", "Exam Not Updated", "Failed to update exam. It might not exist or you lack permission.");
+            }
+        } catch (SQLException e) {
+            AlertClass.ErrorAlert("Database Error", "Failed to update exam", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
     void loadUjian() {
         ObservableList<UjianEntry> ujianList = FXCollections.observableArrayList();
         String sql = "SELECT u.ujian_id, u.jenis_ujian, u.tanggal, m.nama_mapel, k.nama_kelas, u.Kelas_Users_user_id, u.Kelas_kelas_id " +
@@ -1099,6 +1442,9 @@ public class GurudsController {
                 int rowsAffected = stmt.executeUpdate();
                 if (rowsAffected > 0) {
                     AlertClass.InformationAlert("Success", "Exam Deleted", "Exam deleted successfully.");
+                    ujianJenisUjianChoiceBox.getSelectionModel().clearSelection();
+                    ujianTanggalPicker.setValue(null);
+                    ujianTable.getSelectionModel().clearSelection();
                     loadUjian();
                 } else {
                     AlertClass.ErrorAlert("Failed", "Deletion Failed", "Failed to delete exam. It might not exist or you lack permission.");
