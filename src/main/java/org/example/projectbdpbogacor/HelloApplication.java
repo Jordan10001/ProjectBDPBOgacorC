@@ -6,6 +6,7 @@ import javafx.scene.Scene;
 import javafx.stage.Stage;
 
 import java.io.IOException;
+import java.util.Objects;
 import java.util.prefs.Preferences;
 
 public class HelloApplication extends Application {
@@ -59,7 +60,7 @@ public class HelloApplication extends Application {
         if (scene != null) { // Ensure scene is not null before applying styles
             scene.getStylesheets().clear();
             String cssPath = isDarkMode ? DARK_MODE_CSS : LIGHT_MODE_CSS;
-            String stylesheet = getClass().getResource(cssPath).toExternalForm();
+            String stylesheet = Objects.requireNonNull(getClass().getResource(cssPath)).toExternalForm();
             scene.getStylesheets().add(stylesheet);
         }
     }
