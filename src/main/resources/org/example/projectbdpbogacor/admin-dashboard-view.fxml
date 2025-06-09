@@ -437,8 +437,8 @@
                                 </HBox>
                                 <TableView fx:id="announcementTable" prefHeight="300.0" prefWidth="1240.0">
                                     <columns>
-                                        <TableColumn fx:id="announcementWaktuColumn" prefWidth="150.0" text="Date/Time" />
-                                        <TableColumn fx:id="announcementContentColumn" prefWidth="800.0" text="Announcement Content" />
+                                        <TableColumn fx:id="announcementWaktuColumn" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" text="Date/Time" />
+                                        <TableColumn fx:id="announcementContentColumn" maxWidth="1090.0" prefWidth="1090.0" text="Announcement Content" />
                                     </columns>
                                 </TableView>
                             </VBox>

@@ -207,25 +207,6 @@
                         </AnchorPane>
                     </content>
                 </Tab>
-                <Tab text="Feedback">
-                    <content>
-                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                            <children>
-                                <VBox alignment="CENTER" layoutX="400.0" layoutY="100.0" prefHeight="300.0" prefWidth="500.0" spacing="20.0">
-                                    <children>
-                                        <Label text="Submit Feedback">
-                                            <font>
-                                                <Font name="System Bold" size="20.0" />
-                                            </font>
-                                        </Label>
-                                        <TextArea fx:id="feedbackTextArea" prefHeight="150.0" prefWidth="400.0" promptText="Enter your feedback here..." wrapText="true" />
-                                        <Button mnemonicParsing="false" onAction="#handleSubmitFeedback" text="Submit Feedback" />
-                                    </children>
-                                </VBox>
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
                 <Tab text="Announcements">
                     <content>
                         <AnchorPane prefHeight="200.0" prefWidth="200.0">

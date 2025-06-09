@@ -3,11 +3,15 @@
 <?import javafx.geometry.Insets?>
 <?import javafx.scene.control.Button?>
 <?import javafx.scene.control.ChoiceBox?>
+<?import javafx.scene.control.ContextMenu?>
+<?import javafx.scene.control.DatePicker?>
 <?import javafx.scene.control.Label?>
+<?import javafx.scene.control.MenuItem?>
 <?import javafx.scene.control.Tab?>
 <?import javafx.scene.control.TabPane?>
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
+<?import javafx.scene.control.TextArea?>
 <?import javafx.scene.control.TextField?>
 <?import javafx.scene.layout.AnchorPane?>
 <?import javafx.scene.layout.ColumnConstraints?>
@@ -17,11 +21,7 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<?import javafx.scene.control.ContextMenu?>
-<?import javafx.scene.control.MenuItem?>
-<?import javafx.scene.control.TextArea?>
-<?import javafx.scene.control.DatePicker?>
-<AnchorPane prefHeight="600.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.projectbdpbogacor.Guru.GurudsController">
+<AnchorPane prefHeight="600.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.projectbdpbogacor.Guru.GurudsController">
     <children>
         <VBox alignment="TOP_CENTER" prefHeight="700.0" prefWidth="1300.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
             <padding>
@@ -33,7 +33,7 @@
                     <content>
                         <AnchorPane prefHeight="200.0" prefWidth="200.0">
                             <children>
-                                <VBox alignment="TOP_CENTER" layoutX="14.0" layoutY="14.0" prefHeight="552.0" prefWidth="1268.0" spacing="10.0">
+                                <VBox alignment="TOP_CENTER" layoutY="17.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="468.0" prefWidth="1260.0" spacing="10.0">
                                     <children>
                                         <Label text="My Class Schedule">
                                             <font>
@@ -52,13 +52,13 @@
                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                             </padding>
                                         </HBox>
-                                        <TableView fx:id="jadwalKelasTable" prefHeight="480.0" prefWidth="1268.0">
+                                        <TableView fx:id="jadwalKelasTable" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="293.0" prefWidth="1225.0">
                                             <columns>
                                                 <TableColumn fx:id="hariColumn" prefWidth="100.0" text="Hari" />
-                                                <TableColumn fx:id="jamMulaiColumn" prefWidth="120.0" text="Jam Mulai" />
-                                                <TableColumn fx:id="jamSelesaiColumn" prefWidth="120.0" text="Jam Selesai" />
-                                                <TableColumn fx:id="namaMapelColumn" prefWidth="300.0" text="Mata Pelajaran" />
-                                                <TableColumn fx:id="namaKelasJadwalColumn" prefWidth="300.0" text="Kelas" />
+                                                <TableColumn fx:id="jamMulaiColumn" prefWidth="160.0" text="Jam Mulai" />
+                                                <TableColumn fx:id="jamSelesaiColumn" prefWidth="160.0" text="Jam Selesai" />
+                                                <TableColumn fx:id="namaMapelColumn" prefWidth="225.0" text="Mata Pelajaran" />
+                                                <TableColumn fx:id="namaKelasJadwalColumn" prefWidth="580.0" text="Kelas" />
                                             </columns>
                                         </TableView>
                                     </children>
@@ -109,7 +109,7 @@
                                             <children>
                                                 <Label text="Grade Type:" />
                                                 <Label text="Score:" GridPane.rowIndex="1" />
-                                                <ChoiceBox fx:id="gradeTypeChoiseBox"  GridPane.columnIndex="1" />
+                                                <ChoiceBox fx:id="gradeTypeChoiseBox" GridPane.columnIndex="1" />
                                                 <TextField fx:id="scoreField" promptText="0-100" GridPane.columnIndex="1" GridPane.rowIndex="1" />
                                             </children>
                                             <padding>

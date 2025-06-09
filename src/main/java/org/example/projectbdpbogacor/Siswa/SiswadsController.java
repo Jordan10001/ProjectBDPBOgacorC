@@ -135,10 +135,6 @@ public class SiswadsController {
     private TableColumn<AbsensiEntry, String> jamSelesaiAbsensiColumn;
 
 
-    // Feedback
-    @FXML
-    private TextArea feedbackTextArea;
-
     // Announcements
     @FXML
     private TableView<PengumumanEntry> announcementTable;
@@ -448,28 +444,6 @@ public class SiswadsController {
         }
     }
 
-
-    @FXML
-    void handleSubmitFeedback() {
-        String feedbackContent = feedbackTextArea.getText();
-        if (feedbackContent.isEmpty()) {
-            AlertClass.WarningAlert("Input Error", "Feedback Empty", "Please enter your feedback.");
-            return;
-        }
-
-        String sql = "INSERT INTO Feedback (feedback, Users_user_id) VALUES (?, ?)";
-        try (Connection con = DBS.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sql)) {
-            stmt.setString(1, feedbackContent);
-            stmt.setString(2, loggedInUserId);
-            stmt.executeUpdate();
-            AlertClass.InformationAlert("Success", "Feedback Submitted", "Your feedback has been successfully submitted.");
-            feedbackTextArea.clear();
-        } catch (SQLException e) {
-            AlertClass.ErrorAlert("Database Error", "Failed to submit feedback", "An error occurred while submitting feedback: " + e.getMessage());
-            e.printStackTrace();
-        }
-    }
 
     // --- Announcements Methods ---
     private void initAnnouncementTable() {
