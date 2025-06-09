@@ -450,6 +450,7 @@ public class WalidsController {
 
     private Map<String, String> getStudentBiodata(String userId) throws SQLException {
         Map<String, String> biodata = new HashMap<>();
+        // Fetch both user_id and NIS_NIP
         String sql = "SELECT user_id, username, NIS_NIP, nama, gender, alamat, email, nomer_hp FROM Users WHERE user_id = ?";
         try (Connection con = DBS.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql)) {
@@ -578,7 +579,9 @@ public class WalidsController {
         html.append("        <div class=\"info-section\">\n");
         html.append("            <h3>Student Information:</h3>\n");
         html.append("            <p><strong>Name:</strong> ").append(biodata.get("nama")).append("</p>\n");
-        html.append("            <p><strong>Student ID (NIS/NIP):</strong> ").append(biodata.get("NIS_NIP")).append("</p>\n");
+        // Displaying both Student ID (user_id) and NIS/NIP
+        html.append("            <p><strong>Student ID:</strong> ").append(biodata.get("user_id")).append("</p>\n");
+        html.append("            <p><strong>NIS:</strong> ").append(biodata.get("NIS_NIP")).append("</p>\n");
         html.append("            <p><strong>Class:</strong> ").append(className).append("</p>\n");
         html.append("            <p><strong>Gender:</strong> ").append(biodata.get("gender")).append("</p>\n");
         html.append("            <p><strong>Email:</strong> ").append(biodata.get("email")).append("</p>\n");
