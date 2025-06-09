@@ -169,7 +169,7 @@ public class LoginController {
                 }
                 app.changeScene(fxmlFile, title, sceneWidth, sceneHeight);
             } else {
-                AlertClass.ErrorAlert("Login Failed", "Invalid Credentials", "Please check your username and password.");
+                AlertClass.ErrorAlert("Login Failed", "Invalid Credentials", "Please check your username, password, dan role.");
             }
         } catch (SQLException e) {
             AlertClass.ErrorAlert("Database Error", "Login Failed", "An error occurred during login: " + e.getMessage());

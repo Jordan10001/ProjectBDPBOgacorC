@@ -1166,6 +1166,23 @@ public class AdmindsController {
         }
     }
 
+    // Helper method to get user's role name and actual name
+    private Pair<String, String> getUserRoleAndName(String userId) throws SQLException {
+        String roleName = null;
+        String userName = null;
+        String sql = "SELECT u.nama, r.role_name FROM Users u JOIN Role r ON u.Role_role_id = r.role_id WHERE u.user_id = ?";
+        try (Connection con = DBS.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                userName = rs.getString("nama");
+                roleName = rs.getString("role_name");
+            }
+        }
+        return new Pair<>(roleName, userName);
+    }
+
     @FXML
     void handleCreateAnnouncement() {
         String announcementContent = announcementTextArea.getText();
@@ -1176,10 +1193,16 @@ public class AdmindsController {
         }
 
         try (Connection con = DBS.getConnection()) {
-            String sql = "INSERT INTO Pengumuman (pengumuman, Users_user_id, waktu) VALUES (?, ?, NOW())"; // Added waktu column
+            Pair<String, String> userInfo = getUserRoleAndName(loggedInUserId);
+            String rolePrefix = (userInfo.getKey() != null) ? "[" + userInfo.getKey().toUpperCase() + "] " : "";
+            String namePrefix = (userInfo.getValue() != null) ? userInfo.getValue() + ": " : "";
+
+            String finalAnnouncementContent = rolePrefix + namePrefix + announcementContent;
+
+            String sql = "INSERT INTO Pengumuman (pengumuman, Users_user_id, waktu) VALUES (?, ?, NOW())";
             PreparedStatement stmt = con.prepareStatement(sql);
-            stmt.setString(1, announcementContent);
-            stmt.setString(2, loggedInUserId); // Admin's user ID
+            stmt.setString(1, finalAnnouncementContent);
+            stmt.setString(2, loggedInUserId);
 
             int rowsAffected = stmt.executeUpdate();
             if (rowsAffected > 0) {
@@ -1203,8 +1226,7 @@ public class AdmindsController {
 
     private void loadAnnouncements() {
         ObservableList<PengumumanEntry> announcementList = FXCollections.observableArrayList();
-        // SELECT pengumuman_id is added to fetch the ID for the model
-        String sql = "SELECT pengumuman_id, pengumuman, waktu FROM Pengumuman ORDER BY waktu DESC";
+        String sql = "SELECT pengumuman_id, pengumuman, waktu, Users_user_id FROM Pengumuman ORDER BY waktu DESC"; // Fetch Users_user_id
         try (Connection con = DBS.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -1217,10 +1239,32 @@ public class AdmindsController {
                     waktuFormatted = "N/A";
                 }
 
+                String originalContent = rs.getString("pengumuman");
+                String userIdOfPoster = rs.getString("Users_user_id"); // Get the user ID of the poster
+
+                // Check if content already contains the prefix
+                // A simple heuristic: check for "[ROLE] Name:" at the beginning
+                boolean hasPrefix = originalContent.matches("^\\[.+\\] .+:.+");
+                String displayContent = originalContent;
+
+                if (!hasPrefix) {
+                    // If no prefix, try to get the poster's info and prepend it
+                    try {
+                        Pair<String, String> posterInfo = getUserRoleAndName(userIdOfPoster);
+                        if (posterInfo.getKey() != null && posterInfo.getValue() != null) {
+                            displayContent = "[" + posterInfo.getKey().toUpperCase() + "] " + posterInfo.getValue() + ": " + originalContent;
+                        }
+                    } catch (SQLException e) {
+                        System.err.println("Error fetching poster info for announcement ID " + rs.getInt("pengumuman_id") + ": " + e.getMessage());
+                        // Fallback to original content if poster info can't be fetched
+                        displayContent = originalContent;
+                    }
+                }
+
                 announcementList.add(new PengumumanEntry(
-                        rs.getInt("pengumuman_id"), // Pass the ID to the constructor
+                        rs.getInt("pengumuman_id"),
                         waktuFormatted,
-                        rs.getString("pengumuman")
+                        displayContent // Use the processed content
                 ));
             }
             announcementTable.setItems(announcementList);
@@ -1238,19 +1282,50 @@ public class AdmindsController {
             return;
         }
 
-        String updatedContent = announcementTextArea.getText();
-        if (updatedContent.isEmpty()) {
+        String updatedContentRaw = announcementTextArea.getText();
+        if (updatedContentRaw.isEmpty()) {
             AlertClass.WarningAlert("Input Error", "Announcement Content Empty", "Please enter content for the announcement.");
             return;
         }
 
-        // Use the pengumuman_id directly from the selected object
+        // Get the original content from the selected entry to preserve the prefix
+        String originalFullContent = selectedAnnouncement.getPengumuman();
+
+        // Extract the prefix if it exists, otherwise assume no prefix and append new one
+        String prefix = "";
+        String actualContent = updatedContentRaw;
+
+        // Regular expression to match "[ROLE] Name: " at the beginning
+        // Pattern matches: [any chars except ']'] any chars : any chars (non-greedy)
+        // This pattern will correctly capture prefixes like "[ADMIN] Aaron Jordan: "
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("^\\[.+\\]\\s*[^:]+:\\s*");
+        java.util.regex.Matcher matcher = pattern.matcher(originalFullContent);
+
+        if (matcher.find()) {
+            // Prefix found in the original content
+            prefix = matcher.group(0); // Get the entire matched prefix
+            actualContent = prefix + updatedContentRaw;
+        } else {
+            // No prefix in original content, so use the current user's info as the new prefix.
+            Pair<String, String> userInfo = null;
+            try {
+                userInfo = getUserRoleAndName(loggedInUserId);
+            } catch (SQLException e) {
+                System.err.println("Error fetching user info for update: " + e.getMessage());
+                AlertClass.ErrorAlert("Database Error", "Failed to get user info for update", "Could not retrieve current user's role and name.");
+                return;
+            }
+            String rolePrefix = (userInfo.getKey() != null) ? "[" + userInfo.getKey().toUpperCase() + "] " : "";
+            String namePrefix = (userInfo.getValue() != null) ? userInfo.getValue() + ": " : "";
+            actualContent = rolePrefix + namePrefix + updatedContentRaw;
+        }
+
         int pengumumanId = selectedAnnouncement.getPengumumanId();
 
         try (Connection con = DBS.getConnection()) {
             String sql = "UPDATE Pengumuman SET pengumuman = ?, waktu = NOW() WHERE pengumuman_id = ?";
             PreparedStatement stmt = con.prepareStatement(sql);
-            stmt.setString(1, updatedContent);
+            stmt.setString(1, actualContent); // Use the content with preserved/new prefix
             stmt.setInt(2, pengumumanId);
 
             int rowsAffected = stmt.executeUpdate();
@@ -1304,7 +1379,6 @@ public class AdmindsController {
             }
         }
     }
-
 
     // --- Manage Students in Class Methods ---
     private void initStudentInClassTable() {
@@ -1679,15 +1753,6 @@ public class AdmindsController {
         String currentWaliIdForKelasPK = ids[1]; // The original wali_id which is part of the PK
 
         try (Connection con = DBS.getConnection()) {
-            // If Wali Kelas is changed, it means the primary key (Users_user_id, kelas_id) will change for this class.
-            // This is a complex scenario as it involves updating a composite primary key.
-            // PostgreSQL allows updating columns that are part of a primary key, but it cascades to foreign keys.
-            // If ON UPDATE CASCADE is not set on related tables (Jadwal, Materi, Tugas, Ujian, Student_Class_Enrollment),
-            // this will fail. Based on ProjectBDPBOscript.sql, many FKs are ON UPDATE NO ACTION.
-            // This means we might need to delete and re-insert the class, or manually update all dependent records.
-            // For simplicity and assuming typical database design, we'll try to update the class. If the wali_id changes,
-            // we'll explicitly handle cascading updates or re-creation if necessary.
-
             String sql = "UPDATE Kelas SET nama_kelas = ?, keterangan = ?, Users_user_id = ?, Semester_semester_id = ? WHERE kelas_id = ? AND Users_user_id = ?";
             PreparedStatement stmt = con.prepareStatement(sql);
             stmt.setString(1, className);
@@ -1852,7 +1917,6 @@ public class AdmindsController {
         String nameFilter = filterNameField.getText();
         loadAllUsersToTable(selectedRole, nameFilter);
     }
-
 
     @FXML
     void handleLogout() {

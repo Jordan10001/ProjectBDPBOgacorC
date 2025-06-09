@@ -6,26 +6,19 @@ import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
-import javafx.scene.control.Label;
-import javafx.scene.control.Tab; // Import Tab class
-import javafx.scene.control.TabPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.ChoiceBox; // Import ChoiceBox
-import javafx.scene.control.TextField; // Import TextField
-import javafx.scene.control.TableView; // Import TableView
-import javafx.scene.control.TableColumn; // Import TableColumn
+import javafx.scene.control.*;
 import javafx.scene.control.cell.PropertyValueFactory; // Import PropertyValueFactory
 import org.example.projectbdpbogacor.Aset.AlertClass;
 import org.example.projectbdpbogacor.DBSource.DBS;
 import org.example.projectbdpbogacor.HelloApplication;
+import org.example.projectbdpbogacor.model.PengumumanEntry;
 
 import java.io.IOException;
-import java.sql.Connection;
-import java.sql.PreparedStatement;
-import java.sql.ResultSet;
-import java.sql.SQLException;
+import java.sql.*;
+import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.Optional;
 
 public class KepaladsController {
 
@@ -37,6 +30,13 @@ public class KepaladsController {
     // Announcements
     @FXML
     private TextArea announcementTextArea;
+    @FXML
+    private TableView<PengumumanEntry> announcementTable; // Table to view announcements
+    @FXML
+    private TableColumn<PengumumanEntry, String> announcementWaktuColumn; // Column for announcement time
+    @FXML
+    private TableColumn<PengumumanEntry, String> announcementContentColumn; // Column for announcement content
+
 
     // View All Users (NEW FXML elements)
     @FXML
@@ -84,11 +84,27 @@ public class KepaladsController {
         filterRoleChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> handleFilterUsers());
         filterNameField.textProperty().addListener((observable, oldValue, newValue) -> handleFilterUsers());
 
-        // Add listener to tabs to load data when selected
+        // Initialize announcement table
+        initAnnouncementTable(); // Initialize new announcement table
+        loadAnnouncements(); // Load announcements initially when the controller starts
+
+        // Add listener for announcement table selection
+        announcementTable.getSelectionModel().selectedItemProperty().addListener((observable, oldSelection, newSelection) -> {
+            if (newSelection != null) {
+                announcementTextArea.setText(newSelection.getPengumuman()); // Populate text area with selected announcement content
+            } else {
+                announcementTextArea.clear(); // Clear text area if no selection
+            }
+        });
+
+
+        // Add listeners to tabs to load data when selected
         kepalaTabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if (newTab != null) {
                 if (newTab.getText().equals("View All Users")) {
                     loadAllUsersToTable(filterRoleChoiceBox.getValue(), filterNameField.getText());
+                } else if (newTab.getText().equals("Announcements")) { // Added this case
+                    loadAnnouncements();
                 }
             }
         });
@@ -109,34 +125,7 @@ public class KepaladsController {
         }
     }
 
-    @FXML
-    void handleCreateAnnouncement() {
-        String announcementContent = announcementTextArea.getText();
 
-        if (announcementContent.isEmpty()) {
-            AlertClass.WarningAlert("Input Error", "Announcement Empty", "Please enter the announcement content.");
-            return;
-        }
-
-        try (Connection con = DBS.getConnection()) {
-            // Updated SQL to include 'waktu' column and set it to NOW()
-            String sql = "INSERT INTO Pengumuman (pengumuman, Users_user_id, waktu) VALUES (?, ?, NOW())";
-            PreparedStatement stmt = con.prepareStatement(sql);
-            stmt.setString(1, announcementContent);
-            stmt.setString(2, loggedInUserId); // Kepala Sekolah's user ID
-
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                AlertClass.InformationAlert("Success", "Announcement Published", "Announcement has been published successfully.");
-                announcementTextArea.clear();
-            } else {
-                AlertClass.ErrorAlert("Failed", "Announcement Not Published", "Failed to publish announcement.");
-            }
-        } catch (SQLException e) {
-            AlertClass.ErrorAlert("Database Error", "Failed to publish announcement", e.getMessage());
-            e.printStackTrace();
-        }
-    }
 
     // NEW: View All Users Methods
     private void initAllUsersTable() {
@@ -227,6 +216,220 @@ public class KepaladsController {
         loadAllUsersToTable(selectedRole, nameFilter);
     }
 
+    // Helper method to get user's role name and actual name
+    private Pair<String, String> getUserRoleAndName(String userId) throws SQLException {
+        String roleName = null;
+        String userName = null;
+        String sql = "SELECT u.nama, r.role_name FROM Users u JOIN Role r ON u.Role_role_id = r.role_id WHERE u.user_id = ?";
+        try (Connection con = DBS.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                userName = rs.getString("nama");
+                roleName = rs.getString("role_name");
+            }
+        }
+        return new Pair<>(roleName, userName);
+    }
+
+    @FXML
+    void handleCreateAnnouncement() {
+        String announcementContent = announcementTextArea.getText();
+
+        if (announcementContent.isEmpty()) {
+            AlertClass.WarningAlert("Input Error", "Announcement Empty", "Please enter the announcement content.");
+            return;
+        }
+
+        try (Connection con = DBS.getConnection()) {
+            Pair<String, String> userInfo = getUserRoleAndName(loggedInUserId);
+            String rolePrefix = (userInfo.getKey() != null) ? "[" + userInfo.getKey().toUpperCase() + "] " : "";
+            String namePrefix = (userInfo.getValue() != null) ? userInfo.getValue() + ": " : "";
+
+            String finalAnnouncementContent = rolePrefix + namePrefix + announcementContent;
+
+            String sql = "INSERT INTO Pengumuman (pengumuman, Users_user_id, waktu) VALUES (?, ?, NOW())";
+            PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setString(1, finalAnnouncementContent);
+            stmt.setString(2, loggedInUserId); // Admin's user ID
+
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                AlertClass.InformationAlert("Success", "Announcement Published", "Announcement has been published successfully.");
+                announcementTextArea.clear();
+                loadAnnouncements(); // Refresh the table after creation
+            } else {
+                AlertClass.ErrorAlert("Failed", "Announcement Not Published", "Failed to publish announcement.");
+            }
+        } catch (SQLException e) {
+            AlertClass.ErrorAlert("Database Error", "Failed to publish announcement", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    // --- Announcements Methods ---
+    private void initAnnouncementTable() {
+        announcementWaktuColumn.setCellValueFactory(new PropertyValueFactory<>("waktu"));
+        announcementContentColumn.setCellValueFactory(new PropertyValueFactory<>("pengumuman"));
+    }
+
+    private void loadAnnouncements() {
+        ObservableList<PengumumanEntry> announcementList = FXCollections.observableArrayList();
+        String sql = "SELECT pengumuman_id, pengumuman, waktu, Users_user_id FROM Pengumuman ORDER BY waktu DESC";
+        try (Connection con = DBS.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                Timestamp timestamp = rs.getTimestamp("waktu");
+                String waktuFormatted;
+                if (timestamp != null) {
+                    waktuFormatted = timestamp.toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
+                } else {
+                    waktuFormatted = "N/A";
+                }
+
+                String originalContent = rs.getString("pengumuman");
+                String userIdOfPoster = rs.getString("Users_user_id");
+
+                boolean hasPrefix = originalContent.matches("^\\[.+\\]\\s*[^:]+:\\s*");
+                String displayContent = originalContent;
+
+                if (!hasPrefix) {
+                    try {
+                        Pair<String, String> posterInfo = getUserRoleAndName(userIdOfPoster);
+                        if (posterInfo.getKey() != null && posterInfo.getValue() != null) {
+                            displayContent = "[" + posterInfo.getKey().toUpperCase() + "] " + posterInfo.getValue() + ": " + originalContent;
+                        }
+                    } catch (SQLException e) {
+                        System.err.println("Error fetching poster info for announcement ID " + rs.getInt("pengumuman_id") + ": " + e.getMessage());
+                        displayContent = originalContent;
+                    }
+                }
+
+                announcementList.add(new PengumumanEntry(
+                        rs.getInt("pengumuman_id"),
+                        waktuFormatted,
+                        displayContent
+                ));
+            }
+            announcementTable.setItems(announcementList);
+        } catch (SQLException e) {
+            AlertClass.ErrorAlert("Database Error", "Failed to load announcements", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void handleUpdateAnnouncement() {
+        PengumumanEntry selectedAnnouncement = announcementTable.getSelectionModel().getSelectedItem();
+        if (selectedAnnouncement == null) {
+            AlertClass.WarningAlert("Selection Error", "No Announcement Selected", "Please select an announcement to update.");
+            return;
+        }
+
+        String updatedContentRaw = announcementTextArea.getText();
+        if (updatedContentRaw.isEmpty()) {
+            AlertClass.WarningAlert("Input Error", "Announcement Content Empty", "Please enter content for the announcement.");
+            return;
+        }
+
+        String originalFullContent = selectedAnnouncement.getPengumuman();
+        String finalContentToSave;
+
+        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("^\\[.+\\]\\s*[^:]+:\\s*");
+        java.util.regex.Matcher matcher = pattern.matcher(originalFullContent);
+
+        if (matcher.find()) {
+            // If the original content has a prefix, keep it and append the new raw content
+            String prefix = matcher.group(0);
+
+            // Check if the user re-typed the prefix in the textarea. If so, remove it to avoid duplication.
+            // This is a heuristic and might need refinement based on actual user behavior.
+            String strippedUpdatedContent = updatedContentRaw;
+            java.util.regex.Matcher updatedContentMatcher = pattern.matcher(updatedContentRaw);
+            if (updatedContentMatcher.find() && updatedContentMatcher.group(0).equals(prefix)) {
+                strippedUpdatedContent = updatedContentRaw.substring(prefix.length());
+            }
+
+            finalContentToSave = prefix + strippedUpdatedContent;
+        } else {
+            // If the original content doesn't have a prefix, create a new one using the current user's info
+            Pair<String, String> userInfo = null;
+            try {
+                userInfo = getUserRoleAndName(loggedInUserId);
+            } catch (SQLException e) {
+                System.err.println("Error fetching user info for update: " + e.getMessage());
+                AlertClass.ErrorAlert("Database Error", "Failed to get user info for update", "Could not retrieve current user's role and name.");
+                return;
+            }
+            String rolePrefix = (userInfo.getKey() != null) ? "[" + userInfo.getKey().toUpperCase() + "] " : "";
+            String namePrefix = (userInfo.getValue() != null) ? userInfo.getValue() + ": " : "";
+            finalContentToSave = rolePrefix + namePrefix + updatedContentRaw;
+        }
+
+
+        int pengumumanId = selectedAnnouncement.getPengumumanId();
+
+        try (Connection con = DBS.getConnection()) {
+            String sql = "UPDATE Pengumuman SET pengumuman = ?, waktu = NOW() WHERE pengumuman_id = ?";
+            PreparedStatement stmt = con.prepareStatement(sql);
+            stmt.setString(1, finalContentToSave);
+            stmt.setInt(2, pengumumanId);
+
+            int rowsAffected = stmt.executeUpdate();
+            if (rowsAffected > 0) {
+                AlertClass.InformationAlert("Success", "Announcement Updated", "Announcement updated successfully.");
+                announcementTextArea.clear();
+                loadAnnouncements(); // Refresh the table
+            } else {
+                AlertClass.ErrorAlert("Failed", "Announcement Not Updated", "Failed to update announcement.");
+            }
+        } catch (SQLException e) {
+            AlertClass.ErrorAlert("Database Error", "Failed to update announcement", e.getMessage());
+            e.printStackTrace();
+        }
+    }
+
+    @FXML
+    void handleDeleteAnnouncement() {
+        PengumumanEntry selectedAnnouncement = announcementTable.getSelectionModel().getSelectedItem();
+        if (selectedAnnouncement == null) {
+            AlertClass.WarningAlert("Selection Error", "No Announcement Selected", "Please select an announcement to delete.");
+            return;
+        }
+
+        Optional<ButtonType> result = AlertClass.ConfirmationAlert(
+                "Confirm Deletion",
+                "Delete Announcement",
+                "Are you sure you want to delete this announcement? This action cannot be undone."
+        );
+
+        if (result.isPresent() && result.get() == ButtonType.OK) {
+            // Use the pengumuman_id directly from the selected object
+            int pengumumanId = selectedAnnouncement.getPengumumanId();
+
+            try (Connection con = DBS.getConnection()) {
+                String sql = "DELETE FROM Pengumuman WHERE pengumuman_id = ?";
+                PreparedStatement stmt = con.prepareStatement(sql);
+                stmt.setInt(1, pengumumanId);
+
+                int rowsAffected = stmt.executeUpdate();
+                if (rowsAffected > 0) {
+                    AlertClass.InformationAlert("Success", "Announcement Deleted", "Announcement deleted successfully.");
+                    announcementTextArea.clear();
+                    loadAnnouncements(); // Refresh the table
+                } else {
+                    AlertClass.ErrorAlert("Failed", "Announcement Not Deleted", "Failed to delete announcement.");
+                }
+            } catch (SQLException e) {
+                AlertClass.ErrorAlert("Database Error", "Failed to delete announcement", e.getMessage());
+                e.printStackTrace();
+            }
+        }
+    }
+
+
     @FXML
     void handleLogout() {
         try {
@@ -279,5 +482,29 @@ public class KepaladsController {
         public StringProperty nomerHpProperty() { return nomerHp; }
         public String getRoleName() { return roleName.get(); }
         public StringProperty roleNameProperty() { return roleName; }
+    }
+
+    // Helper class for ChoiceBox items (to store display text and associated ID)
+    private static class Pair<K, V> {
+        private final K key;
+        private final V value;
+
+        public Pair(K key, V value) {
+            this.key = key;
+            this.value = value;
+        }
+
+        public K getKey() {
+            return key;
+        }
+
+        public V getValue() {
+            return value;
+        }
+
+        @Override
+        public String toString() {
+            return key.toString(); // Display the key in ChoiceBox
+        }
     }
 }

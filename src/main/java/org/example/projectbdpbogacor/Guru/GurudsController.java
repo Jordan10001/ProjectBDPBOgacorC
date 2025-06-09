@@ -156,21 +156,13 @@ public class GurudsController {
     @FXML
     private MenuItem deleteUjianButton;
 
-    // Announcements (New FXML Elements for Guru to make announcements)
-    @FXML
-    private TextArea announcementTextArea;
-    @FXML
-    private Button createAnnouncementButton;
+    // Announcements (Updated FXML Elements for Guru to only view announcements)
     @FXML
     private TableView<PengumumanEntry> guruAnnouncementTable; // Table to view announcements
     @FXML
     private TableColumn<PengumumanEntry, String> guruAnnouncementWaktuColumn; // Column for announcement time
     @FXML
     private TableColumn<PengumumanEntry, String> guruAnnouncementContentColumn; // Column for announcement content
-    @FXML
-    private Button guruUpdateAnnouncementButton;
-    @FXML
-    private Button guruDeleteAnnouncementButton;
 
     // NEW: Manage Absensi Tab
     @FXML
@@ -222,7 +214,7 @@ public class GurudsController {
         initTugasTable();
         initMateriTable();
         initUjianTable();
-        initGuruAnnouncementTable();
+        initGuruAnnouncementTable(); // Initialize announcement table for viewing
         initAbsensiTable();
 
         // Load initial data for ChoiceBoxes
@@ -246,14 +238,7 @@ public class GurudsController {
         gradeTypeChoiseBox.getItems().addAll("UTS", "UAS", "TUGAS 1", "TUGAS 2", "TUGAS 3", "TUGAS 4");
         gradeTypeChoiseBox.setValue("Tugas 1");
 
-        // Add listener for announcement table selection
-        guruAnnouncementTable.getSelectionModel().selectedItemProperty().addListener((observable, oldSelection, newSelection) -> {
-            if (newSelection != null) {
-                announcementTextArea.setText(newSelection.getPengumuman());
-            } else {
-                announcementTextArea.clear();
-            }
-        });
+
 
         // NEW: Absensi ChoiceBox listeners
         absensiClassChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
@@ -298,7 +283,7 @@ public class GurudsController {
                         loadUjian(); // Load exams
                         break;
                     case "Announcements":
-                        loadGuruAnnouncements(); // Load announcements
+                        loadGuruAnnouncements(); // Load announcements (only viewing for Guru)
                         break;
                     case "Manage Absensi": // NEW: Handle "Manage Absensi" tab selection
                         loadAbsensiClasses(); // Refresh classes for absensi
@@ -1132,42 +1117,16 @@ public class GurudsController {
         guruAnnouncementContentColumn.setCellValueFactory(new PropertyValueFactory<>("pengumuman"));
     }
 
-    @FXML
-    void handleCreateGuruAnnouncement() {
-        String announcementContent = announcementTextArea.getText();
 
-        if (announcementContent.isEmpty()) {
-            AlertClass.WarningAlert("Input Error", "Announcement Empty", "Please enter the announcement content.");
-            return;
-        }
-
-        try (Connection con = DBS.getConnection()) {
-            String sql = "INSERT INTO Pengumuman (pengumuman, Users_user_id, waktu) VALUES (?, ?, NOW())";
-            PreparedStatement stmt = con.prepareStatement(sql);
-            stmt.setString(1, announcementContent);
-            stmt.setString(2, loggedInUserId);
-
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                AlertClass.InformationAlert("Success", "Announcement Published", "Announcement has been published successfully.");
-                announcementTextArea.clear();
-                loadGuruAnnouncements();
-            } else {
-                AlertClass.ErrorAlert("Failed", "Announcement Not Published", "Failed to publish announcement.");
-            }
-        } catch (SQLException e) {
-            AlertClass.ErrorAlert("Database Error", "Failed to publish announcement", e.getMessage());
-            e.printStackTrace();
-        }
-    }
 
     @FXML
     void loadGuruAnnouncements() {
         ObservableList<PengumumanEntry> announcementList = FXCollections.observableArrayList();
-        String sql = "SELECT pengumuman_id, pengumuman, waktu FROM Pengumuman WHERE Users_user_id = ? ORDER BY waktu DESC";
+        // Guru can see all announcements, not just their own
+        String sql = "SELECT pengumuman_id, pengumuman, waktu FROM Pengumuman ORDER BY waktu DESC";
         try (Connection con = DBS.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql)) {
-            stmt.setString(1, loggedInUserId);
+            // No user_id filter here, as Guru can view all announcements
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Timestamp timestamp = rs.getTimestamp("waktu");
@@ -1191,80 +1150,7 @@ public class GurudsController {
         }
     }
 
-    @FXML
-    void handleUpdateGuruAnnouncement() {
-        PengumumanEntry selectedAnnouncement = guruAnnouncementTable.getSelectionModel().getSelectedItem();
-        if (selectedAnnouncement == null) {
-            AlertClass.WarningAlert("Selection Error", "No Announcement Selected", "Please select an announcement to update.");
-            return;
-        }
 
-        String updatedContent = announcementTextArea.getText();
-        if (updatedContent.isEmpty()) {
-            AlertClass.WarningAlert("Input Error", "Announcement Content Empty", "Please enter content for the announcement.");
-            return;
-        }
-
-        int pengumumanId = selectedAnnouncement.getPengumumanId();
-
-        try (Connection con = DBS.getConnection()) {
-            String sql = "UPDATE Pengumuman SET pengumuman = ?, waktu = NOW() WHERE pengumuman_id = ? AND Users_user_id = ?";
-            PreparedStatement stmt = con.prepareStatement(sql);
-            stmt.setString(1, updatedContent);
-            stmt.setInt(2, pengumumanId);
-            stmt.setString(3, loggedInUserId);
-
-            int rowsAffected = stmt.executeUpdate();
-            if (rowsAffected > 0) {
-                AlertClass.InformationAlert("Success", "Announcement Updated", "Announcement updated successfully.");
-                announcementTextArea.clear();
-                loadGuruAnnouncements();
-            } else {
-                AlertClass.ErrorAlert("Failed", "Announcement Not Updated", "Failed to update announcement. It might not exist or you lack permission.");
-            }
-        } catch (SQLException e) {
-            AlertClass.ErrorAlert("Database Error", "Failed to update announcement", e.getMessage());
-            e.printStackTrace();
-        }
-    }
-
-    @FXML
-    void handleDeleteGuruAnnouncement() {
-        PengumumanEntry selectedAnnouncement = guruAnnouncementTable.getSelectionModel().getSelectedItem();
-        if (selectedAnnouncement == null) {
-            AlertClass.WarningAlert("Selection Error", "No Announcement Selected", "Please select an announcement to delete.");
-            return;
-        }
-
-        Optional<javafx.scene.control.ButtonType> result = AlertClass.ConfirmationAlert(
-                "Confirm Deletion",
-                "Delete Announcement",
-                "Are you sure you want to delete this announcement? This action cannot be undone."
-        );
-
-        if (result.isPresent() && result.get() == javafx.scene.control.ButtonType.OK) {
-            int pengumumanId = selectedAnnouncement.getPengumumanId();
-
-            try (Connection con = DBS.getConnection()) {
-                String sql = "DELETE FROM Pengumuman WHERE pengumuman_id = ? AND Users_user_id = ?";
-                PreparedStatement stmt = con.prepareStatement(sql);
-                stmt.setInt(1, pengumumanId);
-                stmt.setString(2, loggedInUserId);
-
-                int rowsAffected = stmt.executeUpdate();
-                if (rowsAffected > 0) {
-                    AlertClass.InformationAlert("Success", "Announcement Deleted", "Announcement deleted successfully.");
-                    announcementTextArea.clear();
-                    loadGuruAnnouncements();
-                } else {
-                    AlertClass.ErrorAlert("Failed", "Announcement Not Deleted", "Failed to delete announcement. It might not exist or you lack permission.");
-                }
-            } catch (SQLException e) {
-                AlertClass.ErrorAlert("Database Error", "Failed to delete announcement", e.getMessage());
-                e.printStackTrace();
-            }
-        }
-    }
 
     // NEW: Manage Absensi Methods
     private void initAbsensiTable() {

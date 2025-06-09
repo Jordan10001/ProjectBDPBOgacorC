@@ -226,7 +226,7 @@
                         </AnchorPane>
                     </content>
                 </Tab>
-                <Tab text="Pengumuman">
+                <Tab text="Announcements">
                     <content>
                         <AnchorPane prefHeight="200.0" prefWidth="200.0">
                             <TableView fx:id="announcementTable" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
