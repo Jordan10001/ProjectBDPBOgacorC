@@ -1,3 +1,4 @@
+// ProjectBDPBOgacor/src/main/java/org/example/projectbdpbogacor/Siswa/SiswadsController.java
 package org.example.projectbdpbogacor.Siswa;
 
 import javafx.collections.FXCollections;
@@ -19,14 +20,14 @@ import org.example.projectbdpbogacor.model.MateriEntry;
 import org.example.projectbdpbogacor.model.NilaiEntry;
 import org.example.projectbdpbogacor.model.TugasEntry;
 import org.example.projectbdpbogacor.model.UjianEntry;
-import org.example.projectbdpbogacor.model.PengumumanEntry; // Import the new model
+import org.example.projectbdpbogacor.model.PengumumanEntry;
 
 import java.io.IOException;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
-import java.sql.Timestamp; // Import Timestamp
+import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
 import java.time.LocalDateTime;
 
@@ -69,7 +70,7 @@ public class SiswadsController {
     @FXML
     private TableColumn<JadwalEntry, String> namaKelasJadwalColumn;
     @FXML
-    private TableColumn<JadwalEntry, String> namaPengajarJadwalColumn; // For teacher's name
+    private TableColumn<JadwalEntry, String> namaPengajarJadwalColumn;
 
     // Nilai Ujian Table
     @FXML
@@ -79,7 +80,7 @@ public class SiswadsController {
     @FXML
     private TableColumn<NilaiEntry, String> namaMapelNilaiColumn;
     @FXML
-    private TableColumn<NilaiEntry, Integer> nilaiColumn;
+    private TableColumn<NilaiEntry, Integer> existingNilaiColumn;
 
     // Tugas Table
     @FXML
@@ -140,11 +141,11 @@ public class SiswadsController {
 
     // Announcements
     @FXML
-    private TableView<PengumumanEntry> announcementTable; // Changed to TableView
+    private TableView<PengumumanEntry> announcementTable;
     @FXML
-    private TableColumn<PengumumanEntry, String> announcementWaktuColumn; // New column for time
+    private TableColumn<PengumumanEntry, String> announcementWaktuColumn;
     @FXML
-    private TableColumn<PengumumanEntry, String> announcementContentColumn; // Column for content
+    private TableColumn<PengumumanEntry, String> announcementContentColumn;
 
     private String loggedInUserId;
 
@@ -160,7 +161,7 @@ public class SiswadsController {
         initMateriTable();
         initUjianTable();
         initAbsensiTable();
-        initAnnouncementTable(); // Initialize new announcement table
+        initAnnouncementTable();
 
         // Load data when tabs are selected
         siswaTabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
@@ -187,7 +188,7 @@ public class SiswadsController {
                     case "Absensi":
                         loadAbsensi();
                         break;
-                    case "Pengumuman": // Add this case
+                    case "Pengumuman":
                         loadAnnouncements();
                         break;
                 }
@@ -196,6 +197,8 @@ public class SiswadsController {
 
         // Load biodata initially
         loadBiodata();
+        // Load announcements initially if the announcement tab is the default or should be loaded on start
+        loadAnnouncements();
     }
 
     private void loadStudentName() {
@@ -278,7 +281,7 @@ public class SiswadsController {
     private void initNilaiUjianTable() {
         jenisNilaiColumn.setCellValueFactory(new PropertyValueFactory<>("jenisNilai"));
         namaMapelNilaiColumn.setCellValueFactory(new PropertyValueFactory<>("namaMapel"));
-        nilaiColumn.setCellValueFactory(new PropertyValueFactory<>("nilai"));
+        existingNilaiColumn.setCellValueFactory(new PropertyValueFactory<>("nilai"));
     }
 
     private void loadNilaiUjian() {
@@ -300,7 +303,8 @@ public class SiswadsController {
                 ));
             }
             nilaiUjianTable.setItems(nilaiList);
-        } catch (SQLException e) {
+        }
+        catch (SQLException e) {
             AlertClass.ErrorAlert("Database Error", "Failed to load exam scores", e.getMessage());
             e.printStackTrace();
         }
@@ -316,7 +320,7 @@ public class SiswadsController {
 
     private void loadTugas() {
         ObservableList<TugasEntry> tugasList = FXCollections.observableArrayList();
-        String sql = "SELECT t.keterangan, t.deadline, t.tanggal_direlease, m.nama_mapel, k.nama_kelas " + // Removed tugas_id, kelas_Users_user_id, kelas_kelas_id
+        String sql = "SELECT t.keterangan, t.deadline, t.tanggal_direlease, m.nama_mapel, k.nama_kelas " +
                 "FROM Tugas t " +
                 "JOIN Matpel m ON t.Matpel_mapel_id = m.mapel_id " +
                 "JOIN Kelas k ON t.Kelas_Users_user_id = k.Users_user_id AND t.Kelas_kelas_id = k.kelas_id " +
@@ -349,7 +353,7 @@ public class SiswadsController {
 
     private void loadMateri() {
         ObservableList<MateriEntry> materiList = FXCollections.observableArrayList();
-        String sql = "SELECT mt.nama_materi, m.nama_mapel, k.nama_kelas " + // Removed materi_id, kelas_Users_user_id, kelas_kelas_id
+        String sql = "SELECT mt.nama_materi, m.nama_mapel, k.nama_kelas " +
                 "FROM Materi mt " +
                 "JOIN Matpel m ON mt.Matpel_mapel_id = m.mapel_id " +
                 "JOIN Kelas k ON mt.Kelas_Users_user_id = k.Users_user_id AND mt.Kelas_kelas_id = k.kelas_id " +
@@ -381,7 +385,7 @@ public class SiswadsController {
 
     private void loadUjian() {
         ObservableList<UjianEntry> ujianList = FXCollections.observableArrayList();
-        String sql = "SELECT u.jenis_ujian, u.tanggal, m.nama_mapel, k.nama_kelas " + // Removed ujian_id, kelas_Users_user_id, kelas_kelas_id
+        String sql = "SELECT u.jenis_ujian, u.tanggal, m.nama_mapel, k.nama_kelas " +
                 "FROM Ujian u " +
                 "JOIN Matpel m ON u.Matpel_mapel_id = m.mapel_id " +
                 "JOIN Kelas k ON u.Kelas_Users_user_id = k.Users_user_id AND u.Kelas_kelas_id = k.kelas_id " +
@@ -472,26 +476,24 @@ public class SiswadsController {
         announcementWaktuColumn.setCellValueFactory(new PropertyValueFactory<>("waktu"));
         announcementContentColumn.setCellValueFactory(new PropertyValueFactory<>("pengumuman"));
     }
-
-    private void loadAnnouncements() {
+    @FXML
+    void loadAnnouncements() {
         ObservableList<PengumumanEntry> announcementList = FXCollections.observableArrayList();
-        // Updated SQL to include pengumuman_id
         String sql = "SELECT pengumuman_id, pengumuman, waktu FROM Pengumuman ORDER BY waktu DESC";
         try (Connection con = DBS.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Timestamp timestamp = rs.getTimestamp("waktu");
                 String waktuFormatted;
                 if (timestamp != null) {
                     waktuFormatted = timestamp.toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
                 } else {
-                    waktuFormatted = "N/A"; // Or any other placeholder for null timestamps
+                    waktuFormatted = "N/A";
                 }
 
-                // Updated constructor call to include pengumuman_id
                 announcementList.add(new PengumumanEntry(
-                        rs.getInt("pengumuman_id"), // Fetch and pass pengumuman_id
+                        rs.getInt("pengumuman_id"),
                         waktuFormatted,
                         rs.getString("pengumuman")
                 ));
@@ -502,6 +504,7 @@ public class SiswadsController {
             e.printStackTrace();
         }
     }
+
 
     @FXML
     void handleLogout() {

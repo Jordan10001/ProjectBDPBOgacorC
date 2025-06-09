@@ -114,7 +114,7 @@
                                     <columns>
                                         <TableColumn fx:id="jenisNilaiColumn" prefWidth="200.0" text="Jenis Nilai" />
                                         <TableColumn fx:id="namaMapelNilaiColumn" prefWidth="400.0" text="Mata Pelajaran" />
-                                        <TableColumn fx:id="nilaiColumn" prefWidth="200.0" text="Nilai" />
+                                        <TableColumn fx:id="existingNilaiColumn" prefWidth="200.0" text="Nilai" />
                                     </columns>
                                 </TableView>
                             </children>
