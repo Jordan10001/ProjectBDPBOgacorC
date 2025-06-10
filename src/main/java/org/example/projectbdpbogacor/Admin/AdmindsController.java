@@ -66,8 +66,6 @@ public class AdmindsController {
     @FXML
     private ChoiceBox<String> filterYearsChoiceBox; // NEW: Filter by years
     @FXML
-    private TextField userSearchInput; // NEW: Search input field for user selection
-    @FXML
     private Button searchUserButton; // NEW: Search button for user selection
     @FXML
     private ChoiceBox<String> selectUserForEditDeleteChoiceBox; // NEW: This is the actual user selection ChoiceBox for edit/delete
