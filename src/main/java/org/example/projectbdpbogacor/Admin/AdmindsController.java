@@ -26,8 +26,12 @@ import java.sql.Timestamp;
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
+import java.util.HashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 public class AdmindsController {
 
@@ -60,7 +64,15 @@ public class AdmindsController {
 
     // Manage Users (Edit/Delete)
     @FXML
-    private ChoiceBox<String> editUserChoiceBox; // Displays "Name (ID)"
+    private ChoiceBox<String> filterbyRoleChoiceBox; // Existing filter by role
+    @FXML
+    private ChoiceBox<String> filterYearsChoiceBox; // NEW: Filter by years
+    @FXML
+    private TextField userSearchInput; // NEW: Search input field for user selection
+    @FXML
+    private Button searchUserButton; // NEW: Search button for user selection
+    @FXML
+    private ChoiceBox<String> selectUserForEditDeleteChoiceBox; // NEW: This is the actual user selection ChoiceBox for edit/delete
     @FXML
     private TextField editUserIdField;
     @FXML
@@ -85,9 +97,6 @@ public class AdmindsController {
     private Button deleteUserButton;
     @FXML
     private Button updateUserButton;
-    // FXML elements for filtering in Edit/Delete section (editUserFilterNameField removed)
-    @FXML
-    private ChoiceBox<String> editUserFilterRoleChoiceBox;
 
 
     // Manage Schedules & Subjects (This section will now be for schedules only, subjects moved to a new tab)
@@ -159,7 +168,7 @@ public class AdmindsController {
     private Button deleteClassButton;
 
 
-    // View All Users Table
+    // View All Users Table (separate from Edit/Delete user section)
     @FXML
     private TableView<UserTableEntry> allUsersTableView;
     @FXML
@@ -180,10 +189,10 @@ public class AdmindsController {
     private TableColumn<UserTableEntry, String> tableNomerHpColumn;
     @FXML
     private TableColumn<UserTableEntry, String> tableRoleColumn;
-    @FXML
-    private ChoiceBox<String> filterRoleChoiceBox; // Filter by role
-    @FXML
-    private TextField filterNameField; // Filter by name
+    @FXML // Renamed to separate from edit/delete filter
+    private ChoiceBox<String> allUsersFilterRoleChoiceBox;
+    @FXML // Renamed to separate from edit/delete filter
+    private TextField allUsersFilterNameField;
 
 
     // NEW FXML elements for "Manage Subjects" Tab
@@ -219,7 +228,8 @@ public class AdmindsController {
     private ObservableList<Pair<String, String>> classData = FXCollections.observableArrayList(); // Pair<Display, ID> where ID is "kelas_id-wali_user_id"
     private ObservableList<Pair<String, Integer>> subjectData = FXCollections.observableArrayList(); // Pair<Display, ID>
     private ObservableList<Pair<String, String>> studentData = FXCollections.observableArrayList(); // Pair<Display, ID>
-    private ObservableList<Pair<String, String>> allUsersData = FXCollections.observableArrayList(); // Pair<Display, UserID> for edit/delete
+    // This will now hold UserID -> DisplayName for selectUserForEditDeleteChoiceBox
+    private Map<String, String> userDisplayMap = new HashMap<>();
     private ObservableList<Pair<String, String>> waliKelasData = FXCollections.observableArrayList(); // Pair<Display, WaliID> for new class
     private ObservableList<Pair<String, Integer>> semesterData = FXCollections.observableArrayList(); // Pair<Display, SemesterID> for new class
     private ObservableList<Pair<String, String>> guruData = FXCollections.observableArrayList(); // Pair<Display, GuruID> for assigning teachers
@@ -264,10 +274,15 @@ public class AdmindsController {
         // Initialize edit/delete user fields
         editGenderChoiceBox.getItems().addAll("L", "P");
         loadRolesForEditUserFilter(); // Load roles for the new filter choice box
-        editUserFilterRoleChoiceBox.setValue("All Roles"); // Set default value
-        loadUsersForEditDelete(editUserFilterRoleChoiceBox.getValue()); // Load users initially with no name filter
+        filterbyRoleChoiceBox.setValue("All Roles"); // Set default value for role filter
+        loadYearsForFilter(); // NEW: Load years for the filter
+        filterYearsChoiceBox.setValue("All Years"); // NEW: Set default for years filter
+
+        // No direct call to loadUsersForEditDelete here. It will be called by searchUserButton.
         editRoleChoiceBox.getItems().addAll(roleNameToIdMap.keySet()); // Populate edit role choice box
-        editUserChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
+
+        // Listener for the NEW selectUserForEditDeleteChoiceBox
+        selectUserForEditDeleteChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
                 handleUserSelectionForEditDelete();
             } else {
@@ -275,8 +290,13 @@ public class AdmindsController {
             }
         });
 
-        // Add listeners for the new filter fields in Manage Users (removed editUserFilterNameField listener)
-        editUserFilterRoleChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> handleFilterUsersForEditDelete());
+        // Add listeners for the new filter choice boxes
+        filterbyRoleChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> filterUsersAndRefreshSearch());
+        filterYearsChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> filterUsersAndRefreshSearch());
+
+        // Listener for the search button
+
+
 
         // Initialize Student in Class Table
         initStudentInClassTable();
@@ -312,9 +332,9 @@ public class AdmindsController {
 
         // Initialize all users table
         initAllUsersTable();
-        filterRoleChoiceBox.getItems().addAll("All Roles"); // Add "All Roles" option
-        filterRoleChoiceBox.getItems().addAll(roleNameToIdMap.keySet()); // Add actual roles
-        filterRoleChoiceBox.setValue("All Roles"); // Default selection
+        allUsersFilterRoleChoiceBox.getItems().addAll("All Roles"); // Add "All Roles" option
+        allUsersFilterRoleChoiceBox.getItems().addAll(roleNameToIdMap.keySet()); // Add actual roles
+        allUsersFilterRoleChoiceBox.setValue("All Roles"); // Default selection
 
         // NEW: Initialize elements for "Manage Subjects" Tab
         initSubjectAssignmentTable();
@@ -360,10 +380,10 @@ public class AdmindsController {
                         loadClassesForChoiceBox();  // Refresh classes
                         break;
                     case "Manage Users":
-                        loadUsersForEditDelete(editUserFilterRoleChoiceBox.getValue()); // Load with current filters
-                        // Clear selected user fields when switching to this tab
-                        editUserChoiceBox.getSelectionModel().clearSelection();
-                        clearEditUserFields();
+                        // Ensure filters and search are applied when tab is selected
+                        filterUsersAndRefreshSearch();
+                        selectUserForEditDeleteChoiceBox.getSelectionModel().clearSelection(); // Clear selection
+                        clearEditUserFields(); // Clear selected user fields when switching to this tab
                         updateUserButton.setDisable(true); // Ensure disabled on tab change
                         deleteUserButton.setDisable(true); // Ensure disabled on tab change
                         break;
@@ -383,7 +403,7 @@ public class AdmindsController {
                         deleteClassButton.setDisable(true); // Ensure disabled on tab change
                         break;
                     case "View All Users":
-                        loadAllUsersToTable(filterRoleChoiceBox.getValue(), filterNameField.getText()); // Load all users to the table with current filters
+                        loadAllUsersToTable(allUsersFilterRoleChoiceBox.getValue(), allUsersFilterNameField.getText()); // Load all users to the table with current filters
                         break;
                     case "Manage Subjects": // NEW: Handle "Manage Subjects" tab selection
                         loadSubjectsForChoiceBox(); // Populate assignTeacherSubjectChoiceBox
@@ -402,12 +422,12 @@ public class AdmindsController {
             }
         });
 
-        // Add listeners for filter fields
-        filterRoleChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> handleFilterUsers());
-        filterNameField.textProperty().addListener((observable, oldValue, newValue) -> handleFilterUsers());
+        // Add listeners for filter fields for the "View All Users" table
+        allUsersFilterRoleChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> handleFilterAllUsersTable());
+        allUsersFilterNameField.textProperty().addListener((observable, oldValue, newValue) -> handleFilterAllUsersTable());
 
-        // Load all users initially
-        loadAllUsersToTable(filterRoleChoiceBox.getValue(), filterNameField.getText());
+        // Load all users initially for "View All Users" table
+        loadAllUsersToTable(allUsersFilterRoleChoiceBox.getValue(), allUsersFilterNameField.getText());
         loadAnnouncements(); // Load announcements initially
 
         // Set initial state for Manage Users (Edit/Delete) buttons
@@ -453,9 +473,34 @@ public class AdmindsController {
     }
     // NEW: Load roles specifically for the edit user filter choice box
     private void loadRolesForEditUserFilter() {
-        editUserFilterRoleChoiceBox.getItems().clear(); //
-        editUserFilterRoleChoiceBox.getItems().add("All Roles"); //
-        editUserFilterRoleChoiceBox.getItems().addAll(roleNameToIdMap.keySet()); //
+        filterbyRoleChoiceBox.getItems().clear();
+        filterbyRoleChoiceBox.getItems().add("All Roles");
+        filterbyRoleChoiceBox.getItems().addAll(roleNameToIdMap.keySet());
+    }
+
+    // NEW: Load years for the filterYearsChoiceBox
+    private void loadYearsForFilter() {
+        filterYearsChoiceBox.getItems().clear();
+        filterYearsChoiceBox.getItems().add("All Years"); // Option to show all years
+
+        Set<String> years = new HashSet<>();
+        String sql = "SELECT user_id FROM Users";
+        try (Connection con = DBS.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                String userId = rs.getString("user_id");
+                if (userId != null && userId.length() >= 3) {
+                    years.add(userId.substring(1, 3)); // Extract the two digits after the role prefix
+                }
+            }
+        } catch (SQLException e) {
+            AlertClass.ErrorAlert("Database Error", "Failed to load years for filter", e.getMessage());
+            e.printStackTrace();
+        }
+        // Sort years for consistent display
+        SortedSet<String> sortedYears = new TreeSet<>(years);
+        filterYearsChoiceBox.getItems().addAll(sortedYears);
     }
 
     // Helper method to generate user ID prefix based on role
@@ -551,11 +596,13 @@ public class AdmindsController {
                 newEmailField.clear();
                 newPhoneNumberField.clear();
                 newRoleChoiceBox.setValue("Siswa"); // Reset to default
-                loadUsersForEditDelete(editUserFilterRoleChoiceBox.getValue()); // Refresh list of users for edit/delete
+                filterUsersAndRefreshSearch(); // Refresh list of users for edit/delete
                 loadStudentsForChoiceBox(); // Refresh students for assignment
                 loadWaliKelasForChoiceBox(); // Refresh wali kelas for new class
                 loadGuruForChoiceBox(); // Refresh guru for subject assignment
-                loadAllUsersToTable(filterRoleChoiceBox.getValue(), filterNameField.getText()); // Refresh all users table
+                loadAllUsersToTable(allUsersFilterRoleChoiceBox.getValue(), allUsersFilterNameField.getText()); // Refresh all users table
+                loadSubjectAssignments(); // Refresh subject assignments
+                loadYearsForFilter(); // Refresh years filter
             } else {
                 AlertClass.ErrorAlert("Failed", "User Not Added", "Failed to add user to the database.");
             }
@@ -565,11 +612,10 @@ public class AdmindsController {
         }
     }
 
-    // --- Manage Users (Edit/Delete) Methods ---
-    // Modified to accept only role filter
-    private void loadUsersForEditDelete(String roleFilter) {
-        allUsersData.clear();
-        editUserChoiceBox.getItems().clear();
+    // This method is now called by the search button or filter changes
+    private void loadUsersForEditDelete(String roleFilter, String yearFilter) {
+        userDisplayMap.clear(); // Clear the map that stores user ID to display name
+        selectUserForEditDeleteChoiceBox.getItems().clear(); // Clear the ChoiceBox for user selection
 
         StringBuilder sqlBuilder = new StringBuilder("SELECT user_id, nama, NIS_NIP, Role_role_id FROM Users WHERE 1=1 ");
 
@@ -579,11 +625,14 @@ public class AdmindsController {
                 sqlBuilder.append("AND Role_role_id = ? ");
             }
         }
-        // Removed name filter logic here
-        sqlBuilder.append("ORDER BY nama");
+        if (yearFilter != null && !yearFilter.equals("All Years")) {
+            sqlBuilder.append("AND SUBSTRING(user_id, 2, 2) = ? "); // Filter by the 2nd and 3rd characters for year ID
+        }
 
-        try (Connection con = DBS.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sqlBuilder.toString())) {
+        sqlBuilder.append("ORDER BY user_id"); // Order by user_id to group by year
+
+        try (Connection con = DBS.getConnection()) {
+            PreparedStatement stmt = con.prepareStatement(sqlBuilder.toString());
 
             int paramIndex = 1;
             if (roleFilter != null && !roleFilter.equals("All Roles")) {
@@ -592,35 +641,40 @@ public class AdmindsController {
                     stmt.setString(paramIndex++, roleId);
                 }
             }
-            // Removed name filter parameter binding
+            if (yearFilter != null && !yearFilter.equals("All Years")) {
+                stmt.setString(paramIndex++, yearFilter);
+            }
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 String userId = rs.getString("user_id");
                 String nama = rs.getString("nama");
                 String nisNip = rs.getString("NIS_NIP");
-                String display = nama + " (" + userId + " - " + nisNip + ")";
-                allUsersData.add(new Pair<>(display, userId));
-                editUserChoiceBox.getItems().add(display);
+                String display = userId + " - " + nama + " (NIS/NIP: " + nisNip + ")";
+                userDisplayMap.put(userId, display); // Store actual user_id to display string
+                selectUserForEditDeleteChoiceBox.getItems().add(display);
             }
         } catch (SQLException e) {
             AlertClass.ErrorAlert("Database Error", "Failed to load users for edit/delete", e.getMessage());
             e.printStackTrace();
         }
     }
-    // NEW: Handler for filtering in Edit/Delete section (simplified)
+
+    // New method to trigger loading users based on filters and search input
     @FXML
-    void handleFilterUsersForEditDelete() {
-        loadUsersForEditDelete(editUserFilterRoleChoiceBox.getValue());
-        clearEditUserFields(); // Clear fields when filter changes
-        editUserChoiceBox.getSelectionModel().clearSelection(); // Clear selection
+    void filterUsersAndRefreshSearch() {
+        String selectedRole = filterbyRoleChoiceBox.getValue();
+        String selectedYear = filterYearsChoiceBox.getValue();
+        loadUsersForEditDelete(selectedRole, selectedYear);
+        clearEditUserFields(); // Clear fields when filters or search change
+        selectUserForEditDeleteChoiceBox.getSelectionModel().clearSelection(); // Clear selection
         updateUserButton.setDisable(true); // Disable update
         deleteUserButton.setDisable(true); // Disable delete
     }
 
     @FXML
     void handleUserSelectionForEditDelete() {
-        String selectedUserDisplay = editUserChoiceBox.getValue();
+        String selectedUserDisplay = selectUserForEditDeleteChoiceBox.getValue();
         if (selectedUserDisplay == null || selectedUserDisplay.isEmpty()) {
             clearEditUserFields();
             updateUserButton.setDisable(true);
@@ -628,13 +682,11 @@ public class AdmindsController {
             return;
         }
 
-        String userIdToEdit = allUsersData.stream()
-                .filter(p -> p.getKey().equals(selectedUserDisplay))
-                .map(Pair::getValue)
-                .findFirst()
-                .orElse(null);
+        // Extract the actual user_id from the display format "User ID - Name (NIS/NIP)"
+        String userIdToEdit = selectedUserDisplay.substring(0, selectedUserDisplay.indexOf(" - ")).trim();
 
-        if (userIdToEdit == null) {
+
+        if (userIdToEdit == null || userIdToEdit.isEmpty()) {
             clearEditUserFields();
             updateUserButton.setDisable(true);
             deleteUserButton.setDisable(true);
@@ -752,12 +804,12 @@ public class AdmindsController {
             if (rowsAffected > 0) {
                 AlertClass.InformationAlert("Success", "User Updated", "User '" + nama + "' has been updated successfully.");
                 clearEditUserFields();
-                loadUsersForEditDelete(editUserFilterRoleChoiceBox.getValue()); // Refresh the choice box with current filters
+                filterUsersAndRefreshSearch(); // Refresh the choice box with current filters
                 loadStudentsForChoiceBox(); // Refresh student lists if user role changed to/from student
                 loadWaliKelasForChoiceBox(); // Refresh wali kelas list if user role changed to/from wali kelas
                 loadGuruForChoiceBox(); // Refresh guru list if user role changed to/from guru
                 loadClassesForChoiceBox(); // Refresh classes if wali kelas info changed
-                loadAllUsersToTable(filterRoleChoiceBox.getValue(), filterNameField.getText()); // Refresh all users table
+                loadAllUsersToTable(allUsersFilterRoleChoiceBox.getValue(), allUsersFilterNameField.getText()); // Refresh all users table
                 loadSubjectAssignments(); // Refresh subject assignments if a guru was updated
                 updateUserButton.setDisable(true); // Disable update after success
                 deleteUserButton.setDisable(true); // Disable delete after success
@@ -772,19 +824,16 @@ public class AdmindsController {
 
     @FXML
     void handleDeleteUser() {
-        String selectedUserDisplay = editUserChoiceBox.getValue();
+        String selectedUserDisplay = selectUserForEditDeleteChoiceBox.getValue();
         if (selectedUserDisplay == null || selectedUserDisplay.isEmpty()) {
             AlertClass.WarningAlert("Selection Error", "No User Selected", "Please select a user to delete.");
             return;
         }
 
-        String userIdToDelete = allUsersData.stream()
-                .filter(p -> p.getKey().equals(selectedUserDisplay))
-                .map(Pair::getValue)
-                .findFirst()
-                .orElse(null);
+        // Extract the actual user_id from the display format "User ID - Name (NIS/NIP)"
+        String userIdToDelete = selectedUserDisplay.substring(0, selectedUserDisplay.indexOf(" - ")).trim();
 
-        if (userIdToDelete == null) {
+        if (userIdToDelete == null || userIdToDelete.isEmpty()) {
             AlertClass.ErrorAlert("Retrieval Error", "Invalid User", "Could not retrieve user ID for deletion.");
             return;
         }
@@ -797,10 +846,10 @@ public class AdmindsController {
 
         if (result.isPresent() && result.get() == ButtonType.OK) {
             try (Connection con = DBS.getConnection()) {
-                // Delete from Student_Class_Enrollment first if the user is a student
-                // The ON DELETE CASCADE on Student_Class_Enrollment_Users_FK should handle this,
+                // Delete from Enrollment first if the user is a student
+                // The ON DELETE CASCADE on Enrollment_Users_FK should handle this,
                 // but explicit deletion here ensures better control and immediate feedback.
-                String deleteEnrollmentSql = "DELETE FROM Student_Class_Enrollment WHERE Users_user_id = ?";
+                String deleteEnrollmentSql = "DELETE FROM Enrollment WHERE Users_user_id = ?";
                 try (PreparedStatement delEnrollStmt = con.prepareStatement(deleteEnrollmentSql)) {
                     delEnrollStmt.setString(1, userIdToDelete);
                     delEnrollStmt.executeUpdate();
@@ -848,12 +897,12 @@ public class AdmindsController {
                 if (rowsAffected > 0) {
                     AlertClass.InformationAlert("Success", "User Deleted", "User '" + selectedUserDisplay + "' has been deleted.");
                     clearEditUserFields();
-                    loadUsersForEditDelete(editUserFilterRoleChoiceBox.getValue()); // Refresh the choice box with current filters
+                    filterUsersAndRefreshSearch(); // Refresh the choice box with current filters
                     loadStudentsForChoiceBox(); // Refresh student lists if a student was deleted
                     loadWaliKelasForChoiceBox(); // Refresh wali kelas list if a wali was deleted
                     loadGuruForChoiceBox(); // Refresh guru for subject assignment if a guru was deleted
                     loadClassesForChoiceBox(); // Refresh classes if wali kelas deleted
-                    loadAllUsersToTable(filterRoleChoiceBox.getValue(), filterNameField.getText()); // Refresh all users table
+                    loadAllUsersToTable(allUsersFilterRoleChoiceBox.getValue(), allUsersFilterNameField.getText()); // Refresh all users table
                     loadSubjectAssignments(); // Refresh subject assignments
                     updateUserButton.setDisable(true); // Disable update after success
                     deleteUserButton.setDisable(true); // Disable delete after success
@@ -1254,7 +1303,7 @@ public class AdmindsController {
 
         try (Connection con = DBS.getConnection()) {
             // Check if enrollment already exists
-            String checkSql = "SELECT COUNT(*) FROM Student_Class_Enrollment WHERE Users_user_id = ? AND Kelas_kelas_id = ? AND Kelas_Users_user_id = ?";
+            String checkSql = "SELECT COUNT(*) FROM Enrollment WHERE Users_user_id = ? AND Kelas_kelas_id = ? AND Kelas_Users_user_id = ?";
             PreparedStatement checkStmt = con.prepareStatement(checkSql);
             checkStmt.setString(1, studentUserId);
             checkStmt.setInt(2, kelasId);
@@ -1265,7 +1314,8 @@ public class AdmindsController {
                 return;
             }
 
-            String insertSql = "INSERT INTO Student_Class_Enrollment (Users_user_id, Kelas_kelas_id, Kelas_Users_user_id) VALUES (?, ?, ?)";
+            // Changed table name from Student_Class_Enrollment to Enrollment
+            String insertSql = "INSERT INTO Enrollment (Users_user_id, Kelas_kelas_id, Kelas_Users_user_id) VALUES (?, ?, ?)";
             PreparedStatement insertStmt = con.prepareStatement(insertSql);
             insertStmt.setString(1, studentUserId);
             insertStmt.setInt(2, kelasId);
@@ -1544,8 +1594,9 @@ public class AdmindsController {
             return;
         }
 
+        // Changed table name from Student_Class_Enrollment to Enrollment
         String sql = "SELECT u.user_id, u.nama, u.NIS_NIP FROM Users u " +
-                "JOIN Student_Class_Enrollment sce ON u.user_id = sce.Users_user_id " +
+                "JOIN Enrollment sce ON u.user_id = sce.Users_user_id " +
                 "WHERE sce.Kelas_kelas_id = ? AND sce.Kelas_Users_user_id = ? AND u.Role_role_id = 'S'";
         try (Connection con = DBS.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql)) {
@@ -1604,7 +1655,8 @@ public class AdmindsController {
             }
 
             try (Connection con = DBS.getConnection()) {
-                String sql = "DELETE FROM Student_Class_Enrollment WHERE Users_user_id = ? AND Kelas_kelas_id = ? AND Kelas_Users_user_id = ?";
+                // Changed table name from Student_Class_Enrollment to Enrollment
+                String sql = "DELETE FROM Enrollment WHERE Users_user_id = ? AND Kelas_kelas_id = ? AND Kelas_Users_user_id = ?";
                 PreparedStatement stmt = con.prepareStatement(sql);
                 stmt.setString(1, selectedStudent.getUserId());
                 stmt.setInt(2, kelasId);
@@ -1636,9 +1688,16 @@ public class AdmindsController {
 
         // Switch to the "Manage Users" tab and select the user for editing
         adminTabPane.getSelectionModel().select(1); // Assuming "Manage Users" is the second tab (index 1)
-        String userDisplayToSelect = selectedStudent.getStudentName() + " (" + selectedStudent.getUserId() + " - " + selectedStudent.getNisNip() + ")";
-        editUserChoiceBox.setValue(userDisplayToSelect);
-        handleUserSelectionForEditDelete(); // Load details for the selected user
+        // Adjust the display format to match what loadUsersForEditDelete creates for selection
+        // The format is now "USER_ID - Full Name (NIS/NIP: XXX)"
+        String userIdToSelect = selectedStudent.getUserId();
+        String userDisplay = userDisplayMap.get(userIdToSelect); // Retrieve the full display string from the map
+        if (userDisplay != null) {
+            selectUserForEditDeleteChoiceBox.setValue(userDisplay);
+            handleUserSelectionForEditDelete(); // Load details for the selected user
+        } else {
+            AlertClass.ErrorAlert("Error", "User Not Found", "Could not find selected student in the user list for editing.");
+        }
     }
 
     // NEW: Class Management Methods (Create, Update, Delete)
@@ -1937,9 +1996,9 @@ public class AdmindsController {
 
             try (Connection con = DBS.getConnection()) {
                 // Delete from dependent tables first due to ON DELETE NO ACTION
-                // Order matters: Student_Class_Enrollment, Jadwal, Materi, Tugas, Ujian, Detail_Pengajar
+                // Order matters: Enrollment, Jadwal, Materi, Tugas, Ujian, Detail_Pengajar
                 String[] dependentTables = {
-                        "Student_Class_Enrollment", "Jadwal", "Materi", "Tugas", "Ujian", "Detail_Pengajar"
+                        "Enrollment", "Jadwal", "Materi", "Tugas", "Ujian", "Detail_Pengajar"
                 };
 
                 for (String tableName : dependentTables) {
@@ -2047,9 +2106,9 @@ public class AdmindsController {
     }
 
     @FXML
-    void handleFilterUsers() {
-        String selectedRole = filterRoleChoiceBox.getValue();
-        String nameFilter = filterNameField.getText();
+    void handleFilterAllUsersTable() {
+        String selectedRole = allUsersFilterRoleChoiceBox.getValue();
+        String nameFilter = allUsersFilterNameField.getText();
         loadAllUsersToTable(selectedRole, nameFilter);
     }
 
@@ -2123,10 +2182,5 @@ public class AdmindsController {
             return userId;
         }
     }
-
-    // NEW: Model Class for UserTableEntry (for "View All Users" table)
-
-
-    // NEW: Model Class for SubjectAssignmentEntry
 
 }
