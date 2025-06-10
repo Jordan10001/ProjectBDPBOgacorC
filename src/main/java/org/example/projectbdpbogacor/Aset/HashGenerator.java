@@ -21,7 +21,4 @@ public class HashGenerator {
         return hash(input).equals(hash);
     }
 
-
-
-
 }

@@ -517,7 +517,6 @@ public class GurudsController {
             } else {
                 // Clear fields and disable buttons when no row is selected
                 gradeTypeChoiseBox.getSelectionModel().clearSelection();
-                gradeSubjectChoiceBox.getSelectionModel().clearSelection();
                 scoreField.clear();
 
                 updateGradeButton.setDisable(true);

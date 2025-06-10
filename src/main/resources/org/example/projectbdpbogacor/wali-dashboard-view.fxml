@@ -34,8 +34,7 @@
                                         </Label>
                                         <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" spacing="10.0">
                                             <children>
-                                                <Label text="Select Class:" />
-                                                <ChoiceBox fx:id="attendanceClassChoiceBox" onAction="#handleClassSelectionForAttendance" prefWidth="200.0" />
+                                                <Label fx:id="attendanceClassNameLabel" text="Kelas: " style="-fx-font-weight: bold;" />
                                                 <Label text="Select Student (Optional):" />
                                                 <ChoiceBox fx:id="attendanceStudentChoiceBox" onAction="#loadAbsensiData" prefWidth="200.0" />
                                                 <Button mnemonicParsing="false" onAction="#loadAbsensiData" text="Refresh" />
@@ -77,8 +76,7 @@
                                         </Label>
                                         <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" spacing="10.0">
                                             <children>
-                                                <Label text="Select Class:" />
-                                                <ChoiceBox fx:id="raporClassChoiceBox" onAction="#handleClassSelectionForRapor" prefWidth="200.0" />
+                                                <Label fx:id="raporClassNameLabel" text="Kelas: " style="-fx-font-weight: bold;" />
                                                 <Label text="Select Student:" />
                                                 <ChoiceBox fx:id="raporStudentChoiceBox" onAction="#loadNilaiData" prefWidth="200.0" />
                                                 <Label text="Select Semester:" />

@@ -48,6 +48,5 @@ public class AlertClass {
         return dialog;
     }
 
-
 }
 
