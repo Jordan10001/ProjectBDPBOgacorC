@@ -1,4 +1,4 @@
-package org.example.projectbdpbogacor.Kepala;
+package org.example.projectbdpbogacor.model;
 
 public class Pair<K, V> {
     private final K key;

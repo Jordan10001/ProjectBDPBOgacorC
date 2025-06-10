@@ -703,7 +703,7 @@ public class WalidsController {
     @FXML
     void handleLogout() {
         try {
-            HelloApplication.getInstance().changeScene("login-view.fxml", "Login Aplikasi", 1300, 600);
+            HelloApplication.getInstance().changeScene("login-view.fxml", "Login Aplikasi", 1300, 700);
         } catch (IOException e) {
             AlertClass.ErrorAlert("Error", "Logout Failed", "Could not return to login screen.");
             e.printStackTrace();

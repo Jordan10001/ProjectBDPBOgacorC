@@ -12,9 +12,7 @@ import org.example.projectbdpbogacor.Aset.AlertClass;
 import org.example.projectbdpbogacor.Aset.HashGenerator;
 import org.example.projectbdpbogacor.DBSource.DBS;
 import org.example.projectbdpbogacor.HelloApplication;
-import org.example.projectbdpbogacor.model.PengumumanEntry; // Import the PengumumanEntry model
-import org.example.projectbdpbogacor.model.SubjectAssignmentEntry;
-import org.example.projectbdpbogacor.model.UserTableEntry;
+import org.example.projectbdpbogacor.model.*;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -2123,64 +2121,9 @@ public class AdmindsController {
     }
 
     // Helper class for ChoiceBox items (to store display text and associated ID)
-    private static class Pair<K, V> {
-        private final K key;
-        private final V value;
 
-        public Pair(K key, V value) {
-            this.key = key;
-            this.value = value;
-        }
-
-        public K getKey() {
-            return key;
-        }
-
-        public V getValue() {
-            return value;
-        }
-
-        @Override
-        public String toString() {
-            return key.toString(); // Display the key in ChoiceBox
-        }
-    }
 
     // New Model Class for StudentEntry in TableView
-    public static class StudentEntry {
-        private final StringProperty studentName;
-        private final StringProperty nisNip;
-        private final StringProperty userId;
 
-        public StudentEntry(String studentName, String nisNip, String userId) {
-            this.studentName = new SimpleStringProperty(studentName);
-            this.nisNip = new SimpleStringProperty(nisNip);
-            this.userId = new SimpleStringProperty(userId);
-        }
-
-        public String getStudentName() {
-            return studentName.get();
-        }
-
-        public StringProperty studentNameProperty() {
-            return studentName;
-        }
-
-        public String getNisNip() {
-            return nisNip.get();
-        }
-
-        public StringProperty nisNipProperty() {
-            return nisNip;
-        }
-
-        public String getUserId() {
-            return userId.get();
-        }
-
-        public StringProperty userIdProperty() {
-            return userId;
-        }
-    }
 
 }

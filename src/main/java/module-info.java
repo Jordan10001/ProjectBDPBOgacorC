@@ -12,7 +12,7 @@ module org.example.projectbdpbogacor {
     opens org.example.projectbdpbogacor.Guru to javafx.fxml;
     opens org.example.projectbdpbogacor.Wali to javafx.fxml;
     opens org.example.projectbdpbogacor.Siswa to javafx.fxml;
-    opens org.example.projectbdpbogacor.model to javafx.base; // Make sure this line exists
+    // Make sure this line exists
 
     exports org.example.projectbdpbogacor;
     exports org.example.projectbdpbogacor.Admin;
@@ -20,4 +20,6 @@ module org.example.projectbdpbogacor {
     exports org.example.projectbdpbogacor.Guru;
     exports org.example.projectbdpbogacor.Wali;
     exports org.example.projectbdpbogacor.Siswa;
+    exports org.example.projectbdpbogacor.model;
+    opens org.example.projectbdpbogacor.model to javafx.base, javafx.fxml;
 }

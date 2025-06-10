@@ -1,8 +1,6 @@
 // ProjectBDPBOgacor/src/main/java/org/example/projectbdpbogacor/Kepala/KepaladsController.java
 package org.example.projectbdpbogacor.Kepala;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -11,6 +9,7 @@ import javafx.scene.control.cell.PropertyValueFactory; // Import PropertyValueFa
 import org.example.projectbdpbogacor.Aset.AlertClass;
 import org.example.projectbdpbogacor.DBSource.DBS;
 import org.example.projectbdpbogacor.HelloApplication;
+import org.example.projectbdpbogacor.model.Pair;
 import org.example.projectbdpbogacor.model.PengumumanEntry;
 import org.example.projectbdpbogacor.model.UserTableEntry;
 
