@@ -12,7 +12,9 @@ public class AbsensiEntry {
     private final StringProperty jamMulai;
     private final StringProperty jamSelesai;
 
-    public AbsensiEntry(String tanggal, String status, String namaMapel, String namaKelas, String jamMulai, String jamSelesai) {
+    public AbsensiEntry(String tanggal, String status, String namaMapel,
+                        String namaKelas, String jamMulai,
+                        String jamSelesai) {
         this.tanggal = new SimpleStringProperty(tanggal);
         this.status = new SimpleStringProperty(status);
         this.namaMapel = new SimpleStringProperty(namaMapel);

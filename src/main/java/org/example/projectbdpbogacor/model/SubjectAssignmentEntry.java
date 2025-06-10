@@ -12,8 +12,10 @@ public class SubjectAssignmentEntry {
     private final String kelasWaliId;
     private final int kelasId;
 
-    public SubjectAssignmentEntry(String subjectName, String className, String teacherName,
-                                  String teacherId, int subjectId, String kelasWaliId, int kelasId) {
+    public SubjectAssignmentEntry(String subjectName, String className,
+                                  String teacherName,
+                                  String teacherId, int subjectId,
+                                  String kelasWaliId, int kelasId) {
         this.subjectName = new SimpleStringProperty(subjectName);
         this.className = new SimpleStringProperty(className);
         this.teacherName = new SimpleStringProperty(teacherName);

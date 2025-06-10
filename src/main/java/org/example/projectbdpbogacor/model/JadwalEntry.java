@@ -12,7 +12,9 @@ public class JadwalEntry {
     private final StringProperty namaKelas;
     private final StringProperty namaPengajar; // Added for Guru's name
 
-    public JadwalEntry(String hari, String jamMulai, String jamSelesai, String namaMapel, String namaKelas, String namaPengajar) {
+    public JadwalEntry(String hari, String jamMulai, String jamSelesai,
+                       String namaMapel, String namaKelas,
+                       String namaPengajar) {
         this.hari = new SimpleStringProperty(hari);
         this.jamMulai = new SimpleStringProperty(jamMulai);
         this.jamSelesai = new SimpleStringProperty(jamSelesai);

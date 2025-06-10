@@ -17,7 +17,10 @@ public class TugasEntry {
     private final int kelasId;
 
     // Constructor for Guru (includes IDs)
-    public TugasEntry(int tugasId, String keterangan, String deadline, String tanggalDirelease, String namaMapel, String namaKelas, String kelasWaliId, int kelasId) {
+    public TugasEntry(int tugasId, String keterangan,
+                      String deadline, String tanggalDirelease,
+                      String namaMapel, String namaKelas,
+                      String kelasWaliId, int kelasId) {
         this.tugasId = new SimpleIntegerProperty(tugasId);
         this.keterangan = new SimpleStringProperty(keterangan);
         this.deadline = new SimpleStringProperty(deadline);

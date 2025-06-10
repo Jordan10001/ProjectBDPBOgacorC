@@ -14,7 +14,10 @@ public class UserTableEntry {
     private final StringProperty nomerHp;
     private final StringProperty roleName; // Full role name
 
-    public UserTableEntry(String userId, String username, String nisNip, String nama, String gender, String alamat, String email, String nomerHp, String roleName) {
+    public UserTableEntry(String userId, String username,
+                          String nisNip, String nama, String gender,
+                          String alamat, String email,
+                          String nomerHp, String roleName) {
         this.userId = new SimpleStringProperty(userId);
         this.username = new SimpleStringProperty(username);
         this.nisNip = new SimpleStringProperty(nisNip);

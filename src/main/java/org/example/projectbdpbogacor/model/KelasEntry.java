@@ -15,7 +15,9 @@ public class KelasEntry {
     private final StringProperty semesterName; // Untuk tampilan, join dengan Semester
     private final IntegerProperty tahunAjaran;
 
-    public KelasEntry(int classId, String className, int waliKelasId, String waliKelasName, int semesterId, String semesterName, int tahunAjaran) {
+    public KelasEntry(int classId, String className, int waliKelasId,
+                      String waliKelasName, int semesterId,
+                      String semesterName, int tahunAjaran) {
         this.classId = new SimpleIntegerProperty(classId);
         this.className = new SimpleStringProperty(className);
         this.waliKelasId = new SimpleIntegerProperty(waliKelasId);

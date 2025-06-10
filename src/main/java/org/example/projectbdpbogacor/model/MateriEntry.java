@@ -17,7 +17,8 @@ public class MateriEntry {
     private final int kelasId;
 
     // Constructor for Guru (includes IDs)
-    public MateriEntry(int materiId, String namaMateri, String namaMapel, String namaKelas, String kelasWaliId, int kelasId) {
+    public MateriEntry(int materiId, String namaMateri, String namaMapel,
+                       String namaKelas, String kelasWaliId, int kelasId) {
         this.materiId = new SimpleIntegerProperty(materiId);
         this.namaMateri = new SimpleStringProperty(namaMateri);
         this.namaMapel = new SimpleStringProperty(namaMapel);
