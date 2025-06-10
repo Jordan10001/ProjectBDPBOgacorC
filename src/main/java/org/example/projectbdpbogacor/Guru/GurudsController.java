@@ -253,7 +253,7 @@ public class GurudsController {
         ujianJenisUjianChoiceBox.setValue("UTS");
 
         gradeTypeChoiseBox.getItems().addAll("UTS", "UAS", "TUGAS 1", "TUGAS 2", "TUGAS 3", "TUGAS 4");
-        gradeTypeChoiseBox.setValue("Tugas 1");
+        gradeTypeChoiseBox.setValue("TUGAS 1");
 
         // Add listeners for table selections to enable edit/delete buttons and populate fields
         setupGradeTableSelectionListener();
@@ -677,6 +677,21 @@ public class GurudsController {
                 return;
             }
 
+            // NEW: Check for duplicate grade type for the same subject and student within the semester
+            String checkDuplicateGradeSql = "SELECT COUNT(*) FROM Nilai n " +
+                    "JOIN Rapor r ON n.Rapor_rapor_id = r.rapor_id " +
+                    "WHERE r.Users_user_id = ? AND r.Semester_semester_id = ? AND n.Matpel_mapel_id = ? AND n.jenis_nilai = ?";
+            try (PreparedStatement checkDuplicateStmt = con.prepareStatement(checkDuplicateGradeSql)) {
+                checkDuplicateStmt.setString(1, studentUserId);
+                checkDuplicateStmt.setInt(2, semesterId);
+                checkDuplicateStmt.setInt(3, mapelId);
+                checkDuplicateStmt.setString(4, jenisNilai);
+                ResultSet duplicateRs = checkDuplicateStmt.executeQuery();
+                if (duplicateRs.next() && duplicateRs.getInt(1) > 0) {
+                    AlertClass.WarningAlert("Duplicate Grade Type", "Grade Type Already Exists", "A grade of type '" + jenisNilai + "' for subject '" + selectedSubjectDisplay + "' already exists for this student in this semester. Please update the existing grade or select a different type.");
+                    return; // Prevent insertion
+                }
+            }
             // 2. Insert the grade
             String insertNilaiSql = "INSERT INTO Nilai (nilai, jenis_nilai, Matpel_mapel_id, Rapor_rapor_id) VALUES (?, ?, ?, ?)";
             PreparedStatement stmt = con.prepareStatement(insertNilaiSql);

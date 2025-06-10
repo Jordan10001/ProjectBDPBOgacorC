@@ -23,12 +23,12 @@
                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
             </padding>
             <Label fx:id="welcomeUserLabel" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Welcome, Admin!" />
-            <TabPane fx:id="guruTabPane" prefHeight="570.0" style="-fx-background-color: #8cff00; -fx-background-radius: 15px; -fx-border-radius: 15px;" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+            <TabPane fx:id="guruTabPane" maxHeight="570.0" minHeight="570.0" prefHeight="570.0" style="-fx-background-color: #8cff00; -fx-background-radius: 15px; -fx-border-radius: 15px;" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
                 <Tab text="Class Schedule">
                     <content>
                         <AnchorPane prefHeight="200.0" prefWidth="200.0">
                             <children>
-                                <VBox alignment="TOP_CENTER" layoutY="17.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="468.0" prefWidth="1260.0" spacing="10.0">
+                                <VBox alignment="TOP_CENTER" layoutY="17.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="526.0" prefWidth="1260.0" spacing="10.0">
                                     <children>
                                         <Label text="My Class Schedule">
                                             <font>
@@ -47,7 +47,7 @@
                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                             </padding>
                                         </HBox>
-                                        <TableView fx:id="jadwalKelasTable" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="293.0" prefWidth="1225.0">
+                                        <TableView fx:id="jadwalKelasTable" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="418.0" prefWidth="1240.0">
                                             <columns>
                                                 <TableColumn fx:id="hariColumn" prefWidth="100.0" text="Hari" />
                                                 <TableColumn fx:id="jamMulaiColumn" prefWidth="160.0" text="Jam Mulai" />
@@ -68,7 +68,7 @@
                 <Tab text="Input Grades">
                     <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <VBox layoutX="10.0" layoutY="6.0" maxWidth="1240.0" minWidth="1240.0" prefHeight="472.0" prefWidth="1240.0" spacing="10">
+                            <VBox layoutX="10.0" layoutY="6.0" maxWidth="1240.0" minWidth="1240.0" prefHeight="534.0" prefWidth="1240.0" spacing="10">
                                 <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Input Grades" />
                                 <HBox spacing="10">
                                     <Label text="Class:" />
@@ -89,7 +89,7 @@
                                     <Button fx:id="updateGradeButton" disable="true" onAction="#handleUpdateGrade" text="Update Grade" />
                                     <Button fx:id="deleteGradeButton" disable="true" onAction="#handleDeleteGrade" text="Delete Grade" />
                                 </HBox>
-                                <TableView fx:id="existingGradesTable" maxHeight="-Infinity" maxWidth="1240.0" minHeight="-Infinity" minWidth="1240.0" prefHeight="324.0" prefWidth="1240.0" VBox.vgrow="ALWAYS">
+                                <TableView fx:id="existingGradesTable" maxHeight="-Infinity" maxWidth="1240.0" minHeight="-Infinity" minWidth="1240.0" prefHeight="417.0" prefWidth="1240.0" VBox.vgrow="ALWAYS">
                                     <columns>
                                         <TableColumn fx:id="existingGradeIdColumn" prefWidth="50" text="ID" visible="false" />
                                         <TableColumn fx:id="existingJenisNilaiColumn" prefWidth="150.0" text="Jenis Nilai" />
@@ -105,7 +105,7 @@
                 <Tab text="Manage Assignments">
                     <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <VBox layoutX="10.0" layoutY="10.0" prefHeight="497.0" prefWidth="1240.0" spacing="10">
+                            <VBox layoutX="10.0" layoutY="10.0" prefHeight="532.0" prefWidth="1240.0" spacing="10">
                                 <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Manage Assignments" />
                                 <HBox spacing="10">
                                     <Label text="Class:" />
@@ -122,7 +122,7 @@
                                     <Button fx:id="updateTugasButton" disable="true" onAction="#handleUpdateTugas" text="Update Assignment" />
                                     <Button fx:id="deleteTugasButton" disable="true" onAction="#handleDeleteTugas" text="Delete Assignment" />
                                 </HBox>
-                                <TableView fx:id="tugasTable" maxHeight="-Infinity" maxWidth="1240.0" minHeight="-Infinity" prefHeight="307.0" prefWidth="1240.0" VBox.vgrow="ALWAYS">
+                                <TableView fx:id="tugasTable" maxHeight="-Infinity" maxWidth="1240.0" minHeight="-Infinity" prefHeight="397.0" prefWidth="1240.0" VBox.vgrow="ALWAYS">
                                     <columns>
                                         <TableColumn fx:id="tugasIdColumn" prefWidth="50" text="ID" visible="false" />
                                         <TableColumn fx:id="tugasKeteranganColumn" prefWidth="300.0" text="Description" />
@@ -140,7 +140,7 @@
                 <Tab text="Manage Materials">
                     <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <VBox layoutX="10.0" layoutY="9.0" prefHeight="500.0" prefWidth="1240.0" spacing="10">
+                            <VBox layoutX="10.0" layoutY="9.0" prefHeight="524.0" prefWidth="1240.0" spacing="10">
                                 <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Manage Materials" />
                                 <HBox spacing="10">
                                     <Label text="Class:" />
@@ -155,7 +155,7 @@
                                     <Button fx:id="updateMateriButton" disable="true" onAction="#handleUpdateMateri" text="Update Material" />
                                     <Button fx:id="deleteMateriButton" disable="true" onAction="#handleDeleteMateri" text="Delete Material" />
                                 </HBox>
-                                <TableView fx:id="materiTable" maxHeight="-Infinity" prefHeight="323.0" prefWidth="1240.0" VBox.vgrow="ALWAYS">
+                                <TableView fx:id="materiTable" maxHeight="-Infinity" prefHeight="413.0" prefWidth="1240.0" VBox.vgrow="ALWAYS">
                                     <columns>
                                         <TableColumn fx:id="materiIdColumn" prefWidth="50" text="ID" visible="false" />
                                         <TableColumn fx:id="materiNamaMateriColumn" prefWidth="300.0" text="Material Name" />
@@ -171,7 +171,7 @@
                 <Tab text="Manage Exams">
                     <content>
                         <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
-                            <VBox layoutX="10.0" layoutY="8.0" prefHeight="500.0" prefWidth="1240.0" spacing="10">
+                            <VBox layoutX="10.0" layoutY="8.0" prefHeight="523.0" prefWidth="1240.0" spacing="10">
                                 <Label style="-fx-font-size: 18px; -fx-font-weight: bold;" text="Manage Exams" />
                                 <HBox spacing="10">
                                     <Label text="Class:" />
@@ -188,7 +188,7 @@
                                     <Button fx:id="updateUjianButton" disable="true" onAction="#handleUpdateUjian" text="Update Exam" />
                                     <Button fx:id="deleteUjianButton" disable="true" onAction="#handleDeleteUjian" text="Delete Exam" />
                                 </HBox>
-                                <TableView fx:id="ujianTable" maxHeight="-Infinity" prefHeight="323.0" prefWidth="1240.0" VBox.vgrow="ALWAYS">
+                                <TableView fx:id="ujianTable" maxHeight="-Infinity" prefHeight="419.0" prefWidth="1240.0" VBox.vgrow="ALWAYS">
                                     <columns>
                                         <TableColumn fx:id="ujianIdColumn" prefWidth="50" text="ID" visible="false" />
                                         <TableColumn fx:id="ujianJenisColumn" prefWidth="150.0" text="Exam Type" />

@@ -33,7 +33,7 @@
                                                 <Font name="System Bold" size="20.0" />
                                             </font>
                                         </Label>
-                                        <GridPane alignment="CENTER" hgap="10.0" vgap="10.0">
+                                        <GridPane alignment="CENTER" hgap="10.0" style="-fx-background-color: #ffffff; -fx-background-radius: 15px;" vgap="10.0">
                                             <columnConstraints>
                                                 <ColumnConstraints maxWidth="150.0" minWidth="10.0" prefWidth="100.0" />
                                                 <ColumnConstraints maxWidth="250.0" minWidth="10.0" prefWidth="250.0" />
@@ -85,7 +85,7 @@
                                         <Font name="System Bold" size="20.0" />
                                     </font>
                                 </Label>
-                                <TableView fx:id="jadwalKelasTable" layoutX="10.0" layoutY="77.0" prefHeight="358.0" prefWidth="1240.0">
+                                <TableView fx:id="jadwalKelasTable" layoutX="10.0" layoutY="77.0" prefHeight="362.0" prefWidth="1240.0" style="-fx-border-radius: 15px;">
                                     <columns>
                                         <TableColumn fx:id="hariColumn" prefWidth="100.0" text="Hari" />
                                         <TableColumn fx:id="jamMulaiColumn" maxWidth="160.0" minWidth="160.0" prefWidth="160.0" text="Jam Mulai" />
@@ -108,7 +108,7 @@
                                         <Font name="System Bold" size="20.0" />
                                     </font>
                                 </Label>
-                                <TableView fx:id="nilaiUjianTable" layoutX="10.0" layoutY="77.0" prefHeight="358.0" prefWidth="1240.0">
+                                <TableView fx:id="nilaiUjianTable" layoutX="10.0" layoutY="77.0" prefHeight="364.0" prefWidth="1240.0">
                                     <columns>
                                         <TableColumn fx:id="jenisNilaiColumn" prefWidth="200.0" text="Jenis Nilai" />
                                         <TableColumn fx:id="namaMapelNilaiColumn" prefWidth="400.0" text="Mata Pelajaran" />
@@ -128,7 +128,7 @@
                                         <Font name="System Bold" size="20.0" />
                                     </font>
                                 </Label>
-                                <TableView fx:id="tugasTable" layoutX="10.0" layoutY="73.0" prefHeight="362.0" prefWidth="1240.0">
+                                <TableView fx:id="tugasTable" layoutX="10.0" layoutY="73.0" prefHeight="367.0" prefWidth="1240.0">
                                     <columns>
                                         <TableColumn fx:id="keteranganTugasColumn" prefWidth="400.0" text="Keterangan" />
                                         <TableColumn fx:id="deadlineTugasColumn" prefWidth="200.0" text="Deadline" />
@@ -150,7 +150,7 @@
                                         <Font name="System Bold" size="20.0" />
                                     </font>
                                 </Label>
-                                <TableView fx:id="materiTable" layoutX="10.0" layoutY="73.0" maxHeight="362.0" maxWidth="1240.0" minHeight="362.0" minWidth="1240.0" prefHeight="363.0" prefWidth="1240.0">
+                                <TableView fx:id="materiTable" layoutX="10.0" layoutY="73.0" maxHeight="368.0" maxWidth="1240.0" minHeight="362.0" minWidth="1240.0" prefHeight="368.0" prefWidth="1240.0">
                                     <columns>
                                         <TableColumn fx:id="namaMateriColumn" prefWidth="500.0" text="Nama Materi" />
                                         <TableColumn fx:id="mapelMateriColumn" prefWidth="400.0" text="Mata Pelajaran" />
@@ -170,7 +170,7 @@
                                         <Font name="System Bold" size="20.0" />
                                     </font>
                                 </Label>
-                                <TableView fx:id="ujianTable" layoutX="10.0" layoutY="72.0" maxWidth="1240.0" minWidth="1240.0" prefHeight="364.0" prefWidth="1240.0">
+                                <TableView fx:id="ujianTable" layoutX="10.0" layoutY="72.0" maxWidth="1240.0" minWidth="1240.0" prefHeight="368.0" prefWidth="1240.0">
                                     <columns>
                                         <TableColumn fx:id="jenisUjianColumn" prefWidth="250.0" text="Jenis Ujian" />
                                         <TableColumn fx:id="tanggalUjianColumn" prefWidth="250.0" text="Tanggal" />
@@ -191,7 +191,7 @@
                                         <Font name="System Bold" size="20.0" />
                                     </font>
                                 </Label>
-                                <TableView fx:id="absensiTable" layoutX="10.0" layoutY="73.0" maxWidth="1240.0" minWidth="1240.0" prefHeight="362.0" prefWidth="1240.0">
+                                <TableView fx:id="absensiTable" layoutX="10.0" layoutY="73.0" maxWidth="1240.0" minWidth="1240.0" prefHeight="366.0" prefWidth="1240.0">
                                     <columns>
                                         <TableColumn fx:id="tanggalAbsensiColumn" prefWidth="200.0" text="Tanggal" />
                                         <TableColumn fx:id="statusAbsensiColumn" prefWidth="200.0" text="Status" />

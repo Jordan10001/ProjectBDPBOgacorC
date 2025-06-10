@@ -15,6 +15,7 @@ import org.example.projectbdpbogacor.DBSource.DBS;
 import org.example.projectbdpbogacor.HelloApplication;
 import org.example.projectbdpbogacor.model.AbsensiWaliEntry; // Use the specific model for Wali
 import org.example.projectbdpbogacor.model.NilaiEntry;
+import org.example.projectbdpbogacor.model.UserTableEntry; // Import UserTableEntry for student list
 
 import java.io.File;
 import java.io.FileWriter;
@@ -37,9 +38,9 @@ public class WalidsController {
 
     // Student Attendance
     @FXML
-    private Label attendanceClassNameLabel; // Changed from ChoiceBox to Label
+    private Label attendanceClassNameLabel;
     @FXML
-    private ChoiceBox<String> attendanceStudentChoiceBox; // Display: "Student Name (NIS/NIP)"
+    private ChoiceBox<String> attendanceStudentChoiceBox;
     @FXML
     private TableView<AbsensiWaliEntry> absensiTable;
     @FXML
@@ -59,11 +60,11 @@ public class WalidsController {
 
     // Print Report Card
     @FXML
-    private Label raporClassNameLabel; // Changed from ChoiceBox to Label
+    private Label raporClassNameLabel;
     @FXML
-    private ChoiceBox<String> raporStudentChoiceBox; // Display: "Student Name (NIS/NIP)"
+    private ChoiceBox<String> raporStudentChoiceBox;
     @FXML
-    private ChoiceBox<String> raporSemesterChoiceBox; // Display: "Tahun Ajaran - Semester"
+    private ChoiceBox<String> raporSemesterChoiceBox;
     @FXML
     private TableView<NilaiEntry> nilaiUjianTable;
     @FXML
@@ -73,50 +74,67 @@ public class WalidsController {
     @FXML
     private TableColumn<NilaiEntry, Integer> nilaiColumn;
 
+    // NEW: Student List Tab
+    @FXML
+    private Label studentListClassNameLabel; // NEW FXML element for class name in student list
+    @FXML
+    private TableView<UserTableEntry> studentListTable;
+    @FXML
+    private TableColumn<UserTableEntry, String> studentListNameColumn;
+    @FXML
+    private TableColumn<UserTableEntry, String> studentListGenderColumn;
+    @FXML
+    private TableColumn<UserTableEntry, String> studentListNISNIPColumn;
+    @FXML
+    private TableColumn<UserTableEntry, String> studentListAddressColumn;
+    @FXML
+    private TableColumn<UserTableEntry, String> studentListPhoneNumberColumn;
+    @FXML
+    private TableColumn<UserTableEntry, String> studentListEmailColumn;
+
     private String loggedInUserId;
-    private String waliKelasId; // To store the wali_kelas_user_id (same as loggedInUserId)
-    private int kelasId; // To store the kelas_id that this wali kelas manages
-    private String kelasName; // To store the name of the class this wali kelas manages
+    private String waliKelasId;
+    private int kelasId;
+    private String kelasName;
 
     // Maps to store IDs corresponding to displayed names in ChoiceBoxes
-    private Map<String, String> studentsMap = new HashMap<>(); // Display -> user_id
-    private Map<String, Integer> semestersMap = new HashMap<>(); // Display -> semester_id
+    private Map<String, String> studentsMap = new HashMap<>();
+    private Map<String, Integer> semestersMap = new HashMap<>();
 
     @FXML
     void initialize() {
         loggedInUserId = HelloApplication.getInstance().getLoggedInUserId();
-        loadWaliKelasNameAndClassInfo(); // Load wali kelas name and their class info
+        loadWaliKelasNameAndClassInfo();
 
-        // Initialize TableView columns
         initAbsensiTable();
         initNilaiUjianTable();
+        initStudentListTable();
 
-        // Load initial data for ChoiceBoxes
-        loadSemesters(); // Semesters are still selected
+        loadSemesters();
 
-        // Add listeners to tab and choice boxes
         attendanceStudentChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> loadAbsensiData());
         raporStudentChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> loadNilaiData());
         raporSemesterChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> loadNilaiData());
 
-        // Add listeners to tabs to load data when selected
         waliTabPane.getSelectionModel().selectedItemProperty().addListener((observable, oldTab, newTab) -> {
             if (newTab != null) {
                 if (newTab.getText().equals("Student Attendance")) {
-                    loadStudentsInClass(attendanceStudentChoiceBox); // Load students for the attendance tab
-                    loadAbsensiData(); // Load attendance for the managed class
+                    loadStudentsInClass(attendanceStudentChoiceBox);
+                    loadAbsensiData();
                 } else if (newTab.getText().equals("Print Report Card")) {
-                    loadStudentsInClass(raporStudentChoiceBox); // Load students for the report card tab
-                    loadSemesters(); // Refresh semesters
+                    loadStudentsInClass(raporStudentChoiceBox);
+                    loadSemesters();
                     if (!raporSemesterChoiceBox.getItems().isEmpty()) {
-                        raporSemesterChoiceBox.setValue(raporSemesterChoiceBox.getItems().get(0)); // Select first semester by default
+                        raporSemesterChoiceBox.setValue(raporSemesterChoiceBox.getItems().get(0));
                     }
-                    loadNilaiData(); // Load grades for the managed class
+                    loadNilaiData();
+                } else if (newTab.getText().equals("Student List")) {
+                    loadStudentsInMyClass();
                 }
             }
         });
 
-        // Load initial data for the currently selected tab (which is usually the first one)
+        // Load initial data for the currently selected tab
         if (waliTabPane.getSelectionModel().getSelectedItem().getText().equals("Student Attendance")) {
             loadStudentsInClass(attendanceStudentChoiceBox);
             loadAbsensiData();
@@ -127,6 +145,8 @@ public class WalidsController {
                 raporSemesterChoiceBox.setValue(raporSemesterChoiceBox.getItems().get(0));
             }
             loadNilaiData();
+        } else if (waliTabPane.getSelectionModel().getSelectedItem().getText().equals("Student List")) {
+            loadStudentsInMyClass();
         }
     }
 
@@ -139,19 +159,21 @@ public class WalidsController {
             stmt.setString(1, loggedInUserId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                welcomeUserLabel.setText("Welcome, " + rs.getString("nama") + "!"); // Set welcome label
-                this.waliKelasId = loggedInUserId; // Store wali_kelas_user_id
-                this.kelasId = rs.getInt("kelas_id"); // Store kelas_id
-                this.kelasName = rs.getString("nama_kelas"); // Store kelas_name
+                welcomeUserLabel.setText("Welcome, " + rs.getString("nama") + "!");
+                this.waliKelasId = loggedInUserId;
+                this.kelasId = rs.getInt("kelas_id");
+                this.kelasName = rs.getString("nama_kelas");
 
-                attendanceClassNameLabel.setText("Kelas: " + kelasName); // Set class name for attendance tab
-                raporClassNameLabel.setText("Kelas: " + kelasName); // Set class name for report card tab
+                attendanceClassNameLabel.setText("Kelas: " + kelasName);
+                raporClassNameLabel.setText("Kelas: " + kelasName);
+                studentListClassNameLabel.setText("Kelas: " + kelasName); // Set class name for student list tab
 
             } else {
                 AlertClass.WarningAlert("Class Not Found", "Wali Kelas has no assigned class", "Please ensure this Wali Kelas is assigned to a class.");
                 welcomeUserLabel.setText("Welcome, Wali Kelas!");
                 attendanceClassNameLabel.setText("Kelas: Not Assigned");
                 raporClassNameLabel.setText("Kelas: Not Assigned");
+                studentListClassNameLabel.setText("Kelas: Not Assigned"); // Set default if no class found
             }
         } catch (SQLException e) {
             AlertClass.ErrorAlert("Database Error", "Failed to load user name or class info", e.getMessage());
@@ -159,24 +181,21 @@ public class WalidsController {
         }
     }
 
-    // --- Common Helper Methods for ChoiceBoxes ---
-    // This method is now simplified as it doesn't need to load multiple classes
     private void loadStudentsInClass(ChoiceBox<String> studentChoiceBoxToPopulate) {
         studentChoiceBoxToPopulate.getItems().clear();
         studentsMap.clear();
 
-        if (this.kelasId == 0) { // Check if class info is loaded
+        if (this.kelasId == 0) {
             return;
         }
 
-        // Query students enrolled in the managed class
         String sql = "SELECT u.user_id, u.nama, u.NIS_NIP FROM Users u " +
-                "JOIN student_class_enrollment sce ON u.user_id = sce.Users_user_id " + // Corrected table name
+                "JOIN student_class_enrollment sce ON u.user_id = sce.Users_user_id " +
                 "WHERE sce.Kelas_kelas_id = ? AND sce.Kelas_Users_user_id = ?";
         try (Connection con = DBS.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql)) {
-            stmt.setInt(1, this.kelasId); // Use the pre-loaded kelasId
-            stmt.setString(2, this.waliKelasId); // Use the pre-loaded waliKelasId
+            stmt.setInt(1, this.kelasId);
+            stmt.setString(2, this.waliKelasId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 String userId = rs.getString("user_id");
@@ -187,7 +206,7 @@ public class WalidsController {
                 studentChoiceBoxToPopulate.getItems().add(display);
             }
             if (!studentChoiceBoxToPopulate.getItems().isEmpty()) {
-                studentChoiceBoxToPopulate.setValue(studentChoiceBoxToPopulate.getItems().get(0)); // Select first student by default
+                studentChoiceBoxToPopulate.setValue(studentChoiceBoxToPopulate.getItems().get(0));
             }
         } catch (SQLException e) {
             AlertClass.ErrorAlert("Database Error", "Failed to load students", e.getMessage());
@@ -217,7 +236,6 @@ public class WalidsController {
         }
     }
 
-    // --- Student Attendance Methods ---
     private void initAbsensiTable() {
         studentNameAbsensiColumn.setCellValueFactory(new PropertyValueFactory<>("studentName"));
         tanggalAbsensiColumn.setCellValueFactory(new PropertyValueFactory<>("tanggal"));
@@ -228,15 +246,12 @@ public class WalidsController {
         jamSelesaiAbsensiColumn.setCellValueFactory(new PropertyValueFactory<>("jamSelesai"));
     }
 
-    // Removed handleClassSelectionForAttendance as class is now fixed.
-    // The student choice box selection listener will now trigger loadAbsensiData.
-
     @FXML
     void loadAbsensiData() {
         ObservableList<AbsensiWaliEntry> absensiList = FXCollections.observableArrayList();
         String selectedStudentDisplay = attendanceStudentChoiceBox.getValue();
 
-        if (this.kelasId == 0 || selectedStudentDisplay == null) { // Ensure class and student are selected
+        if (this.kelasId == 0 || selectedStudentDisplay == null) {
             absensiTable.setItems(FXCollections.emptyObservableList());
             return;
         }
@@ -253,14 +268,14 @@ public class WalidsController {
                 "JOIN Jadwal j ON a.Jadwal_jadwal_id = j.jadwal_id " +
                 "JOIN Matpel m ON j.Matpel_mapel_id = m.mapel_id " +
                 "JOIN Kelas k ON j.Kelas_Users_user_id = k.Users_user_id AND j.Kelas_kelas_id = k.kelas_id " +
-                "JOIN student_class_enrollment sce ON u.user_id = sce.Users_user_id AND k.kelas_id = sce.Kelas_kelas_id AND k.Users_user_id = sce.Kelas_Users_user_id " + // Corrected table name
-                "WHERE k.kelas_id = ? AND k.Users_user_id = ? AND u.user_id = ?"; // Filter by managed class and selected student
+                "JOIN student_class_enrollment sce ON u.user_id = sce.Users_user_id AND k.kelas_id = sce.Kelas_kelas_id AND k.Users_user_id = sce.Kelas_Users_user_id " +
+                "WHERE k.kelas_id = ? AND k.Users_user_id = ? AND u.user_id = ?";
 
         try (Connection con = DBS.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql)) {
-            stmt.setInt(1, this.kelasId); // Use the pre-loaded kelasId
-            stmt.setString(2, this.waliKelasId); // Use the pre-loaded waliKelasId
-            stmt.setString(3, studentId); // Filter by selected student
+            stmt.setInt(1, this.kelasId);
+            stmt.setString(2, this.waliKelasId);
+            stmt.setString(3, studentId);
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
@@ -281,15 +296,11 @@ public class WalidsController {
         }
     }
 
-    // --- Print Report Card Methods ---
     private void initNilaiUjianTable() {
         jenisNilaiColumn.setCellValueFactory(new PropertyValueFactory<>("jenisNilai"));
         namaMapelNilaiColumn.setCellValueFactory(new PropertyValueFactory<>("namaMapel"));
         nilaiColumn.setCellValueFactory(new PropertyValueFactory<>("nilai"));
     }
-
-    // Removed handleClassSelectionForRapor as class is now fixed.
-    // The student and semester choice box selection listeners will now trigger loadNilaiData.
 
     @FXML
     void loadNilaiData() {
@@ -297,7 +308,7 @@ public class WalidsController {
         String selectedStudentDisplay = raporStudentChoiceBox.getValue();
         String selectedSemesterDisplay = raporSemesterChoiceBox.getValue();
 
-        if (selectedStudentDisplay == null || selectedSemesterDisplay == null || this.kelasId == 0) { // Ensure class, student, and semester are selected
+        if (selectedStudentDisplay == null || selectedSemesterDisplay == null || this.kelasId == 0) {
             nilaiUjianTable.setItems(FXCollections.emptyObservableList());
             return;
         }
@@ -339,7 +350,7 @@ public class WalidsController {
         String selectedStudentDisplay = raporStudentChoiceBox.getValue();
         String selectedSemesterDisplay = raporSemesterChoiceBox.getValue();
 
-        if (selectedStudentDisplay == null || selectedSemesterDisplay == null || this.kelasId == 0) { // Ensure class, student, and semester are selected
+        if (selectedStudentDisplay == null || selectedSemesterDisplay == null || this.kelasId == 0) {
             AlertClass.WarningAlert("Input Error", "Missing Information", "Please select a student and semester to print the report card.");
             return;
         }
@@ -353,37 +364,28 @@ public class WalidsController {
         }
 
         try {
-            // 1. Fetch student biodata and class name
             Map<String, String> studentBiodata = getStudentBiodata(studentUserId);
-            String className = this.kelasName; // Use the pre-loaded class name
+            String className = this.kelasName;
 
-            // 2. Fetch grades (already loaded in nilaiUjianTable, but we can re-fetch for robustness)
-            ObservableList<NilaiEntry> grades = nilaiUjianTable.getItems(); // Use the already loaded data
+            ObservableList<NilaiEntry> grades = nilaiUjianTable.getItems();
 
-            // 3. Calculate average grade and letter grade
-            double averageGrade = calculateAverageGrade(grades); // Still calculate for potential future use or debugging
-            String letterGrade = getGradeLetter(averageGrade); // Still calculate for potential future use or debugging
+            double averageGrade = calculateAverageGrade(grades);
+            String letterGrade = getGradeLetter(averageGrade);
 
-            // 4. Fetch attendance summary (e.g., total Hadir, Alpha, Ijin for the selected student and semester)
             Map<String, Integer> attendanceSummary = getAttendanceSummary(studentUserId, semesterId);
 
-            // 5. Generate HTML content
             String htmlContent = generateReportCardHtml(studentBiodata, averageGrade, letterGrade, attendanceSummary, className, selectedSemesterDisplay, grades);
 
-            // 6. Save to a temporary HTML file
-            // Create the "rapor" directory if it doesn't exist
             File raporDir = new File("Rapor");
             if (!raporDir.exists()) {
-                raporDir.mkdirs(); // Creates the directory and any necessary but nonexistent parent directories.
+                raporDir.mkdirs();
             }
 
-            // Save the file inside the "rapor" directory
             File outputFile = new File(raporDir, "rapor_" + studentUserId + "_" + semesterId + ".html");
             try (FileWriter writer = new FileWriter(outputFile)) {
                 writer.write(htmlContent);
             }
 
-            // 7. Open the file in the default browser
             if (Desktop.isDesktopSupported()) {
                 Desktop.getDesktop().browse(outputFile.toURI());
                 AlertClass.InformationAlert("Report Card Generated", "Report card saved and opened.", "The report card for " + studentBiodata.get("nama") + " has been generated and opened in your browser.");
@@ -402,7 +404,6 @@ public class WalidsController {
 
     private Map<String, String> getStudentBiodata(String userId) throws SQLException {
         Map<String, String> biodata = new HashMap<>();
-        // Fetch both user_id and NIS_NIP
         String sql = "SELECT u.user_id, u.username, u.NIS_NIP, u.nama, u.gender, u.alamat, u.email, u.nomer_hp FROM Users u WHERE u.user_id = ?";
         try (Connection con = DBS.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql)) {
@@ -423,8 +424,6 @@ public class WalidsController {
     }
 
     private double calculateAverageGrade(ObservableList<NilaiEntry> grades) {
-        // This calculation is for an overall average based on fixed weights.
-        // It's still used to determine the individual subject average as well.
         double uts = 0;
         double uas = 0;
         double tugas1 = 0;
@@ -454,8 +453,6 @@ public class WalidsController {
                     break;
             }
         }
-
-        // (0.30 * UTS) + (0.30 * UAS) + (0.10 * Tugas 1) + (0.10 * Tugas 2) + (0.10 * Tugas 3) + (0.10 * Tugas 4)
         return (0.30 * uts) + (0.30 * uas) + (0.10 * tugas1) + (0.10 * tugas2) + (0.10 * tugas3) + (0.10 * tugas4);
     }
 
@@ -466,11 +463,10 @@ public class WalidsController {
             return "B";
         } else if (averageGrade >= 75) {
             return "C";
-        } else {//74=>
+        } else {
             return "D";
         }
     }
-
 
     private Map<String, Integer> getAttendanceSummary(String studentUserId, int semesterId) throws SQLException {
         Map<String, Integer> summary = new HashMap<>();
@@ -502,42 +498,29 @@ public class WalidsController {
         }
 
         LocalDateTime semesterEnd;
-        // Determine semester end date based on semester name and start year
         if ("Ganjil".equalsIgnoreCase(semesterName)) {
-            // Ganjil semester typically ends in December of the same year
             semesterEnd = LocalDateTime.of(semesterStart.getYear(), 12, 31, 23, 59, 59);
         } else if ("Genap".equalsIgnoreCase(semesterName)) {
-            // Genap semester typically starts in Jan-Feb of the next year (if tahun_ajaran spans two years)
-            // and ends around June-July of that next year.
-            // For simplicity, let's assume it ends in June of the year it's primarily in.
-            // A more robust solution might involve storing explicit start/end dates for semesters.
             int endYear = semesterStart.getYear();
             if (tahunAjaran != null && tahunAjaran.contains("/")) {
                 try {
                     String[] years = tahunAjaran.split("/");
                     if (years.length == 2) {
-                        endYear = Integer.parseInt(years[1]); // End year of the academic year
+                        endYear = Integer.parseInt(years[1]);
                     }
                 } catch (NumberFormatException e) {
                     System.err.println("Error parsing tahun_ajaran: " + e.getMessage());
                 }
             }
-            semesterEnd = LocalDateTime.of(endYear, 6, 30, 23, 59, 59); // Assuming end of June
+            semesterEnd = LocalDateTime.of(endYear, 6, 30, 23, 59, 59);
         } else {
-            // Fallback: assume 6 months duration if semester name is not Ganjil/Genap
             semesterEnd = semesterStart.plusMonths(6).minusDays(1).withHour(23).withMinute(59).withSecond(59).withNano(999999999);
         }
 
-
         // Override semesterEnd for the example data for testing purposes
-        // Since the Absensi data in sqlscriptuser.sql has '2024-07-08 08:00:00'
-        // and the semester '2024/2025 - Ganjil' starts '2024-07-01 00:00:00'
-        // we need to ensure the semester end date covers July 2024.
-        // For '2024/2025 - Ganjil', the end date should be adjusted.
         if ("2024/2025".equals(tahunAjaran) && "Ganjil".equals(semesterName)) {
             semesterEnd = LocalDateTime.of(2024, 12, 31, 23, 59, 59);
         }
-
 
         System.out.println("Calculating attendance for student: " + studentUserId +
                 " from " + semesterStart.format(DateTimeFormatter.ISO_LOCAL_DATE) +
@@ -593,7 +576,7 @@ public class WalidsController {
         html.append("            <p><strong>Name:</strong> ").append(biodata.get("nama")).append("</p>\n");
         html.append("            <p><strong>Student ID:</strong> ").append(biodata.get("user_id")).append("</p>\n");
         html.append("            <p><strong>NIS:</strong> ").append(biodata.get("NIS_NIP")).append("</p>\n");
-        html.append("            <p><strong>Class:</strong> ").append(className).append("</p>\n"); // Use the class name
+        html.append("            <p><strong>Class:</strong> ").append(className).append("</p>\n");
         html.append("            <p><strong>Gender:</strong> ").append(biodata.get("gender")).append("</p>\n");
         html.append("            <p><strong>Email:</strong> ").append(biodata.get("email")).append("</p>\n");
         html.append("            <p><strong>Phone:</strong> ").append(biodata.get("nomer_hp")).append("</p>\n");
@@ -603,7 +586,6 @@ public class WalidsController {
         html.append("        <div class=\"grades-section\">\n");
         html.append("            <h3>Academic Grades:</h3>\n");
 
-        // Table for individual subject grades, showing average and grade for each
         html.append("            <table>\n");
         html.append("                <thead>\n");
         html.append("                    <tr>\n");
@@ -614,18 +596,16 @@ public class WalidsController {
         html.append("                </thead>\n");
         html.append("                <tbody>\n");
 
-        // Group grades by subject to calculate average for each
-        Map<String, Map<String, Double>> subjectGradesMap = new HashMap<>(); // SubjectName -> { "UTS": score, "TUGAS 1": score, ... }
+        Map<String, Map<String, Double>> subjectGradesMap = new HashMap<>();
 
         for (NilaiEntry grade : grades) {
-            String subjectName = grade.getNamaMapel(); // Get the subject name
-            String jenisNilai = grade.getJenisNilai(); // Get the type of grade (UTS, UAS, Tugas)
-            double nilai = grade.getNilai(); // Get the score
+            String subjectName = grade.getNamaMapel();
+            String jenisNilai = grade.getJenisNilai();
+            double nilai = grade.getNilai();
 
             subjectGradesMap.computeIfAbsent(subjectName, k -> new HashMap<>()).put(jenisNilai, nilai);
         }
 
-        // Iterate through each subject to calculate its average and grade
         for (Map.Entry<String, Map<String, Double>> entry : subjectGradesMap.entrySet()) {
             String subject = entry.getKey();
             Map<String, Double> typesAndScores = entry.getValue();
@@ -637,7 +617,6 @@ public class WalidsController {
             double tugas3 = typesAndScores.getOrDefault("TUGAS 3", 0.0);
             double tugas4 = typesAndScores.getOrDefault("TUGAS 4", 0.0);
 
-            // Calculate weighted average for the current subject
             double subjectAverage = (0.30 * uts) + (0.30 * uas) + (0.10 * tugas1) + (0.10 * tugas2) + (0.10 * tugas3) + (0.10 * tugas4);
             String subjectLetterGrade = getGradeLetter(subjectAverage);
 
@@ -651,8 +630,6 @@ public class WalidsController {
         html.append("            </table>\n");
         html.append("        </div>\n");
 
-        // Removed "Overall Academic Summary" section as requested.
-
         html.append("        <div class=\"attendance-section\">\n");
         html.append("            <h3>Attendance Summary:</h3>\n");
         html.append("            <p><strong>Hadir (Present):</strong> ").append(attendance.getOrDefault("Hadir", 0)).append(" days</p>\n");
@@ -662,7 +639,7 @@ public class WalidsController {
 
         html.append("        <div class=\"footer\">\n");
         html.append("            <p>Generated on: ").append(java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))).append("</p>\n");
-        html.append("            <p>Wali Kelas: ").append(welcomeUserLabel.getText().replace("Welcome, ", "")).append("</p>\n"); // Use welcome label text
+        html.append("            <p>Wali Kelas: ").append(welcomeUserLabel.getText().replace("Welcome, ", "")).append("</p>\n");
         html.append("        </div>\n");
 
         html.append("    </div>\n");
@@ -670,6 +647,56 @@ public class WalidsController {
         html.append("</html>");
 
         return html.toString();
+    }
+
+    // NEW: Student List Methods
+    private void initStudentListTable() {
+        studentListNameColumn.setCellValueFactory(new PropertyValueFactory<>("nama"));
+        studentListGenderColumn.setCellValueFactory(new PropertyValueFactory<>("gender"));
+        studentListNISNIPColumn.setCellValueFactory(new PropertyValueFactory<>("nisNip"));
+        studentListAddressColumn.setCellValueFactory(new PropertyValueFactory<>("alamat"));
+        studentListPhoneNumberColumn.setCellValueFactory(new PropertyValueFactory<>("nomerHp"));
+        studentListEmailColumn.setCellValueFactory(new PropertyValueFactory<>("email"));
+    }
+
+    private void loadStudentsInMyClass() {
+        ObservableList<UserTableEntry> studentList = FXCollections.observableArrayList();
+
+        if (this.kelasId == 0) {
+            studentListTable.setItems(FXCollections.emptyObservableList());
+            return;
+        }
+
+        String sql = "SELECT u.user_id, u.username, u.NIS_NIP, u.nama, u.gender, u.alamat, u.email, u.nomer_hp, r.role_name " +
+                "FROM Users u " +
+                "JOIN student_class_enrollment sce ON u.user_id = sce.Users_user_id " +
+                "JOIN Role r ON u.Role_role_id = r.role_id " +
+                "WHERE sce.Kelas_kelas_id = ? AND sce.Kelas_Users_user_id = ? AND u.Role_role_id = 'S'";
+
+        try (Connection con = DBS.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setInt(1, this.kelasId);
+            stmt.setString(2, this.waliKelasId);
+            ResultSet rs = stmt.executeQuery();
+            while (rs.next()) {
+                studentList.add(new UserTableEntry(
+                        rs.getString("user_id"),
+                        rs.getString("username"),
+                        rs.getString("NIS_NIP"),
+                        rs.getString("nama"),
+                        rs.getString("gender").equals("L") ? "Laki-laki" : "Perempuan",
+                        rs.getString("alamat"),
+                        rs.getString("email"),
+                        rs.getString("nomer_hp"),
+                        rs.getString("role_name")
+                ));
+            }
+            studentListTable.setItems(studentList);
+        } catch (SQLException e) {
+            AlertClass.ErrorAlert("Database Error", "Failed to load student list for class", e.getMessage());
+            e.printStackTrace();
+            studentListTable.setItems(FXCollections.emptyObservableList());
+        }
     }
 
 

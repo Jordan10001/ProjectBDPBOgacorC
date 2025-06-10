@@ -20,12 +20,50 @@
                 <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
             </padding>
             <Label fx:id="welcomeUserLabel" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Welcome, Admin!" />
-            <TabPane fx:id="waliTabPane" prefHeight="570.0" style="-fx-background-color: #8cff00; -fx-background-radius: 15px; -fx-border-radius: 15px;" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+            <TabPane fx:id="waliTabPane" maxHeight="570.0" minHeight="570.0" prefHeight="570.0" style="-fx-background-color: #8cff00; -fx-background-radius: 15px; -fx-border-radius: 15px;" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+                <Tab text="Student List">
+                    <content>
+                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+                            <children>
+                                <VBox alignment="TOP_CENTER" layoutY="-2.0" prefHeight="544.0" prefWidth="1261.0" spacing="10.0">
+                                    <children>
+                                        <Label text="Student In Class">
+                                            <font>
+                                                <Font name="System Bold" size="20.0" />
+                                            </font>
+                                        </Label>
+                                        <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" spacing="10.0">
+                                            <children>
+                                                <Label fx:id="studentListClassNameLabel" style="-fx-font-weight: bold;" text="Kelas: " />
+                                            </children>
+                                            <padding>
+                                                <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
+                                            </padding>
+                                        </HBox>
+                                        <TableView fx:id="studentListTable" layoutX="30.0" layoutY="70.0" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="444.0" prefWidth="1240.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0">
+                                            <columns>
+                                                <TableColumn fx:id="studentListNameColumn" prefWidth="150.0" text="Name" />
+                                                <TableColumn fx:id="studentListGenderColumn" prefWidth="80.0" text="Gender" />
+                                                <TableColumn fx:id="studentListNISNIPColumn" prefWidth="120.0" text="NIS/NIP" />
+                                                <TableColumn fx:id="studentListAddressColumn" prefWidth="250.0" text="Address" />
+                                                <TableColumn fx:id="studentListPhoneNumberColumn" prefWidth="120.0" text="Phone Number" />
+                                                <TableColumn fx:id="studentListEmailColumn" prefWidth="200.0" text="Email" />
+                                            </columns>
+                                        </TableView>
+                                    </children>
+                                    <padding>
+                                        <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                    </padding>
+                                </VBox>
+                            </children>
+                        </AnchorPane>
+                    </content>
+                </Tab>
                 <Tab text="Student Attendance">
                     <content>
                         <AnchorPane prefHeight="200.0" prefWidth="200.0">
                             <children>
-                                <VBox alignment="TOP_CENTER" layoutY="-2.0" prefHeight="499.0" prefWidth="1241.0" spacing="10.0">
+                                <VBox alignment="TOP_CENTER" layoutY="-2.0" prefHeight="544.0" prefWidth="1262.0" spacing="10.0">
                                     <children>
                                         <Label text="Student Attendance Records">
                                             <font>
@@ -34,7 +72,7 @@
                                         </Label>
                                         <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" spacing="10.0">
                                             <children>
-                                                <Label fx:id="attendanceClassNameLabel" text="Kelas: " style="-fx-font-weight: bold;" />
+                                                <Label fx:id="attendanceClassNameLabel" style="-fx-font-weight: bold;" text="Kelas: " />
                                                 <Label text="Select Student (Optional):" />
                                                 <ChoiceBox fx:id="attendanceStudentChoiceBox" onAction="#loadAbsensiData" prefWidth="200.0" />
                                                 <Button mnemonicParsing="false" onAction="#loadAbsensiData" text="Refresh" />
@@ -43,7 +81,7 @@
                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                             </padding>
                                         </HBox>
-                                        <TableView fx:id="absensiTable" maxWidth="1240.0" minWidth="1240.0" prefHeight="338.0" prefWidth="1240.0">
+                                        <TableView fx:id="absensiTable" maxWidth="1240.0" minWidth="1240.0" prefHeight="436.0" prefWidth="1240.0">
                                             <columns>
                                                 <TableColumn fx:id="studentNameAbsensiColumn" prefWidth="200.0" text="Student Name" />
                                                 <TableColumn fx:id="tanggalAbsensiColumn" prefWidth="150.0" text="Date" />
@@ -67,7 +105,7 @@
                     <content>
                         <AnchorPane prefHeight="200.0" prefWidth="200.0">
                             <children>
-                                <VBox alignment="TOP_CENTER" prefHeight="495.0" prefWidth="1260.0" spacing="10.0">
+                                <VBox alignment="TOP_CENTER" prefHeight="542.0" prefWidth="1260.0" spacing="10.0">
                                     <children>
                                         <Label text="Generate Student Report Card">
                                             <font>
@@ -76,7 +114,7 @@
                                         </Label>
                                         <HBox alignment="CENTER_LEFT" prefHeight="30.0" prefWidth="200.0" spacing="10.0">
                                             <children>
-                                                <Label fx:id="raporClassNameLabel" text="Kelas: " style="-fx-font-weight: bold;" />
+                                                <Label fx:id="raporClassNameLabel" style="-fx-font-weight: bold;" text="Kelas: " />
                                                 <Label text="Select Student:" />
                                                 <ChoiceBox fx:id="raporStudentChoiceBox" onAction="#loadNilaiData" prefWidth="200.0" />
                                                 <Label text="Select Semester:" />
@@ -87,7 +125,7 @@
                                                 <Insets bottom="5.0" left="5.0" right="5.0" top="5.0" />
                                             </padding>
                                         </HBox>
-                                        <TableView fx:id="nilaiUjianTable" prefHeight="340.0" prefWidth="1239.0">
+                                        <TableView fx:id="nilaiUjianTable" maxWidth="-Infinity" minWidth="-Infinity" prefHeight="434.0" prefWidth="1240.0">
                                             <columns>
                                                 <TableColumn fx:id="jenisNilaiColumn" prefWidth="200.0" text="Jenis Nilai" />
                                                 <TableColumn fx:id="namaMapelNilaiColumn" prefWidth="400.0" text="Mata Pelajaran" />
