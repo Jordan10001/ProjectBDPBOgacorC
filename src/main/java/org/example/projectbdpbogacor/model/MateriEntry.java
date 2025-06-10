@@ -1,6 +1,8 @@
 // ProjectBDPBOgacor/src/main/java/org/example/projectbdpbogacor/model/MateriEntry.java
 package org.example.projectbdpbogacor.model;
 
+//UNTUK ENTITY MATERI
+
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.IntegerProperty;
