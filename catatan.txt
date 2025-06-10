@@ -1,0 +1,56 @@
+AbsensiEntry.java
+Merepresentasikan data dari entitas Absensi
+(dan informasi terkait dari Users, Jadwal, Matpel, Kelas).
+Ini digunakan dalam tampilan siswa.
+
+AbsensiWaliEntry.java
+Merepresentasikan data dari entitas Absensi
+(dan informasi terkait dari Users, Jadwal, Matpel, Kelas).
+Ini khusus untuk tampilan Wali Kelas dan menyertakan studentName.
+
+JadwalEntry.java
+Merepresentasikan data dari entitas Jadwal
+(dan informasi terkait dari Matpel, Kelas, Users untuk nama pengajar).
+
+MateriEntry.java
+Merepresentasikan data dari entitas Materi
+(dan informasi terkait dari Matpel, Kelas).
+Memiliki konstruktor berbeda untuk penggunaan Guru (dengan ID) dan Siswa (hanya tampilan).
+
+NilaiEntry.java
+Merepresentasikan data dari entitas Nilai (dan informasi terkait dari Matpel).
+
+Pair.java
+Ini adalah kelas utilitas generik dan bukan representasi langsung dari
+entitas database tertentu. Ini digunakan untuk menyimpan pasangan
+kunci-nilai (misalnya, display_name dan ID).
+
+PengumumanEntry.java
+Merepresentasikan data dari entitas Pengumuman.
+
+RoleEntry.java
+Merepresentasikan data dari entitas Role.
+
+StudentEntry.java
+Merepresentasikan subset data dari entitas Users,
+khusus untuk pengguna dengan Role_role_id = 'S' (Siswa),
+seringkali digunakan untuk daftar siswa dalam kelas.
+
+SubjectAssignmentEntry.java
+Merepresentasikan gabungan data dari entitas Detail_Pengajar, Matpel, Kelas, dan Users
+(untuk nama guru). Ini digunakan untuk mengelola penugasan guru ke mata pelajaran dan kelas.
+
+TugasEntry.java
+Merepresentasikan data dari entitas Tugas
+(dan informasi terkait dari Matpel, Kelas).
+Memiliki konstruktor berbeda untuk penggunaan Guru (dengan ID) dan Siswa (hanya tampilan).
+
+UjianEntry.java
+Merepresentasikan data dari entitas Ujian
+(dan informasi terkait dari Matpel, Kelas).
+Memiliki konstruktor berbeda untuk penggunaan Guru (dengan ID) dan Siswa (hanya tampilan).
+
+UserTableEntry.java
+Merepresentasikan gabungan data dari entitas Users dan Role.
+Digunakan untuk menampilkan informasi lengkap pengguna dalam tabel,
+seperti di dasbor admin dan kepala sekolah.

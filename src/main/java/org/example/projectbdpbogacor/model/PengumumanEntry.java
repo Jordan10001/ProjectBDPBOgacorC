@@ -11,7 +11,7 @@ public class PengumumanEntry {
     private final StringProperty waktu;
     private final StringProperty pengumuman;
 
-    public PengumumanEntry(int pengumumanId, String waktu, String pengumuman) { // Updated constructor
+    public PengumumanEntry(int pengumumanId, String waktu, String pengumuman) {
         this.pengumumanId = new SimpleIntegerProperty(pengumumanId);
         this.waktu = new SimpleStringProperty(waktu);
         this.pengumuman = new SimpleStringProperty(pengumuman);

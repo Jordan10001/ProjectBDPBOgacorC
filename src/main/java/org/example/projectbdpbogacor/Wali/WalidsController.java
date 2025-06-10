@@ -16,6 +16,7 @@ import org.example.projectbdpbogacor.HelloApplication;
 import org.example.projectbdpbogacor.model.AbsensiWaliEntry; // Use the specific model for Wali
 import org.example.projectbdpbogacor.model.NilaiEntry;
 import org.example.projectbdpbogacor.model.UserTableEntry; // Import UserTableEntry for student list
+import org.example.projectbdpbogacor.model.RaporEntry; // Import RaporEntry
 
 import java.io.File;
 import java.io.FileWriter;
@@ -366,15 +367,39 @@ public class WalidsController {
         try {
             Map<String, String> studentBiodata = getStudentBiodata(studentUserId);
             String className = this.kelasName;
+            String homeroomTeacherName = welcomeUserLabel.getText().replace("Welcome, ", "").replace("!", ""); // Extract name from label
 
             ObservableList<NilaiEntry> grades = nilaiUjianTable.getItems();
-
-            double averageGrade = calculateAverageGrade(grades);
-            String letterGrade = getGradeLetter(averageGrade);
+            Map<String, Double> subjectAverageGrades = calculateSubjectAverageGrades(grades); // Calculate average per subject
 
             Map<String, Integer> attendanceSummary = getAttendanceSummary(studentUserId, semesterId);
 
-            String htmlContent = generateReportCardHtml(studentBiodata, averageGrade, letterGrade, attendanceSummary, className, selectedSemesterDisplay, grades);
+            // Extract semester name and academic year from selectedSemesterDisplay
+            String semesterName = selectedSemesterDisplay.split(" - ")[1];
+            String academicYear = selectedSemesterDisplay.split(" - ")[0];
+
+            // Create RaporEntry object using the constructor
+            RaporEntry rapor = new RaporEntry(
+                    studentBiodata.get("user_id"),
+                    studentBiodata.get("nama"),
+                    studentBiodata.get("NIS_NIP"),
+                    className,
+                    studentBiodata.get("gender"),
+                    studentBiodata.get("alamat"),
+                    studentBiodata.get("email"),
+                    studentBiodata.get("nomer_hp"),
+                    homeroomTeacherName,
+                    semesterName,
+                    academicYear,
+                    subjectAverageGrades, // Pass the calculated subject average grades
+                    attendanceSummary.getOrDefault("Hadir", 0),
+                    attendanceSummary.getOrDefault("Sakit", 0),
+                    attendanceSummary.getOrDefault("Ijin", 0),
+                    attendanceSummary.getOrDefault("Alpha", 0)
+            );
+
+            // Generate HTML content using the RaporEntry object
+            String htmlContent = generateReportCardHtml(rapor);
 
             File raporDir = new File("Rapor");
             if (!raporDir.exists()) {
@@ -423,37 +448,34 @@ public class WalidsController {
         return biodata;
     }
 
-    private double calculateAverageGrade(ObservableList<NilaiEntry> grades) {
-        double uts = 0;
-        double uas = 0;
-        double tugas1 = 0;
-        double tugas2 = 0;
-        double tugas3 = 0;
-        double tugas4 = 0;
+    private Map<String, Double> calculateSubjectAverageGrades(ObservableList<NilaiEntry> grades) {
+        Map<String, Map<String, Double>> subjectGradesMap = new HashMap<>();
 
         for (NilaiEntry grade : grades) {
-            switch (grade.getJenisNilai().toUpperCase()) {
-                case "UTS":
-                    uts = grade.getNilai();
-                    break;
-                case "UAS":
-                    uas = grade.getNilai();
-                    break;
-                case "TUGAS 1":
-                    tugas1 = grade.getNilai();
-                    break;
-                case "TUGAS 2":
-                    tugas2 = grade.getNilai();
-                    break;
-                case "TUGAS 3":
-                    tugas3 = grade.getNilai();
-                    break;
-                case "TUGAS 4":
-                    tugas4 = grade.getNilai();
-                    break;
-            }
+            String subjectName = grade.getNamaMapel();
+            String jenisNilai = grade.getJenisNilai();
+            double nilai = grade.getNilai();
+
+            subjectGradesMap.computeIfAbsent(subjectName, k -> new HashMap<>()).put(jenisNilai, nilai);
         }
-        return (0.30 * uts) + (0.30 * uas) + (0.10 * tugas1) + (0.10 * tugas2) + (0.10 * tugas3) + (0.10 * tugas4);
+
+        Map<String, Double> subjectAverageGrades = new HashMap<>();
+        for (Map.Entry<String, Map<String, Double>> entry : subjectGradesMap.entrySet()) {
+            String subject = entry.getKey();
+            Map<String, Double> typesAndScores = entry.getValue();
+
+            double uts = typesAndScores.getOrDefault("UTS", 0.0);
+            double uas = typesAndScores.getOrDefault("UAS", 0.0);
+            double tugas1 = typesAndScores.getOrDefault("TUGAS 1", 0.0);
+            double tugas2 = typesAndScores.getOrDefault("TUGAS 2", 0.0);
+            double tugas3 = typesAndScores.getOrDefault("TUGAS 3", 0.0);
+            double tugas4 = typesAndScores.getOrDefault("TUGAS 4", 0.0);
+
+            // Calculate weighted average
+            double subjectAverage = (0.30 * uts) + (0.30 * uas) + (0.10 * tugas1) + (0.10 * tugas2) + (0.10 * tugas3) + (0.10 * tugas4);
+            subjectAverageGrades.put(subject, subjectAverage);
+        }
+        return subjectAverageGrades;
     }
 
     private String getGradeLetter(double averageGrade) {
@@ -473,6 +495,7 @@ public class WalidsController {
         summary.put("Hadir", 0);
         summary.put("Alpha", 0);
         summary.put("Ijin", 0);
+        summary.put("Sakit", 0); // Include Sakit (Sick)
 
         String semesterSql = "SELECT tahun_ajaran, semester, tahun FROM Semester WHERE semester_id = ?";
         LocalDateTime semesterStart = null;
@@ -518,6 +541,7 @@ public class WalidsController {
         }
 
         // Override semesterEnd for the example data for testing purposes
+        // This block might be for testing purposes and can be removed in production
         if ("2024/2025".equals(tahunAjaran) && "Ganjil".equals(semesterName)) {
             semesterEnd = LocalDateTime.of(2024, 12, 31, 23, 59, 59);
         }
@@ -546,14 +570,14 @@ public class WalidsController {
     }
 
 
-    private String generateReportCardHtml(Map<String, String> biodata, double overallAverageGrade, String overallLetterGrade, Map<String, Integer> attendance, String className, String semesterName, ObservableList<NilaiEntry> grades) {
+    private String generateReportCardHtml(RaporEntry rapor) {
         StringBuilder html = new StringBuilder();
         html.append("<!DOCTYPE html>\n");
         html.append("<html lang=\"en\">\n");
         html.append("<head>\n");
         html.append("    <meta charset=\"UTF-8\">\n");
         html.append("    <meta name=\"viewport\" content=\"width=device-width, initial-scale=1.0\">\n");
-        html.append("    <title>Report Card - ").append(biodata.get("nama")).append("</title>\n");
+        html.append("    <title>Report Card - ").append(rapor.getStudentName()).append("</title>\n");
         html.append("    <style>\n");
         html.append("        body { font-family: Arial, sans-serif; margin: 20px; }\n");
         html.append("        .container { width: 800px; margin: 0 auto; border: 1px solid #ccc; padding: 20px; box-shadow: 2px 2px 8px rgba(0,0,0,0.1); }\n");
@@ -569,18 +593,18 @@ public class WalidsController {
         html.append("<body>\n");
         html.append("    <div class=\"container\">\n");
         html.append("        <h1>School Report Card</h1>\n");
-        html.append("        <h2>").append(semesterName).append("</h2>\n");
+        html.append("        <h2>").append(rapor.getAcademicYear()).append(" - ").append(rapor.getSemester()).append("</h2>\n");
 
         html.append("        <div class=\"info-section\">\n");
         html.append("            <h3>Student Information:</h3>\n");
-        html.append("            <p><strong>Name:</strong> ").append(biodata.get("nama")).append("</p>\n");
-        html.append("            <p><strong>Student ID:</strong> ").append(biodata.get("user_id")).append("</p>\n");
-        html.append("            <p><strong>NIS:</strong> ").append(biodata.get("NIS_NIP")).append("</p>\n");
-        html.append("            <p><strong>Class:</strong> ").append(className).append("</p>\n");
-        html.append("            <p><strong>Gender:</strong> ").append(biodata.get("gender")).append("</p>\n");
-        html.append("            <p><strong>Email:</strong> ").append(biodata.get("email")).append("</p>\n");
-        html.append("            <p><strong>Phone:</strong> ").append(biodata.get("nomer_hp")).append("</p>\n");
-        html.append("            <p><strong>Address:</strong> ").append(biodata.get("alamat")).append("</p>\n");
+        html.append("            <p><strong>Name:</strong> ").append(rapor.getStudentName()).append("</p>\n");
+        html.append("            <p><strong>Student ID:</strong> ").append(rapor.getStudentId()).append("</p>\n");
+        html.append("            <p><strong>NIS:</strong> ").append(rapor.getStudentNIS()).append("</p>\n");
+        html.append("            <p><strong>Class:</strong> ").append(rapor.getStudentClass()).append("</p>\n");
+        html.append("            <p><strong>Gender:</strong> ").append(rapor.getStudentGender()).append("</p>\n");
+        html.append("            <p><strong>Email:</strong> ").append(rapor.getStudentEmail()).append("</p>\n");
+        html.append("            <p><strong>Phone:</strong> ").append(rapor.getStudentPhone()).append("</p>\n");
+        html.append("            <p><strong>Address:</strong> ").append(rapor.getStudentAddress()).append("</p>\n");
         html.append("        </div>\n");
 
         html.append("        <div class=\"grades-section\">\n");
@@ -596,33 +620,14 @@ public class WalidsController {
         html.append("                </thead>\n");
         html.append("                <tbody>\n");
 
-        Map<String, Map<String, Double>> subjectGradesMap = new HashMap<>();
-
-        for (NilaiEntry grade : grades) {
-            String subjectName = grade.getNamaMapel();
-            String jenisNilai = grade.getJenisNilai();
-            double nilai = grade.getNilai();
-
-            subjectGradesMap.computeIfAbsent(subjectName, k -> new HashMap<>()).put(jenisNilai, nilai);
-        }
-
-        for (Map.Entry<String, Map<String, Double>> entry : subjectGradesMap.entrySet()) {
+        for (Map.Entry<String, Double> entry : rapor.getSubjectAverageGrades().entrySet()) {
             String subject = entry.getKey();
-            Map<String, Double> typesAndScores = entry.getValue();
-
-            double uts = typesAndScores.getOrDefault("UTS", 0.0);
-            double uas = typesAndScores.getOrDefault("UAS", 0.0);
-            double tugas1 = typesAndScores.getOrDefault("TUGAS 1", 0.0);
-            double tugas2 = typesAndScores.getOrDefault("TUGAS 2", 0.0);
-            double tugas3 = typesAndScores.getOrDefault("TUGAS 3", 0.0);
-            double tugas4 = typesAndScores.getOrDefault("TUGAS 4", 0.0);
-
-            double subjectAverage = (0.30 * uts) + (0.30 * uas) + (0.10 * tugas1) + (0.10 * tugas2) + (0.10 * tugas3) + (0.10 * tugas4);
-            String subjectLetterGrade = getGradeLetter(subjectAverage);
+            Double averageScore = entry.getValue();
+            String subjectLetterGrade = getGradeLetter(averageScore);
 
             html.append("                    <tr>\n");
             html.append("                        <td>").append(subject).append("</td>\n");
-            html.append("                        <td>").append(String.format("%.2f", subjectAverage)).append("</td>\n");
+            html.append("                        <td>").append(String.format("%.2f", averageScore)).append("</td>\n");
             html.append("                        <td>").append(subjectLetterGrade).append("</td>\n");
             html.append("                    </tr>\n");
         }
@@ -632,14 +637,15 @@ public class WalidsController {
 
         html.append("        <div class=\"attendance-section\">\n");
         html.append("            <h3>Attendance Summary:</h3>\n");
-        html.append("            <p><strong>Hadir (Present):</strong> ").append(attendance.getOrDefault("Hadir", 0)).append(" days</p>\n");
-        html.append("            <p><strong>Alpha (Absent without leave):</strong> ").append(attendance.getOrDefault("Alpha", 0)).append(" days</p>\n");
-        html.append("            <p><strong>Ijin (Excused):</strong> ").append(attendance.getOrDefault("Ijin", 0)).append(" days</p>\n");
+        html.append("            <p><strong>Hadir (Present):</strong> ").append(rapor.getTotalPresent()).append(" days</p>\n");
+        html.append("            <p><strong>Alpha (Absent without leave):</strong> ").append(rapor.getTotalAbsent()).append(" days</p>\n");
+        html.append("            <p><strong>Ijin (Excused):</strong> ").append(rapor.getTotalPermission()).append(" days</p>\n");
+        html.append("            <p><strong>Sakit (Sick):</strong> ").append(rapor.getTotalSick()).append(" days</p>\n");
         html.append("        </div>\n");
 
         html.append("        <div class=\"footer\">\n");
         html.append("            <p>Generated on: ").append(java.time.LocalDate.now().format(DateTimeFormatter.ofPattern("yyyy-MM-dd"))).append("</p>\n");
-        html.append("            <p>Wali Kelas: ").append(welcomeUserLabel.getText().replace("Welcome, ", "")).append("</p>\n");
+        html.append("            <p>Wali Kelas: ").append(rapor.getHomeroomTeacherName()).append("</p>\n");
         html.append("        </div>\n");
 
         html.append("    </div>\n");

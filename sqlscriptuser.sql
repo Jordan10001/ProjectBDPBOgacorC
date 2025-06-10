@@ -25,53 +25,6 @@ INSERT INTO Role (role_id, role_name) VALUES ('G', 'Guru');
 INSERT INTO Role (role_id, role_name) VALUES ('W', 'Wali Kelas');
 INSERT INTO Role (role_id, role_name) VALUES ('S', 'Siswa');
 
---SEMESTER
-INSERT INTO Semester (tahun_ajaran, semester, tahun) VALUES ('2024/2025', 'Ganjil', '2024-07-01 00:00:00');
-
---MATPEL
-INSERT INTO Matpel (nama_mapel, category) VALUES ('Matematika', 'Umum');
-
---KELAS
-INSERT INTO Kelas (nama_kelas, keterangan, Users_user_id, Semester_semester_id) VALUES ('Kelas 10A', 'Siswa SMA Kelas 10 A', 'USR002', 1);
-
---JADWAL
-INSERT INTO Jadwal (hari, jam_mulai, jam_selsai, Kelas_Users_user_id, Matpel_mapel_id, Kelas_kelas_id) VALUES
-('Senin', '08:00', '09:30', 'USR002', 1, 1);
-
---ABSENSI
-INSERT INTO Absensi (tanggal, status, Users_user_id, Jadwal_jadwal_id) VALUES ('2024-07-08 08:00:00', 'Hadir', 'USR003', 1);
-
---DETAIL PENGAJAR
-INSERT INTO Detail_Pengajar (Users_user_id, Kelas_Users_user_id, Matpel_mapel_id, Kelas_kelas_id) VALUES
-('USR002', 'USR002', 1, 1);
-
---FEEDBACK
-INSERT INTO Feedback (feedback, Users_user_id) VALUES ('Aplikasi sangat membantu.', 'USR003');
-
---MATERI
-INSERT INTO Materi (nama_materi, Kelas_Users_user_id, Matpel_mapel_id, Kelas_kelas_id) VALUES
-('Pengenalan Aljabar', 'USR002', 1, 1);
-
---PENGUMUMAN
-INSERT INTO Pengumuman (pengumuman, Users_user_id) VALUES ('Libur Idul Adha.', 'USR001');
-
---RAPOR
-INSERT INTO Rapor (Users_user_id, Semester_semester_id) VALUES ('USR003', 1);
-
--- NILAI
-INSERT INTO Nilai (nilai, jenis_nilai, Matpel_mapel_id, Rapor_rapor_id) VALUES (85, 'UTS', 1, 1);
-
---TUGAS
-INSERT INTO Tugas (keterangan, deadline, tanggal_direlease, Kelas_Users_user_id, Matpel_mapel_id, Kelas_kelas_id) VALUES
-('Kerjakan latihan soal', '2024-07-15 23:59:59', '2024-07-08 08:00:00', 'USR002', 1, 1);
-
---UJIAN
-INSERT INTO Ujian (jenis_ujian, tanggal, Kelas_Users_user_id, Matpel_mapel_id, Kelas_kelas_id) VALUES
-('UTS', '2024-09-01 08:00:00', 'USR002', 1, 1);
-
---USER LOG
-INSERT INTO User_Log (jenis, keterangan, waktu, Users_user_id) VALUES
-('Login', 'Pengguna admin1 berhasil login', '2025-06-07 18:00:00', 'USR001');
 
 
 
