@@ -23,6 +23,14 @@ public class Pengumuman {
         this.waktu = new SimpleObjectProperty<>(waktu);
     }
 
+    // Constructor fo pengumuman guru
+    public Pengumuman(int pengumumanId, String pengumumanContent,  LocalDateTime waktu) {
+        this.pengumumanId = new SimpleIntegerProperty(pengumumanId);
+        this.pengumumanContent = new SimpleStringProperty(pengumumanContent);
+        this.usersUserId = new SimpleStringProperty("");
+        this.waktu = new SimpleObjectProperty<>(waktu);
+    }
+
     // Getters
     public int getPengumumanId() { return pengumumanId.get(); }
     public String getPengumumanContent() { return pengumumanContent.get(); }

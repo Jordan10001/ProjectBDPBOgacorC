@@ -1402,12 +1402,7 @@ public class AdmindsController {
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 Timestamp timestamp = rs.getTimestamp("waktu");
-                String waktuFormatted;
-                if (timestamp != null) {
-                    waktuFormatted = timestamp.toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-                } else {
-                    waktuFormatted = "N/A";
-                }
+
 
                 String originalContent = rs.getString("pengumuman");
                 String userIdOfPoster = rs.getString("Users_user_id"); // Get the user ID of the poster

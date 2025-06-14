@@ -26,6 +26,28 @@ public class Jadwal {
         this.kelasKelasId = new SimpleIntegerProperty(kelasKelasId);
     }
 
+    public Jadwal(int jadwalId, String hari, String jamMulai, String jamSelesai,
+                   int matpelMapelId, int kelasKelasId) {
+        this.jadwalId = new SimpleIntegerProperty(jadwalId);
+        this.hari = new SimpleStringProperty(hari);
+        this.jamMulai = new SimpleStringProperty(jamMulai);
+        this.jamSelesai = new SimpleStringProperty(jamSelesai);
+        this.kelasUsersUserId = new SimpleStringProperty("");
+        this.matpelMapelId = new SimpleIntegerProperty(matpelMapelId);
+        this.kelasKelasId = new SimpleIntegerProperty(kelasKelasId);
+    }
+
+    public Jadwal( String hari, String jamMulai, String jamSelesai,
+                  int matpelMapelId, int kelasKelasId) {
+        this.jadwalId = new SimpleIntegerProperty();
+        this.hari = new SimpleStringProperty(hari);
+        this.jamMulai = new SimpleStringProperty(jamMulai);
+        this.jamSelesai = new SimpleStringProperty(jamSelesai);
+        this.kelasUsersUserId = new SimpleStringProperty("");
+        this.matpelMapelId = new SimpleIntegerProperty(matpelMapelId);
+        this.kelasKelasId = new SimpleIntegerProperty(kelasKelasId);
+    }
+
     // Getters
     public int getJadwalId() { return jadwalId.get(); }
     public String getHari() { return hari.get(); }
