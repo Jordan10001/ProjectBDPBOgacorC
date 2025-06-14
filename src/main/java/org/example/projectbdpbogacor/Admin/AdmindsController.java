@@ -1,4 +1,3 @@
-// ProjectBDPBOgacor/src/main/java/org/example/projectbdpbogacor/Admin/AdmindsController.java
 package org.example.projectbdpbogacor.Admin;
 
 import javafx.beans.property.SimpleStringProperty;
@@ -13,6 +12,7 @@ import org.example.projectbdpbogacor.Aset.HashGenerator;
 import org.example.projectbdpbogacor.DBSource.DBS;
 import org.example.projectbdpbogacor.HelloApplication;
 import org.example.projectbdpbogacor.model.*;
+import org.example.projectbdpbogacor.Service.*; // Import all Service classes
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -134,11 +134,11 @@ public class AdmindsController {
     @FXML
     private TextArea announcementTextArea;
     @FXML
-    private TableView<PengumumanEntry> announcementTable; // Table to view announcements
+    private TableView<Pengumuman> announcementTable; // Table to view announcements // Changed to Pengumuman service class
     @FXML
-    private TableColumn<PengumumanEntry, String> announcementWaktuColumn; // Column for announcement time
+    private TableColumn<Pengumuman, String> announcementWaktuColumn; // Column for announcement time // Changed to Pengumuman service class
     @FXML
-    private TableColumn<PengumumanEntry, String> announcementContentColumn; // Column for announcement content
+    private TableColumn<Pengumuman, String> announcementContentColumn; // Column for announcement content // Changed to Pengumuman service class
     @FXML
     private Button createAnnouncementButton; // Assuming you have a button to create
     @FXML
@@ -166,25 +166,25 @@ public class AdmindsController {
 
     // View All Users Table (separate from Edit/Delete user section)
     @FXML
-    private TableView<UserTableEntry> allUsersTableView;
+    private TableView<Users> allUsersTableView; // Changed to Users service class
     @FXML
-    private TableColumn<UserTableEntry, String> tableUserIdColumn;
+    private TableColumn<Users, String> tableUserIdColumn; // Changed to Users service class
     @FXML
-    private TableColumn<UserTableEntry, String> tableUsernameColumn;
+    private TableColumn<Users, String> tableUsernameColumn; // Changed to Users service class
     @FXML
-    private TableColumn<UserTableEntry, String> tableNisNipColumn;
+    private TableColumn<Users, String> tableNisNipColumn; // Changed to Users service class
     @FXML
-    private TableColumn<UserTableEntry, String> tableNamaColumn;
+    private TableColumn<Users, String> tableNamaColumn; // Changed to Users service class
     @FXML
-    private TableColumn<UserTableEntry, String> tableGenderColumn;
+    private TableColumn<Users, String> tableGenderColumn; // Changed to Users service class
     @FXML
-    private TableColumn<UserTableEntry, String> tableAlamatColumn;
+    private TableColumn<Users, String> tableAlamatColumn; // Changed to Users service class
     @FXML
-    private TableColumn<UserTableEntry, String> tableEmailColumn;
+    private TableColumn<Users, String> tableEmailColumn; // Changed to Users service class
     @FXML
-    private TableColumn<UserTableEntry, String> tableNomerHpColumn;
+    private TableColumn<Users, String> tableNomerHpColumn; // Changed to Users service class
     @FXML
-    private TableColumn<UserTableEntry, String> tableRoleColumn;
+    private TableColumn<Users, String> tableRoleColumn; // Changed to Users service class
     @FXML // Renamed to separate from edit/delete filter
     private ChoiceBox<String> allUsersFilterRoleChoiceBox;
     @FXML // Renamed to separate from edit/delete filter
@@ -352,7 +352,7 @@ public class AdmindsController {
         // Add listener for announcement table selection
         announcementTable.getSelectionModel().selectedItemProperty().addListener((observable, oldSelection, newSelection) -> {
             if (newSelection != null) {
-                announcementTextArea.setText(newSelection.getPengumuman()); // Populate text area with selected announcement content
+                announcementTextArea.setText(newSelection.getPengumumanContent()); // Populate text area with selected announcement content // Use getPengumumanContent
                 updateAnnouncementButton.setDisable(false); // Enable update
                 deleteAnnouncementButton.setDisable(false); // Enable delete
                 createAnnouncementButton.setDisable(true); // Disable create
@@ -593,7 +593,7 @@ public class AdmindsController {
                 newPhoneNumberField.clear();
                 newRoleChoiceBox.setValue("Siswa"); // Reset to default
                 filterUsersAndRefreshSearch(); // Refresh list of users for edit/delete
-                loadStudentsForChoiceBox(); // Refresh students for assignment
+                loadStudentsForChoiceBox(); // Refresh student lists if user role changed to/from student
                 loadWaliKelasForChoiceBox(); // Refresh wali kelas for new class
                 loadGuruForChoiceBox(); // Refresh guru for subject assignment
                 loadAllUsersToTable(allUsersFilterRoleChoiceBox.getValue(), allUsersFilterNameField.getText()); // Refresh all users table
@@ -770,7 +770,7 @@ public class AdmindsController {
                     return;
                 }
                 String hashedPassword = HashGenerator.hash(password);
-                sql = "UPDATE Users SET username = ?, password = ?, NIS_NIP = ?, nama = ?, gender = ?, alamat = ?, email = ?, nomer_hp = ?, Role_role_id = ? WHERE user_id = ?";
+                sql = "UPDATE Users SET username = ?, password = ?, NIS_NIP = ?, nama = ?, gender = ?, ?, email = ?, nomer_hp = ?, Role_role_id = ? WHERE user_id = ?";
                 stmt = con.prepareStatement(sql);
                 stmt.setString(1, username);
                 stmt.setString(2, hashedPassword);
@@ -1390,12 +1390,12 @@ public class AdmindsController {
 
     // --- Announcements Methods ---
     private void initAnnouncementTable() {
-        announcementWaktuColumn.setCellValueFactory(new PropertyValueFactory<>("waktu"));
-        announcementContentColumn.setCellValueFactory(new PropertyValueFactory<>("pengumuman"));
+        announcementWaktuColumn.setCellValueFactory(new PropertyValueFactory<>("waktu")); // Property name from Pengumuman service
+        announcementContentColumn.setCellValueFactory(new PropertyValueFactory<>("pengumumanContent")); // Property name from Pengumuman service
     }
 
     private void loadAnnouncements() {
-        ObservableList<PengumumanEntry> announcementList = FXCollections.observableArrayList();
+        ObservableList<Pengumuman> announcementList = FXCollections.observableArrayList(); // Changed to Pengumuman service
         String sql = "SELECT pengumuman_id, pengumuman, waktu, Users_user_id FROM Pengumuman ORDER BY waktu DESC"; // Fetch Users_user_id
         try (Connection con = DBS.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql);
@@ -1431,10 +1431,11 @@ public class AdmindsController {
                     }
                 }
 
-                announcementList.add(new PengumumanEntry(
+                announcementList.add(new Pengumuman( // Using Pengumuman service constructor
                         rs.getInt("pengumuman_id"),
-                        waktuFormatted,
-                        displayContent // Use the processed content
+                        displayContent, // Use processed content for the pengumumanContent field
+                        userIdOfPoster, // Pass the user ID of the poster
+                        timestamp != null ? timestamp.toLocalDateTime() : null // Pass LocalDateTime object
                 ));
             }
             announcementTable.setItems(announcementList);
@@ -1446,7 +1447,7 @@ public class AdmindsController {
 
     @FXML
     void handleUpdateAnnouncement() {
-        PengumumanEntry selectedAnnouncement = announcementTable.getSelectionModel().getSelectedItem();
+        Pengumuman selectedAnnouncement = announcementTable.getSelectionModel().getSelectedItem(); // Changed to Pengumuman service
         if (selectedAnnouncement == null) {
             AlertClass.WarningAlert("Selection Error", "No Announcement Selected", "Please select an announcement to update.");
             return;
@@ -1458,7 +1459,7 @@ public class AdmindsController {
             return;
         }
 
-        String originalFullContent = selectedAnnouncement.getPengumuman();
+        String originalFullContent = selectedAnnouncement.getPengumumanContent(); // Changed to getPengumumanContent
         String finalContentToSave;
 
         // Pattern to identify the prefix: "[ROLE] Name: "
@@ -1475,7 +1476,6 @@ public class AdmindsController {
             originalFullContent = originalFullContent.substring(currentPrefix.length());
         }
 
-        // Now, compare `updatedContentRaw` with `originalFullContent` (which is now just the message part)
         // If the user's input `updatedContentRaw` starts with the `currentPrefix`,
         // it means they might have copied the prefixed text back into the textarea.
         // In that case, we should strip the prefix from their input before re-adding.
@@ -1502,7 +1502,7 @@ public class AdmindsController {
         finalContentToSave = rolePrefix + namePrefix + contentWithoutPotentialPrefix;
 
 
-        int pengumumanId = selectedAnnouncement.getPengumumanId();
+        int pengumumanId = selectedAnnouncement.getPengumumanId(); // Property name from Pengumuman service
 
         try (Connection con = DBS.getConnection()) {
             String sql = "UPDATE Pengumuman SET pengumuman = ?, waktu = NOW() WHERE pengumuman_id = ?";
@@ -1526,7 +1526,7 @@ public class AdmindsController {
 
     @FXML
     void handleDeleteAnnouncement() {
-        PengumumanEntry selectedAnnouncement = announcementTable.getSelectionModel().getSelectedItem();
+        Pengumuman selectedAnnouncement = announcementTable.getSelectionModel().getSelectedItem(); // Changed to Pengumuman service
         if (selectedAnnouncement == null) {
             AlertClass.WarningAlert("Selection Error", "No Announcement Selected", "Please select an announcement to delete.");
             return;
@@ -2067,7 +2067,7 @@ public class AdmindsController {
     }
 
     private void loadAllUsersToTable(String roleFilter, String nameFilter) {
-        ObservableList<UserTableEntry> userList = FXCollections.observableArrayList();
+        ObservableList<Users> userList = FXCollections.observableArrayList(); // Changed to Users service class
         StringBuilder sqlBuilder = new StringBuilder("SELECT u.user_id, u.username, u.NIS_NIP, u.nama, u.gender, u.alamat, u.email, u.nomer_hp, r.role_name " +
                 "FROM Users u JOIN Role r ON u.Role_role_id = r.role_id WHERE 1=1 "); // Start with 1=1 for easy WHERE clause appending
 
@@ -2099,10 +2099,10 @@ public class AdmindsController {
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                userList.add(new UserTableEntry(
+                userList.add(new Users( // Using the new Users constructor
                         rs.getString("user_id"),
                         rs.getString("username"),
-                        rs.getString("NIS_NIP"),
+                        rs.getString("NIS_NIP"), // password, roleId not retrieved
                         rs.getString("nama"),
                         rs.getString("gender").equals("L") ? "Laki-laki" : "Perempuan",
                         rs.getString("alamat"),
