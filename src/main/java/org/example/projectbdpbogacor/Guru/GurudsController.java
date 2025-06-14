@@ -14,13 +14,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.example.projectbdpbogacor.Aset.AlertClass;
 import org.example.projectbdpbogacor.DBSource.DBS;
 import org.example.projectbdpbogacor.HelloApplication;
-import org.example.projectbdpbogacor.model.JadwalEntry;
-import org.example.projectbdpbogacor.model.NilaiEntry;
-import org.example.projectbdpbogacor.model.TugasEntry;
-import org.example.projectbdpbogacor.model.MateriEntry;
-import org.example.projectbdpbogacor.model.UjianEntry;
-import org.example.projectbdpbogacor.model.PengumumanEntry;
-import org.example.projectbdpbogacor.model.AbsensiEntry;
+import org.example.projectbdpbogacor.model.*;
+import org.example.projectbdpbogacor.Service.Pengumuman;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Button;
@@ -175,11 +170,11 @@ public class GurudsController {
 
     // Announcements (Updated FXML Elements for Guru to only view announcements)
     @FXML
-    private TableView<PengumumanEntry> guruAnnouncementTable; // Table to view announcements
+    private TableView<Pengumuman> guruAnnouncementTable; // Table to view announcements
     @FXML
-    private TableColumn<PengumumanEntry, String> guruAnnouncementWaktuColumn; // Column for announcement time
+    private TableColumn<Pengumuman, String> guruAnnouncementWaktuColumn; // Column for announcement time
     @FXML
-    private TableColumn<PengumumanEntry, String> guruAnnouncementContentColumn; // Column for announcement content
+    private TableColumn<Pengumuman, String> guruAnnouncementContentColumn; // Column for announcement content
 
     // NEW: Manage Absensi Tab
     @FXML
@@ -274,7 +269,7 @@ public class GurudsController {
         absensiStudentChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> loadAbsensiData()); // Reload data when student changes
         absensiDatePicker.valueProperty().addListener((observable, oldValue, newValue) -> loadAbsensiData()); // Reload data when date changes
 
-        absensiStatusChoiceBox.getItems().addAll("Hadir", "Alpha", "Ijin");
+        absensiStatusChoiceBox.getItems().addAll("Hadir", "Alpha", "Ijin","Sakit");
         absensiStatusChoiceBox.setValue("Hadir");
 
         // Add listeners to tabs to load data when selected
@@ -1474,33 +1469,47 @@ public class GurudsController {
     // --- Announcements Methods for Guru ---
     private void initGuruAnnouncementTable() {
         guruAnnouncementWaktuColumn.setCellValueFactory(new PropertyValueFactory<>("waktu"));
-        guruAnnouncementContentColumn.setCellValueFactory(new PropertyValueFactory<>("pengumuman"));
+        guruAnnouncementContentColumn.setCellValueFactory(new PropertyValueFactory<>("pengumumanContent"));
     }
 
 
 
     @FXML
     void loadGuruAnnouncements() {
-        ObservableList<PengumumanEntry> announcementList = FXCollections.observableArrayList();
+        ObservableList<Pengumuman> announcementList = FXCollections.observableArrayList();
         // Guru can see all announcements, not just their own
-        String sql = "SELECT pengumuman_id, pengumuman, waktu FROM Pengumuman ORDER BY waktu DESC";
+        String sql = "SELECT pengumuman_id, pengumuman, waktu, Users_user_id FROM Pengumuman ORDER BY waktu DESC";
         try (Connection con = DBS.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql)) {
             // No user_id filter here, as Guru can view all announcements
-            ResultSet rs = stmt.executeQuery();
+             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
                 Timestamp timestamp = rs.getTimestamp("waktu");
-                String waktuFormatted;
-                if (timestamp != null) {
-                    waktuFormatted = timestamp.toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm"));
-                } else {
-                    waktuFormatted = "N/A";
+
+                String originalContent = rs.getString("pengumuman");
+                String userIdOfPoster = rs.getString("Users_user_id");
+
+                boolean hasPrefix = originalContent.matches("^\\[.+\\]\\s*[^:]+:\\s*");
+                String displayContent = originalContent;
+
+                if (!hasPrefix) {
+                    try {
+                        Pair<String, String> posterInfo = getUserRoleAndName(userIdOfPoster);
+                        if (posterInfo.getKey() != null && posterInfo.getValue() != null) {
+                            displayContent = "[" + posterInfo.getKey().toUpperCase() + "] " + posterInfo.getValue() + ": " + originalContent;
+                        }
+                    } catch (SQLException e) {
+                        System.err.println("Error fetching poster info for announcement ID " + rs.getInt("pengumuman_id") + ": " + e.getMessage());
+                        displayContent = originalContent;
+                    }
                 }
 
-                announcementList.add(new PengumumanEntry(
+                announcementList.add(new Pengumuman(
                         rs.getInt("pengumuman_id"),
-                        waktuFormatted,
-                        rs.getString("pengumuman")
+                        displayContent, // Use processed content for the pengumumanContent field
+                        userIdOfPoster,
+                        timestamp != null ? timestamp.toLocalDateTime() : null
+
                 ));
             }
             guruAnnouncementTable.setItems(announcementList);
@@ -1510,7 +1519,21 @@ public class GurudsController {
         }
     }
 
-
+    private Pair<String, String> getUserRoleAndName(String userId) throws SQLException {
+        String roleName = null;
+        String userName = null;
+        String sql = "SELECT u.nama, r.role_name FROM Users u JOIN Role r ON u.Role_role_id = r.role_id WHERE u.user_id = ?";
+        try (Connection con = DBS.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, userId);
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next()) {
+                userName = rs.getString("nama");
+                roleName = rs.getString("role_name");
+            }
+        }
+        return new Pair<>(roleName, userName);
+    }
 
     // NEW: Manage Absensi Methods
     private void initAbsensiTable() {
