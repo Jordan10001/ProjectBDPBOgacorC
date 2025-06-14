@@ -1359,9 +1359,13 @@ public class AdmindsController {
 
         try (Connection con = DBS.getConnection()) {
             Pair<String, String> userInfo = getUserRoleAndName(loggedInUserId);
+            // Ensure the prefix is only added once at creation
             String rolePrefix = (userInfo.getKey() != null) ? "[" + userInfo.getKey().toUpperCase() + "] " : "";
             String namePrefix = (userInfo.getValue() != null) ? userInfo.getValue() + ": " : "";
 
+            // Construct the final content by prepending the role and name once.
+            // If the user somehow typed the prefix in the textarea, it will still be there.
+            // This method assumes the user inputs raw content.
             String finalAnnouncementContent = rolePrefix + namePrefix + announcementContent;
 
             String sql = "INSERT INTO Pengumuman (pengumuman, Users_user_id, waktu) VALUES (?, ?, NOW())";
@@ -1382,6 +1386,7 @@ public class AdmindsController {
             e.printStackTrace();
         }
     }
+
 
     // --- Announcements Methods ---
     private void initAnnouncementTable() {
@@ -1453,44 +1458,56 @@ public class AdmindsController {
             return;
         }
 
-        // Get the original content from the selected entry to preserve the prefix
         String originalFullContent = selectedAnnouncement.getPengumuman();
+        String finalContentToSave;
 
-        // Extract the prefix if it exists, otherwise assume no prefix and append new one
-        String prefix = "";
-        String actualContent = updatedContentRaw;
-
-        // Regular expression to match "[ROLE] Name: " at the beginning
-        // Pattern matches: [any chars except ']'] any chars : any chars (non-greedy)
-        // This pattern will correctly capture prefixes like "[ADMIN] Aaron Jordan: "
+        // Pattern to identify the prefix: "[ROLE] Name: "
         java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("^\\[.+\\]\\s*[^:]+:\\s*");
         java.util.regex.Matcher matcher = pattern.matcher(originalFullContent);
 
+        String currentPrefix = "";
         if (matcher.find()) {
-            // Prefix found in the original content
-            prefix = matcher.group(0); // Get the entire matched prefix
-            actualContent = prefix + updatedContentRaw;
-        } else {
-            // No prefix in original content, so use the current user's info as the new prefix.
-            Pair<String, String> userInfo = null;
-            try {
-                userInfo = getUserRoleAndName(loggedInUserId);
-            } catch (SQLException e) {
-                System.err.println("Error fetching user info for update: " + e.getMessage());
-                AlertClass.ErrorAlert("Database Error", "Failed to get user info for update", "Could not retrieve current user's role and name.");
-                return;
-            }
-            String rolePrefix = (userInfo.getKey() != null) ? "[" + userInfo.getKey().toUpperCase() + "] " : "";
-            String namePrefix = (userInfo.getValue() != null) ? userInfo.getValue() + ": " : "";
-            actualContent = rolePrefix + namePrefix + updatedContentRaw;
+            currentPrefix = matcher.group(0); // Capture the existing prefix
+            // Now, strip the prefix from the original content to get the actual "raw" message
+            // This ensures that the user's input in the textarea is treated as the new raw message
+            // and the prefix is re-added based on the current user if necessary.
+            // This also handles the case where the user might have copied the prefix into the textarea.
+            originalFullContent = originalFullContent.substring(currentPrefix.length());
         }
+
+        // Now, compare `updatedContentRaw` with `originalFullContent` (which is now just the message part)
+        // If the user's input `updatedContentRaw` starts with the `currentPrefix`,
+        // it means they might have copied the prefixed text back into the textarea.
+        // In that case, we should strip the prefix from their input before re-adding.
+        String contentWithoutPotentialPrefix = updatedContentRaw;
+        java.util.regex.Matcher updatedContentMatcher = pattern.matcher(updatedContentRaw);
+        if (updatedContentMatcher.find() && updatedContentMatcher.group(0).equals(currentPrefix)) {
+            contentWithoutPotentialPrefix = updatedContentRaw.substring(currentPrefix.length());
+        }
+
+        // Reconstruct the final content with the correct prefix and the new raw content.
+        // Get the current user's info to form the prefix for the update.
+        Pair<String, String> userInfo = null;
+        try {
+            userInfo = getUserRoleAndName(loggedInUserId);
+        } catch (SQLException e) {
+            System.err.println("Error fetching user info for update: " + e.getMessage());
+            AlertClass.ErrorAlert("Database Error", "Failed to get user info for update", "Could not retrieve current user's role and name.");
+            return;
+        }
+        String rolePrefix = (userInfo.getKey() != null) ? "[" + userInfo.getKey().toUpperCase() + "] " : "";
+        String namePrefix = (userInfo.getValue() != null) ? userInfo.getValue() + ": " : "";
+
+        // Combine the current poster's prefix with the actual content typed by the user.
+        finalContentToSave = rolePrefix + namePrefix + contentWithoutPotentialPrefix;
+
 
         int pengumumanId = selectedAnnouncement.getPengumumanId();
 
         try (Connection con = DBS.getConnection()) {
             String sql = "UPDATE Pengumuman SET pengumuman = ?, waktu = NOW() WHERE pengumuman_id = ?";
             PreparedStatement stmt = con.prepareStatement(sql);
-            stmt.setString(1, actualContent); // Use the content with preserved/new prefix
+            stmt.setString(1, finalContentToSave); // Use the content with preserved/new prefix
             stmt.setInt(2, pengumumanId);
 
             int rowsAffected = stmt.executeUpdate();

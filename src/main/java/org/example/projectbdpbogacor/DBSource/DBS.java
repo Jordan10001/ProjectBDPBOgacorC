@@ -8,7 +8,8 @@ import java.sql.SQLException;
 
 public class DBS {
 
-    protected static final String URL = "jdbc:postgresql://db.uqmjegbdazbmjrwcqont.supabase.co:5432/postgres"; // Ganti 'dbmu' sesuai database kamu
+    protected static final String URL = "jdbc:postgresql://localhost:5432/ProjectBDPBO"; // Ganti 'dbmu' sesuai database kamu
+//    protected static final String URL = "jdbc:postgresql://db.uqmjegbdazbmjrwcqont.supabase.co:5432/postgres"; // Ganti 'dbmu' sesuai database kamu
     protected static final String USER = "postgres"; // Ganti user kamu
     protected static final String PASSWORD = "admin"; // Ganti password kamu
 

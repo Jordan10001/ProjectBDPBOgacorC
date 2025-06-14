@@ -13,6 +13,8 @@ module org.example.projectbdpbogacor {
     opens org.example.projectbdpbogacor.Wali to javafx.fxml;
     opens org.example.projectbdpbogacor.Siswa to javafx.fxml;
     // Make sure this line exists
+    // BARIS BARU YANG DITAMBAHKAN:
+    opens org.example.projectbdpbogacor.Service to javafx.base;
 
     exports org.example.projectbdpbogacor;
     exports org.example.projectbdpbogacor.Admin;
@@ -22,4 +24,5 @@ module org.example.projectbdpbogacor {
     exports org.example.projectbdpbogacor.Siswa;
     exports org.example.projectbdpbogacor.model;
     opens org.example.projectbdpbogacor.model to javafx.base, javafx.fxml;
+
 }
