@@ -15,7 +15,8 @@ import org.example.projectbdpbogacor.DBSource.DBS;
 import org.example.projectbdpbogacor.HelloApplication;
 import org.example.projectbdpbogacor.model.AbsensiWaliEntry; // Use the specific model for Wali
 import org.example.projectbdpbogacor.model.NilaiEntry;
-import org.example.projectbdpbogacor.model.UserTableEntry; // Import UserTableEntry for student list
+import org.example.projectbdpbogacor.Service.Users; // Impor Service.Users
+import org.example.projectbdpbogacor.Service.Semester; // Impor Service.Semester
 import org.example.projectbdpbogacor.model.RaporEntry; // Import RaporEntry
 
 import java.io.File;
@@ -79,19 +80,19 @@ public class WalidsController {
     @FXML
     private Label studentListClassNameLabel; // NEW FXML element for class name in student list
     @FXML
-    private TableView<UserTableEntry> studentListTable;
+    private TableView<Users> studentListTable; // UBAH: Menggunakan Service.Users
     @FXML
-    private TableColumn<UserTableEntry, String> studentListNameColumn;
+    private TableColumn<Users, String> studentListNameColumn; // UBAH: Tipe kolom mengikuti Users
     @FXML
-    private TableColumn<UserTableEntry, String> studentListGenderColumn;
+    private TableColumn<Users, String> studentListGenderColumn; // UBAH
     @FXML
-    private TableColumn<UserTableEntry, String> studentListNISNIPColumn;
+    private TableColumn<Users, String> studentListNISNIPColumn; // UBAH
     @FXML
-    private TableColumn<UserTableEntry, String> studentListAddressColumn;
+    private TableColumn<Users, String> studentListAddressColumn; // UBAH
     @FXML
-    private TableColumn<UserTableEntry, String> studentListPhoneNumberColumn;
+    private TableColumn<Users, String> studentListPhoneNumberColumn; // UBAH
     @FXML
-    private TableColumn<UserTableEntry, String> studentListEmailColumn;
+    private TableColumn<Users, String> studentListEmailColumn; // UBAH
 
     private String loggedInUserId;
     private String waliKelasId;
@@ -109,9 +110,9 @@ public class WalidsController {
 
         initAbsensiTable();
         initNilaiUjianTable();
-        initStudentListTable();
+        initStudentListTable(); // Panggil inisialisasi tabel siswa
 
-        loadSemesters();
+        loadSemesters(); // Muat data semester
 
         attendanceStudentChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> loadAbsensiData());
         raporStudentChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> loadNilaiData());
@@ -130,7 +131,7 @@ public class WalidsController {
                     }
                     loadNilaiData();
                 } else if (newTab.getText().equals("Student List")) {
-                    loadStudentsInMyClass();
+                    loadStudentsInMyClass(); // Panggil method untuk memuat daftar siswa
                 }
             }
         });
@@ -191,7 +192,7 @@ public class WalidsController {
         }
 
         String sql = "SELECT u.user_id, u.nama, u.NIS_NIP FROM Users u " +
-                "JOIN student_class_enrollment sce ON u.user_id = sce.Users_user_id " +
+                "JOIN student_class_enrollment sce ON u.user_id = sce.Users_user_id " + // UBAH: Enrollment menjadi student_class_enrollment
                 "WHERE sce.Kelas_kelas_id = ? AND sce.Kelas_Users_user_id = ?";
         try (Connection con = DBS.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql)) {
@@ -219,7 +220,7 @@ public class WalidsController {
         semestersMap.clear();
         raporSemesterChoiceBox.getItems().clear();
 
-        String sql = "SELECT semester_id, tahun_ajaran, semester FROM Semester";
+        String sql = "SELECT semester_id, tahun_ajaran, semester, tahun FROM Semester"; // Tambahkan kolom tahun
         try (Connection con = DBS.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
@@ -227,8 +228,12 @@ public class WalidsController {
                 int semesterId = rs.getInt("semester_id");
                 String tahunAjaran = rs.getString("tahun_ajaran");
                 String semesterName = rs.getString("semester");
-                String display = tahunAjaran + " - " + semesterName;
-                semestersMap.put(display, semesterId);
+                LocalDateTime tahun = rs.getTimestamp("tahun").toLocalDateTime(); // Ambil data tahun sebagai LocalDateTime
+
+                // GUNAKAN SERVICE.SEMESTER UNTUK MENGISI CHOICEBOX
+                Semester semesterObj = new Semester(semesterId, tahunAjaran, semesterName, tahun); // Inisialisasi objek Semester
+                String display = semesterObj.getTahunAjaran() + " - " + semesterObj.getNamaSemester(); // Gunakan getter dari objek Semester
+                semestersMap.put(display, semesterObj.getSemesterId()); // Gunakan getter dari objek Semester
                 raporSemesterChoiceBox.getItems().add(display);
             }
         } catch (SQLException e) {
@@ -269,7 +274,7 @@ public class WalidsController {
                 "JOIN Jadwal j ON a.Jadwal_jadwal_id = j.jadwal_id " +
                 "JOIN Matpel m ON j.Matpel_mapel_id = m.mapel_id " +
                 "JOIN Kelas k ON j.Kelas_Users_user_id = k.Users_user_id AND j.Kelas_kelas_id = k.kelas_id " +
-                "JOIN student_class_enrollment sce ON u.user_id = sce.Users_user_id AND k.kelas_id = sce.Kelas_kelas_id AND k.Users_user_id = sce.Kelas_Users_user_id " +
+                "JOIN student_class_enrollment sce ON u.user_id = sce.Users_user_id AND k.kelas_id = sce.Kelas_kelas_id AND k.Users_user_id = sce.Kelas_Users_user_id " + // UBAH: Enrollment menjadi student_class_enrollment
                 "WHERE k.kelas_id = ? AND k.Users_user_id = ? AND u.user_id = ?";
 
         try (Connection con = DBS.getConnection();
@@ -439,6 +444,7 @@ public class WalidsController {
                 biodata.put("username", rs.getString("username"));
                 biodata.put("NIS_NIP", rs.getString("NIS_NIP"));
                 biodata.put("nama", rs.getString("nama"));
+                // Data ini tidak ditampilkan di TableView, jadi langsung diolah string-nya atau dimasukkan ke Map
                 biodata.put("gender", rs.getString("gender").equals("L") ? "Laki-laki" : "Perempuan");
                 biodata.put("alamat", rs.getString("alamat"));
                 biodata.put("email", rs.getString("email"));
@@ -657,6 +663,7 @@ public class WalidsController {
 
     // NEW: Student List Methods
     private void initStudentListTable() {
+        // UBAH: PropertyValueFactory menggunakan nama properti dari Service.Users
         studentListNameColumn.setCellValueFactory(new PropertyValueFactory<>("nama"));
         studentListGenderColumn.setCellValueFactory(new PropertyValueFactory<>("gender"));
         studentListNISNIPColumn.setCellValueFactory(new PropertyValueFactory<>("nisNip"));
@@ -666,7 +673,8 @@ public class WalidsController {
     }
 
     private void loadStudentsInMyClass() {
-        ObservableList<UserTableEntry> studentList = FXCollections.observableArrayList();
+        // UBAH: ObservableList menggunakan Service.Users
+        ObservableList<Users> studentList = FXCollections.observableArrayList();
 
         if (this.kelasId == 0) {
             studentListTable.setItems(FXCollections.emptyObservableList());
@@ -675,7 +683,7 @@ public class WalidsController {
 
         String sql = "SELECT u.user_id, u.username, u.NIS_NIP, u.nama, u.gender, u.alamat, u.email, u.nomer_hp, r.role_name " +
                 "FROM Users u " +
-                "JOIN student_class_enrollment sce ON u.user_id = sce.Users_user_id " +
+                "JOIN student_class_enrollment sce ON u.user_id = sce.Users_user_id " + // UBAH: Enrollment menjadi student_class_enrollment
                 "JOIN Role r ON u.Role_role_id = r.role_id " +
                 "WHERE sce.Kelas_kelas_id = ? AND sce.Kelas_Users_user_id = ? AND u.Role_role_id = 'S'";
 
@@ -685,12 +693,13 @@ public class WalidsController {
             stmt.setString(2, this.waliKelasId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                studentList.add(new UserTableEntry(
+                // UBAH: Membuat objek Service.Users
+                studentList.add(new Users(
                         rs.getString("user_id"),
                         rs.getString("username"),
                         rs.getString("NIS_NIP"),
                         rs.getString("nama"),
-                        rs.getString("gender").equals("L") ? "Laki-laki" : "Perempuan",
+                        rs.getString("gender").equals("L") ? "Laki-laki" : "Perempuan", // Sesuaikan agar sesuai dengan string display
                         rs.getString("alamat"),
                         rs.getString("email"),
                         rs.getString("nomer_hp"),
