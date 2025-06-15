@@ -11,8 +11,8 @@ import java.time.LocalDateTime; // Untuk kolom TIMESTAMP
 
 public class Semester {
     private final IntegerProperty semesterId;      // semester_id (SERIAL PRIMARY KEY)
-    private final StringProperty tahunAjaran;      // tahun_ajaran (VARCHAR(20))
-    private final StringProperty namaSemester;     // semester (VARCHAR(20)) - renamed to namaSemester for clarity
+    private final StringProperty tahunAjaran;      // 2024/2025 (VARCHAR(20))
+    private final StringProperty namaSemester;     // ganjil/genap
     private final ObjectProperty<LocalDateTime> tahun; // tahun (TIMESTAMP)
 
     // Constructor
@@ -21,6 +21,13 @@ public class Semester {
         this.tahunAjaran = new SimpleStringProperty(tahunAjaran);
         this.namaSemester = new SimpleStringProperty(namaSemester);
         this.tahun = new SimpleObjectProperty<>(tahun);
+    }
+
+    public Semester(int semesterId, String tahunAjaran, String namaSemester) {
+        this.semesterId = new SimpleIntegerProperty(semesterId);
+        this.tahunAjaran = new SimpleStringProperty(tahunAjaran);
+        this.namaSemester = new SimpleStringProperty(namaSemester);
+        this.tahun = new SimpleObjectProperty<>();
     }
 
     // Getters

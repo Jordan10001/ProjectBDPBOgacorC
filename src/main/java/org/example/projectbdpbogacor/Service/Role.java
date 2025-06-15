@@ -13,6 +13,11 @@ public class Role {
         this.roleName = new SimpleStringProperty(roleName);
     }
 
+    public Role( String roleName) {
+        this.roleId = new SimpleStringProperty("");
+        this.roleName = new SimpleStringProperty(roleName);
+    }
+
     // Getters
     public String getRoleId() { return roleId.get(); }
     public String getRoleName() { return roleName.get(); }

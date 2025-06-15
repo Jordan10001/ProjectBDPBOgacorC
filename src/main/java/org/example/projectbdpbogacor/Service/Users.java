@@ -47,7 +47,7 @@ public class Users {
     // NEW: Constructor for displaying user data in tables (e.g., Admin/Kepala dashboard)
     // Does not include password or roleRoleId directly, as they are not retrieved for display in this context.
     public Users(String userId, String username, String nisNip, String nama,
-                 String gender, String alamat, String email, String nomerHp, String roleName) {
+                  String gender, String alamat, String email, String nomerHp, String roleName) {
         this.userId = new SimpleStringProperty(userId);
         this.username = new SimpleStringProperty(username);
         this.password = new SimpleStringProperty(""); // Not retrieved, set to empty
@@ -59,6 +59,49 @@ public class Users {
         this.nomerHp = new SimpleStringProperty(nomerHp);
         this.roleRoleId = new SimpleStringProperty(""); // Not directly retrieved, set to empty
         this.roleName = new SimpleStringProperty(roleName);
+    }
+
+
+    public Users(String userId,  String nisNip, String nama) {
+        this.userId = new SimpleStringProperty(userId);
+        this.username = new SimpleStringProperty("");
+        this.password = new SimpleStringProperty(""); // Not retrieved, set to empty
+        this.nisNip = new SimpleStringProperty(nisNip);
+        this.nama = new SimpleStringProperty(nama);
+        this.gender = new SimpleStringProperty("");
+        this.alamat = new SimpleStringProperty("");
+        this.email = new SimpleStringProperty("");
+        this.nomerHp = new SimpleStringProperty("");
+        this.roleRoleId = new SimpleStringProperty(""); // Not directly retrieved, set to empty
+        this.roleName = new SimpleStringProperty("");
+    }
+
+    public Users(String userId,   String nama) {
+        this.userId = new SimpleStringProperty(userId);
+        this.username = new SimpleStringProperty("");
+        this.password = new SimpleStringProperty(""); // Not retrieved, set to empty
+        this.nisNip = new SimpleStringProperty("");
+        this.nama = new SimpleStringProperty(nama);
+        this.gender = new SimpleStringProperty("");
+        this.alamat = new SimpleStringProperty("");
+        this.email = new SimpleStringProperty("");
+        this.nomerHp = new SimpleStringProperty("");
+        this.roleRoleId = new SimpleStringProperty(""); // Not directly retrieved, set to empty
+        this.roleName = new SimpleStringProperty("");
+    }
+
+    public Users( String nama) {
+        this.userId = new SimpleStringProperty("");
+        this.username = new SimpleStringProperty("");
+        this.password = new SimpleStringProperty("");
+        this.nisNip = new SimpleStringProperty("");
+        this.nama = new SimpleStringProperty(nama);
+        this.gender = new SimpleStringProperty("");
+        this.alamat = new SimpleStringProperty("");
+        this.email = new SimpleStringProperty("");
+        this.nomerHp = new SimpleStringProperty("");
+        this.roleRoleId = new SimpleStringProperty("");
+        this.roleName = new SimpleStringProperty(""); // Initialize here
     }
 
 

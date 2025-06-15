@@ -301,41 +301,48 @@
                     <Tab text="Manage Students in Class">
                         <content>
                             <AnchorPane>
-                                <VBox layoutX="10.0" layoutY="10.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
+                        <VBox layoutX="10.0" layoutY="13.0" prefHeight="279.0" prefWidth="1239.0" spacing="10.0">
+                           <children>
+                              <Label style="-fx-font-weight: bold;" text="Students in Selected Class" />
+                              <TableView fx:id="studentInClassTableView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="203.0" prefWidth="722.0" VBox.vgrow="ALWAYS">
+                                 <columns>
+                                    <TableColumn fx:id="studentNameInClassColumn" prefWidth="232.8000053167343" text="Student Name" />
+                                    <TableColumn fx:id="nisNipInClassColumn" prefWidth="206.4000244140625" text="NIS/NIP" />
+                                    <TableColumn fx:id="studentUserIdInClassColumn" prefWidth="280.79999389648435" text="User ID" />
+                                 </columns>
+                              </TableView>
+                              <HBox spacing="10.0">
+                                 <children>
+                                    <Button fx:id="deleteStudentFromClassButton" onAction="#handleDeleteStudentFromClass" text="Remove From Class" />
+                                 </children>
+                              </HBox>
+                           </children>
+                        </VBox>
+                                <VBox layoutX="11.0" layoutY="321.0" prefHeight="132.0" prefWidth="1239.0" spacing="10.0" AnchorPane.bottomAnchor="91.79999999999995" AnchorPane.leftAnchor="11.0" AnchorPane.rightAnchor="11.400000000000091" AnchorPane.topAnchor="321.0">
                                     <children>
                                         <Label style="-fx-font-weight: bold;" text="Assign Student to Class" />
-                                        <GridPane hgap="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="62.0" prefWidth="484.0" vgap="5.0">
+                                        <GridPane hgap="10.0" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="62.0" prefWidth="598.0" vgap="5.0">
                                             <columnConstraints>
                                                 <ColumnConstraints hgrow="SOMETIMES" maxWidth="-Infinity" minWidth="100.0" prefWidth="150.0" />
                                                 <ColumnConstraints hgrow="SOMETIMES" />
+                                    <ColumnConstraints hgrow="SOMETIMES" minWidth="10.0" prefWidth="100.0" />
                                             </columnConstraints>
                                             <rowConstraints>
-                                                <RowConstraints vgrow="SOMETIMES" />
-                                                <RowConstraints vgrow="SOMETIMES" />
+                                    <RowConstraints />
+                                                <RowConstraints />
+                                    <RowConstraints vgrow="SOMETIMES" />
+                                    <RowConstraints vgrow="SOMETIMES" />
                                             </rowConstraints>
                                             <children>
-                                                <Label text="Select Student:" />
-                                                <ChoiceBox fx:id="assignStudentToClassChoiceBox" prefWidth="300.0" GridPane.columnIndex="1" />
-                                                <Label text="Select Class:" GridPane.rowIndex="1" />
-                                                <ChoiceBox fx:id="studentClassFilterChoiceBox" onAction="#handleClassFilterSelection" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="1" />
+                                                <Label text="Select Student:" GridPane.rowIndex="2" />
+                                                <ChoiceBox fx:id="assignStudentToClassChoiceBox" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="2" />
+                                                <Label text="Select Class:" GridPane.rowIndex="3" />
+                                                <ChoiceBox fx:id="studentClassFilterChoiceBox" onAction="#handleClassFilterSelection" prefWidth="300.0" GridPane.columnIndex="1" GridPane.rowIndex="3" />
+                                    <ChoiceBox fx:id="studentFilterYearsChoiceBox" prefWidth="300.0" GridPane.columnIndex="1" />
+                                    <Label text="Years" />
+                                              <Button fx:id="assignStudentToClassButton" onAction="#handleAssignStudentToClass" text="Assign Student" GridPane.columnIndex="2" GridPane.rowIndex="2" />
                                             </children>
                                         </GridPane>
-                                        <Button fx:id="assignStudentToClassButton" onAction="#handleAssignStudentToClass" text="Assign Student" />
-                                        <Separator orientation="HORIZONTAL" />
-                                        <Label style="-fx-font-weight: bold;" text="Students in Selected Class" />
-                                        <TableView fx:id="studentInClassTableView" maxHeight="-Infinity" maxWidth="-Infinity" minHeight="-Infinity" minWidth="-Infinity" prefHeight="244.0" prefWidth="722.0" VBox.vgrow="ALWAYS">
-                                            <columns>
-                                                <TableColumn fx:id="studentNameInClassColumn" prefWidth="232.8000053167343" text="Student Name" />
-                                                <TableColumn fx:id="nisNipInClassColumn" prefWidth="206.4000244140625" text="NIS/NIP" />
-                                                <TableColumn fx:id="studentUserIdInClassColumn" prefWidth="280.79999389648435" text="User ID" />
-                                            </columns>
-                                        </TableView>
-                                        <HBox spacing="10.0">
-                                            <children>
-                                                <Button fx:id="editStudentInClassButton" onAction="#handleEditStudentInClass" text="Edit Selected Student" />
-                                                <Button fx:id="deleteStudentFromClassButton" onAction="#handleDeleteStudentFromClass" text="Remove From Class" />
-                                            </children>
-                                        </HBox>
                                     </children>
                                 </VBox>
                             </AnchorPane>

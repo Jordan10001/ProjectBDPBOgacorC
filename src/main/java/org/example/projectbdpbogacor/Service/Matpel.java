@@ -17,6 +17,18 @@ public class Matpel {
         this.category = new SimpleStringProperty(category);
     }
 
+    public Matpel(int mapelId, String namaMapel) {
+        this.mapelId = new SimpleIntegerProperty(mapelId);
+        this.namaMapel = new SimpleStringProperty(namaMapel);
+        this.category = new SimpleStringProperty("");
+    }
+
+    public Matpel(String namaMapel) {
+        this.mapelId = new SimpleIntegerProperty();
+        this.namaMapel = new SimpleStringProperty(namaMapel);
+        this.category = new SimpleStringProperty("");
+    }
+
     // Getters
     public int getMapelId() { return mapelId.get(); }
     public String getNamaMapel() { return namaMapel.get(); }

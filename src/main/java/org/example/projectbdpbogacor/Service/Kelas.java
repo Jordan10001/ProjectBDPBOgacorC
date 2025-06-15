@@ -22,6 +22,22 @@ public class Kelas {
         this.semesterSemesterId = new SimpleIntegerProperty(semesterSemesterId);
     }
 
+    public Kelas(String usersUserId, int kelasId, String namaKelas) {
+        this.usersUserId = new SimpleStringProperty(usersUserId);
+        this.kelasId = new SimpleIntegerProperty(kelasId);
+        this.namaKelas = new SimpleStringProperty(namaKelas);
+        this.keterangan = new SimpleStringProperty("");
+        this.semesterSemesterId = new SimpleIntegerProperty();
+    }
+
+    public Kelas( String namaKelas) {
+        this.usersUserId = new SimpleStringProperty("");
+        this.kelasId = new SimpleIntegerProperty();
+        this.namaKelas = new SimpleStringProperty(namaKelas);
+        this.keterangan = new SimpleStringProperty("");
+        this.semesterSemesterId = new SimpleIntegerProperty();
+    }
+
     // Getters
     public String getUsersUserId() { return usersUserId.get(); }
     public int getKelasId() { return kelasId.get(); }

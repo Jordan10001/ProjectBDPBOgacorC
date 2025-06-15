@@ -123,8 +123,9 @@ public class AdmindsController {
     private TableColumn<StudentEntry, String> studentUserIdInClassColumn; // To store user_id
     @FXML
     private Button deleteStudentFromClassButton;
+
     @FXML
-    private Button editStudentInClassButton;
+    private ChoiceBox<String> studentFilterYearsChoiceBox; // [ADD] NEW: Filter by years for student in class
 
     // Announcements
     @FXML
@@ -251,17 +252,18 @@ public class AdmindsController {
         // Add listener to newRoleChoiceBox to auto-fill newUserIdField
         newRoleChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             if (newValue != null) {
-                newUserIdField.setText(generateUserIdPrefix(newValue));
+                // [CHANGE] Call the new generation method
+                newUserIdField.setText(generateNewUserId(newValue));
             }
         });
 
 
         // Initialize ChoiceBoxes for schedules and assignments
-        scheduleDayChoiceBox.getItems().addAll("Senin", "Selasa", "Rabu", "Kamis", "Jumat", "Sabtu", "Minggu"); // Initialize days
+        scheduleDayChoiceBox.getItems().addAll("Senin", "Selasa", "Rabu", "Kamis", "Jumat"); // Initialize days
         scheduleDayChoiceBox.setValue("Senin"); // Default day
         loadSubjectsForChoiceBox();
         loadClassesForChoiceBox();
-        loadStudentsForChoiceBox(); // Now also for assignStudentToClassChoiceBox
+        loadStudentsForChoiceBox(null); // [CHANGE] Load all students initially with null filter
 
         // Initialize edit/delete user fields
         editGenderChoiceBox.getItems().addAll("L", "P");
@@ -293,14 +295,20 @@ public class AdmindsController {
         // Initialize Student in Class Table
         initStudentInClassTable();
         loadClassesForStudentFilter(); // Load classes for the filter dropdown
+        // [ADD] Load years for student in class filter
+        loadYearsForStudentFilter(); // [ADD]
+        studentFilterYearsChoiceBox.setValue("All Years"); // [ADD] Set default for years filter
+
         // Listener for Student in Class Table selection
         studentInClassTableView.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> {
             boolean isSelected = newValue != null;
             deleteStudentFromClassButton.setDisable(!isSelected);
-            editStudentInClassButton.setDisable(!isSelected);
         });
         deleteStudentFromClassButton.setDisable(true); // Disable initially
-        editStudentInClassButton.setDisable(true); // Disable initially
+        // Disable initially
+
+        // [ADD] Add listener for student filter years choice box
+        studentFilterYearsChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> loadStudentsForChoiceBox(newValue)); // [CHANGE] Load students for assignment based on year filter. This will also trigger loadStudentsInSelectedClass later if needed.
 
 
         // Initialize elements for Manage Class
@@ -348,7 +356,7 @@ public class AdmindsController {
         // Add listener for announcement table selection
         announcementTable.getSelectionModel().selectedItemProperty().addListener((observable, oldSelection, newSelection) -> {
             if (newSelection != null) {
-                announcementTextArea.setText(newSelection.getPengumumanContent()); // Populate text area with selected announcement content // Use getPengumumanContent
+                announcementTextArea.setText(newSelection.getPengumumanContent()); // Populate text area with selected announcement content
                 updateAnnouncementButton.setDisable(false); // Enable update
                 deleteAnnouncementButton.setDisable(false); // Enable delete
                 createAnnouncementButton.setDisable(true); // Disable create
@@ -380,11 +388,12 @@ public class AdmindsController {
                         deleteUserButton.setDisable(true); // Ensure disabled on tab change
                         break;
                     case "Manage Students in Class": // This tab now includes student assignment
-                        loadStudentsForChoiceBox(); // Refresh students
+                        loadStudentsForChoiceBox(studentFilterYearsChoiceBox.getValue()); // [CHANGE] Filter students for assignment based on current year filter
                         loadClassesForStudentFilter(); // Refresh classes for filter and assignment
-                        studentInClassTableView.getItems().clear(); // Clear table until a class is selected
+                        loadYearsForStudentFilter(); // [ADD] Refresh years for student filter
+                        loadStudentsInSelectedClass(); // [CHANGE] Load students in table based on current filters
                         deleteStudentFromClassButton.setDisable(true); // Ensure disabled on tab change
-                        editStudentInClassButton.setDisable(true); // Ensure disabled on tab change
+                        // Ensure disabled on tab change
                         break;
                     case "Manage Classes":
                         loadWaliKelasForChoiceBox(); // Refresh wali kelas list
@@ -442,6 +451,57 @@ public class AdmindsController {
         }
     }
 
+    private String generateNewUserId(String roleName) {
+        String prefix = "";
+        switch (roleName) {
+            case "Admin":
+                prefix = "A";
+                break;
+            case "Kepala Sekolah":
+                prefix = "K";
+                break;
+            case "Guru":
+                prefix = "G";
+                break;
+            case "Wali Kelas":
+                prefix = "W";
+                break;
+            case "Siswa":
+                prefix = "S";
+                break;
+            default:
+                prefix = ""; // No prefix or handle unknown role
+        }
+
+        // Get the last two digits of the current year
+        String currentYearLastTwoDigits = String.valueOf(java.time.Year.now().getValue() % 100);
+
+        // Pad with leading zero if needed (e.g., 09 for 2009)
+        if (currentYearLastTwoDigits.length() == 1) {
+            currentYearLastTwoDigits = "0" + currentYearLastTwoDigits;
+        }
+
+        // Find the highest sequence number for this prefix and year
+        int nextSequence = 1;
+        String sql = "SELECT MAX(SUBSTRING(user_id, 4, 6)) FROM Users WHERE user_id LIKE ? || ?";
+        try (Connection con = DBS.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql)) {
+            stmt.setString(1, prefix);
+            stmt.setString(2, currentYearLastTwoDigits + "%"); // Match prefix + year + any sequence
+            ResultSet rs = stmt.executeQuery();
+            if (rs.next() && rs.getString(1) != null) {
+                // Parse the max sequence, convert to int, and add 1
+                nextSequence = Integer.parseInt(rs.getString(1)) + 1;
+            }
+        } catch (SQLException e) {
+            System.err.println("Error generating next user ID sequence: " + e.getMessage());
+            // Fallback to 1 if there's an error
+            nextSequence = 1;
+        }
+
+        return prefix + currentYearLastTwoDigits + String.format("%04d", nextSequence); // Example: S250001
+    }
+
     private void loadRolesForChoiceBox() {
         roleNameToIdMap.clear(); // Clear existing data
         roleIdToNameMap.clear();
@@ -452,11 +512,12 @@ public class AdmindsController {
              PreparedStatement stmt = con.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
+                Role role = new Role(rs.getString("role_id"), rs.getString("role_name")); // Create Role object
                 String roleId = rs.getString("role_id"); // Get role ID
                 String roleName = rs.getString("role_name"); // Get role name
-                roleNameToIdMap.put(roleName, roleId); // Map name to ID
-                roleIdToNameMap.put(roleId, roleName); // Map ID to name
-                newRoleChoiceBox.getItems().add(roleName); // Add name to ChoiceBox
+                roleNameToIdMap.put(role.getRoleName(), role.getRoleId()); // Map name to ID
+                roleIdToNameMap.put(role.getRoleId(), role.getRoleName()); // Map ID to name
+                newRoleChoiceBox.getItems().add(role.getRoleName()); // Add name to ChoiceBox
             }
         } catch (SQLException e) {
             AlertClass.ErrorAlert("Database Error", "Failed to load roles", e.getMessage());
@@ -493,31 +554,6 @@ public class AdmindsController {
         // Sort years for consistent display
         SortedSet<String> sortedYears = new TreeSet<>(years);
         filterYearsChoiceBox.getItems().addAll(sortedYears);
-    }
-
-    // Helper method to generate user ID prefix based on role
-    private String generateUserIdPrefix(String roleName) {
-        String prefix = "";
-        switch (roleName) {
-            case "Admin":
-                prefix = "A";
-                break;
-            case "Kepala Sekolah":
-                prefix = "K";
-                break;
-            case "Guru":
-                prefix = "G";
-                break;
-            case "Wali Kelas":
-                prefix = "W";
-                break;
-            case "Siswa":
-                prefix = "S";
-                break;
-            default:
-                prefix = ""; // No prefix or handle unknown role
-        }
-        return prefix;
     }
 
     @FXML
@@ -589,12 +625,13 @@ public class AdmindsController {
                 newPhoneNumberField.clear();
                 newRoleChoiceBox.setValue("Siswa"); // Reset to default
                 filterUsersAndRefreshSearch(); // Refresh list of users for edit/delete
-                loadStudentsForChoiceBox(); // Refresh student lists if user role changed to/from student
+                loadStudentsForChoiceBox(null); // [CHANGE] Load all students again
                 loadWaliKelasForChoiceBox(); // Refresh wali kelas for new class
                 loadGuruForChoiceBox(); // Refresh guru for subject assignment
                 loadAllUsersToTable(allUsersFilterRoleChoiceBox.getValue(), allUsersFilterNameField.getText()); // Refresh all users table
                 loadSubjectAssignments(); // Refresh subject assignments
                 loadYearsForFilter(); // Refresh years filter
+                loadYearsForStudentFilter(); // [ADD] Refresh years for student filter
             } else {
                 AlertClass.ErrorAlert("Failed", "User Not Added", "Failed to add user to the database.");
             }
@@ -766,7 +803,7 @@ public class AdmindsController {
                     return;
                 }
                 String hashedPassword = HashGenerator.hash(password);
-                sql = "UPDATE Users SET username = ?, password = ?, NIS_NIP = ?, nama = ?, gender = ?, ?, email = ?, nomer_hp = ?, Role_role_id = ? WHERE user_id = ?";
+                sql = "UPDATE Users SET username = ?, password = ?, NIS_NIP = ?, nama = ?, gender = ?, alamat = ?, email = ?, nomer_hp = ?, Role_role_id = ? WHERE user_id = ?";
                 stmt = con.prepareStatement(sql);
                 stmt.setString(1, username);
                 stmt.setString(2, hashedPassword);
@@ -797,7 +834,7 @@ public class AdmindsController {
                 AlertClass.InformationAlert("Success", "User Updated", "User '" + nama + "' has been updated successfully.");
                 clearEditUserFields();
                 filterUsersAndRefreshSearch(); // Refresh the choice box with current filters
-                loadStudentsForChoiceBox(); // Refresh student lists if user role changed to/from student
+                loadStudentsForChoiceBox(null); // [CHANGE] Refresh student lists if user role changed to/from student
                 loadWaliKelasForChoiceBox(); // Refresh wali kelas list if user role changed to/from wali kelas
                 loadGuruForChoiceBox(); // Refresh guru list if user role changed to/from guru
                 loadClassesForChoiceBox(); // Refresh classes if wali kelas info changed
@@ -841,7 +878,7 @@ public class AdmindsController {
                 // Delete from Enrollment first if the user is a student
                 // The ON DELETE CASCADE on Enrollment_Users_FK should handle this,
                 // but explicit deletion here ensures better control and immediate feedback.
-                String deleteEnrollmentSql = "DELETE FROM Enrollment WHERE Users_user_id = ?";
+                String deleteEnrollmentSql = "DELETE FROM Student_Class_Enrollment WHERE Users_user_id = ?";
                 try (PreparedStatement delEnrollStmt = con.prepareStatement(deleteEnrollmentSql)) {
                     delEnrollStmt.setString(1, userIdToDelete);
                     delEnrollStmt.executeUpdate();
@@ -864,7 +901,7 @@ public class AdmindsController {
                         String deleteSql = "DELETE FROM " + tableName + " WHERE Users_user_id = ?";
                         if (tableName.equals("Kelas")) {
                             // For Kelas, it's part of a composite primary key and foreign key.
-                            // Need to be careful. If a Wali Kelas is deleted, their classes need handling.
+                            // If a Wali Kelas is deleted, their classes need handling.
                             // If a class's Wali Kelas is deleted, you might need to reassign the class or delete the class.
                             // For this implementation, let's assume cascade or manual re-assignment is outside scope
                             // and focus on simply trying to delete.
@@ -890,7 +927,7 @@ public class AdmindsController {
                     AlertClass.InformationAlert("Success", "User Deleted", "User '" + selectedUserDisplay + "' has been deleted.");
                     clearEditUserFields();
                     filterUsersAndRefreshSearch(); // Refresh the choice box with current filters
-                    loadStudentsForChoiceBox(); // Refresh student lists if a student was deleted
+                    loadStudentsForChoiceBox(null); // [CHANGE] Refresh student lists if a student was deleted
                     loadWaliKelasForChoiceBox(); // Refresh wali kelas list if a wali was deleted
                     loadGuruForChoiceBox(); // Refresh guru for subject assignment if a guru was deleted
                     loadClassesForChoiceBox(); // Refresh classes if wali kelas deleted
@@ -920,9 +957,10 @@ public class AdmindsController {
             while (rs.next()) {
                 int mapelId = rs.getInt("mapel_id");
                 String namaMapel = rs.getString("nama_mapel");
-                subjectData.add(new Pair<>(namaMapel, mapelId));
-                scheduleSubjectChoiceBox.getItems().add(namaMapel);
-                assignTeacherSubjectChoiceBox.getItems().add(namaMapel); // For new tab
+                Matpel mapel = new Matpel(rs.getInt("mapel_id"), rs.getString("nama_mapel"));
+                subjectData.add(new Pair<>(mapel.getNamaMapel(), mapel.getMapelId()));
+                scheduleSubjectChoiceBox.getItems().add(mapel.getNamaMapel());
+                assignTeacherSubjectChoiceBox.getItems().add(mapel.getNamaMapel()); // For new tab
             }
         } catch (SQLException e) {
             AlertClass.ErrorAlert("Database Error", "Failed to load subjects", e.getMessage());
@@ -944,13 +982,15 @@ public class AdmindsController {
              PreparedStatement stmt = con.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
+                Kelas kelas = new Kelas(rs.getString("wali_id"), rs.getInt("kelas_id"), rs.getString("nama_kelas"));
+                Users waliKelas = new Users(rs.getString("wali_name"));
                 int kelasId = rs.getInt("kelas_id");
                 String namaKelas = rs.getString("nama_kelas");
                 String waliId = rs.getString("wali_id");
                 String waliName = rs.getString("wali_name");
-                String display = namaKelas + " (Wali: " + waliName + ")";
+                String display = namaKelas + " (Wali: " + waliKelas.getNama() + ")";
                 // Store a combined ID that includes both kelas_id and wali_id for lookup
-                classData.add(new Pair<>(display, kelasId + "-" + waliId));
+                classData.add(new Pair<>(display, kelas.getKelasId() + "-" + kelas.getUsersUserId()));
                 scheduleClassChoiceBox.getItems().add(display);
                 // assignClassChoiceBox.getItems().add(display); // Removed as it's merged
                 studentClassFilterChoiceBox.getItems().add(display); // Populate for student filter
@@ -962,19 +1002,34 @@ public class AdmindsController {
         }
     }
 
-    private void loadStudentsForChoiceBox() {
+    // [CHANGE] Modified to accept a yearFilter
+    private void loadStudentsForChoiceBox(String yearFilter) {
         studentData.clear();
         assignStudentToClassChoiceBox.getItems().clear(); // Updated for merged tab
-        String sql = "SELECT user_id, nama, NIS_NIP FROM Users WHERE Role_role_id = 'S'"; // Only students
+
+        StringBuilder sqlBuilder = new StringBuilder("SELECT user_id, nama, NIS_NIP FROM Users WHERE Role_role_id = 'S'"); // Only students
+
+        if (yearFilter != null && !yearFilter.equals("All Years")) {
+            sqlBuilder.append(" AND SUBSTRING(user_id, 2, 2) = ?"); // Filter by the 2nd and 3rd characters for year ID
+        }
+        sqlBuilder.append(" ORDER BY user_id"); // Order by user_id for consistent display
+
         try (Connection con = DBS.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sql);
-             ResultSet rs = stmt.executeQuery()) {
+             PreparedStatement stmt = con.prepareStatement(sqlBuilder.toString())) {
+
+            int paramIndex = 1;
+            if (yearFilter != null && !yearFilter.equals("All Years")) {
+                stmt.setString(paramIndex++, yearFilter);
+            }
+
+            ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
+                Users student = new Users(rs.getString("user_id"), rs.getString("nama"), rs.getString("NIS_NIP"));
                 String userId = rs.getString("user_id");
                 String nama = rs.getString("nama");
                 String nisNip = rs.getString("NIS_NIP");
-                String display = nama + " (NIS/NIP: " + nisNip + ")";
-                studentData.add(new Pair<>(display, userId));
+                String display = student.getNama() + " (NIS/NIP: " + student.getNisNip() + ")";
+                studentData.add(new Pair<>(display, student.getUserId()));
                 assignStudentToClassChoiceBox.getItems().add(display); // Updated for merged tab
             }
         } catch (SQLException e) {
@@ -992,10 +1047,11 @@ public class AdmindsController {
              PreparedStatement stmt = con.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
+                Users guru = new Users(rs.getString("user_id"), rs.getString("nama"));
                 String userId = rs.getString("user_id");
                 String nama = rs.getString("nama");
-                String display = nama + " (" + userId + ")";
-                guruData.add(new Pair<>(display, userId));
+                String display = guru.getNama() + " (" + guru.getUserId() + ")";
+                guruData.add(new Pair<>(display, guru.getUserId()));
                 assignTeacherGuruChoiceBox.getItems().add(display);
             }
         } catch (SQLException e) {
@@ -1202,15 +1258,22 @@ public class AdmindsController {
              PreparedStatement stmt = con.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
+                Matpel matpel = new Matpel(rs.getString("nama_mapel"));
+                Kelas kelas = new Kelas(rs.getString("nama_kelas"));
+                Users guru = new Users(rs.getString("guru_name"));
+                DetailPengajar detailPengajar = new DetailPengajar(
+                        rs.getString("guru_id"), rs.getString("kelas_wali_id"),
+                        rs.getInt("Matpel_mapel_id"), rs.getInt("Kelas_kelas_id"));
                 assignmentList.add(new SubjectAssignmentEntry(
-                        rs.getString("nama_mapel"),
-                        rs.getString("nama_kelas"),
-                        rs.getString("guru_name"),
-                        rs.getString("guru_id"),
-                        rs.getInt("Matpel_mapel_id"),
-                        rs.getString("kelas_wali_id"),
-                        rs.getInt("Kelas_kelas_id")
+                        matpel.getNamaMapel(),
+                        kelas.getNamaKelas(),
+                        guru.getNama(),
+                        detailPengajar.getUsersUserId(),
+                        detailPengajar.getMatpelMapelId(),
+                        detailPengajar.getKelasUsersUserId(),
+                        detailPengajar.getKelasKelasId()
                 ));
+
             }
             subjectAssignmentTable.setItems(assignmentList);
         } catch (SQLException e) {
@@ -1295,7 +1358,7 @@ public class AdmindsController {
 
         try (Connection con = DBS.getConnection()) {
             // Check if enrollment already exists
-            String checkSql = "SELECT COUNT(*) FROM Enrollment WHERE Users_user_id = ? AND Kelas_kelas_id = ? AND Kelas_Users_user_id = ?";
+            String checkSql = "SELECT COUNT(*) FROM Student_Class_Enrollment WHERE Users_user_id = ? AND Kelas_kelas_id = ? AND Kelas_Users_user_id = ?";
             PreparedStatement checkStmt = con.prepareStatement(checkSql);
             checkStmt.setString(1, studentUserId);
             checkStmt.setInt(2, kelasId);
@@ -1307,7 +1370,7 @@ public class AdmindsController {
             }
 
             // Changed table name from Student_Class_Enrollment to Enrollment
-            String insertSql = "INSERT INTO Enrollment (Users_user_id, Kelas_kelas_id, Kelas_Users_user_id) VALUES (?, ?, ?)";
+            String insertSql = "INSERT INTO Student_Class_Enrollment (Users_user_id, Kelas_kelas_id, Kelas_Users_user_id) VALUES (?, ?, ?)";
             PreparedStatement insertStmt = con.prepareStatement(insertSql);
             insertStmt.setString(1, studentUserId);
             insertStmt.setInt(2, kelasId);
@@ -1337,8 +1400,10 @@ public class AdmindsController {
             stmt.setString(1, userId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                userName = rs.getString("nama");
-                roleName = rs.getString("role_name");
+                Users user = new Users(rs.getString("nama"));
+                Role role = new Role(rs.getString("role_name"));
+                userName = user.getNama();
+                roleName = role.getRoleName();
             }
         }
         return new Pair<>(roleName, userName);
@@ -1391,25 +1456,26 @@ public class AdmindsController {
     }
 
     private void loadAnnouncements() {
-        ObservableList<Pengumuman> announcementList = FXCollections.observableArrayList(); // Changed to Pengumuman service
-        String sql = "SELECT pengumuman_id, pengumuman, waktu, Users_user_id FROM Pengumuman ORDER BY waktu DESC"; // Fetch Users_user_id
+        ObservableList<Pengumuman> announcementList = FXCollections.observableArrayList();
+        String sql = "SELECT pengumuman_id, pengumuman, waktu, Users_user_id FROM Pengumuman ORDER BY waktu DESC";
         try (Connection con = DBS.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 Timestamp timestamp = rs.getTimestamp("waktu");
-
-
                 String originalContent = rs.getString("pengumuman");
-                String userIdOfPoster = rs.getString("Users_user_id"); // Get the user ID of the poster
+                String userIdOfPoster = rs.getString("Users_user_id");
 
-                // Check if content already contains the prefix
-                // A simple heuristic: check for "[ROLE] Name:" at the beginning
-                boolean hasPrefix = originalContent.matches("^\\[.+\\]\\s*[^:]+:\\s*");
                 String displayContent = originalContent;
 
-                if (!hasPrefix) {
-                    // If no prefix, try to get the poster's info and prepend it
+                // [FIX] This part ensures the prefix is only added for display if not already present.
+                // It's crucial to NOT modify the originalContent from the DB unless absolutely necessary,
+                // just for display purposes. The regex should be robust.
+                // Pattern: Starts with '[' (role text) ']' optional spaces (name text) ':' optional spaces (rest of content)
+                java.util.regex.Pattern existingPrefixPattern = java.util.regex.Pattern.compile("^\\[[^\\]]+\\]\\s*[^:]+:\\s*");
+                java.util.regex.Matcher matcher = existingPrefixPattern.matcher(originalContent);
+
+                if (!matcher.find()) { // If the existing prefix pattern is NOT found at the beginning
                     try {
                         Pair<String, String> posterInfo = getUserRoleAndName(userIdOfPoster);
                         if (posterInfo.getKey() != null && posterInfo.getValue() != null) {
@@ -1421,12 +1487,13 @@ public class AdmindsController {
                         displayContent = originalContent;
                     }
                 }
+                // Else, if a prefix WAS found by matcher.find(), then displayContent remains originalContent, which is what we want.
 
-                announcementList.add(new Pengumuman( // Using Pengumuman service constructor
+                announcementList.add(new Pengumuman(
                         rs.getInt("pengumuman_id"),
                         displayContent, // Use processed content for the pengumumanContent field
-                        userIdOfPoster, // Pass the user ID of the poster
-                        timestamp != null ? timestamp.toLocalDateTime() : null // Pass LocalDateTime object
+                        userIdOfPoster,
+                        timestamp != null ? timestamp.toLocalDateTime() : null
                 ));
             }
             announcementTable.setItems(announcementList);
@@ -1438,7 +1505,7 @@ public class AdmindsController {
 
     @FXML
     void handleUpdateAnnouncement() {
-        Pengumuman selectedAnnouncement = announcementTable.getSelectionModel().getSelectedItem(); // Changed to Pengumuman service
+        Pengumuman selectedAnnouncement = announcementTable.getSelectionModel().getSelectedItem();
         if (selectedAnnouncement == null) {
             AlertClass.WarningAlert("Selection Error", "No Announcement Selected", "Please select an announcement to update.");
             return;
@@ -1450,34 +1517,10 @@ public class AdmindsController {
             return;
         }
 
-        String originalFullContent = selectedAnnouncement.getPengumumanContent(); // Changed to getPengumumanContent
-        String finalContentToSave;
+        // The stored content from the DB (might or might not have a prefix)
+        String contentFromDb = selectedAnnouncement.getPengumumanContent(); // This is the content as displayed/stored in the object
 
-        // Pattern to identify the prefix: "[ROLE] Name: "
-        java.util.regex.Pattern pattern = java.util.regex.Pattern.compile("^\\[.+\\]\\s*[^:]+:\\s*");
-        java.util.regex.Matcher matcher = pattern.matcher(originalFullContent);
-
-        String currentPrefix = "";
-        if (matcher.find()) {
-            currentPrefix = matcher.group(0); // Capture the existing prefix
-            // Now, strip the prefix from the original content to get the actual "raw" message
-            // This ensures that the user's input in the textarea is treated as the new raw message
-            // and the prefix is re-added based on the current user if necessary.
-            // This also handles the case where the user might have copied the prefix into the textarea.
-            originalFullContent = originalFullContent.substring(currentPrefix.length());
-        }
-
-        // If the user's input `updatedContentRaw` starts with the `currentPrefix`,
-        // it means they might have copied the prefixed text back into the textarea.
-        // In that case, we should strip the prefix from their input before re-adding.
-        String contentWithoutPotentialPrefix = updatedContentRaw;
-        java.util.regex.Matcher updatedContentMatcher = pattern.matcher(updatedContentRaw);
-        if (updatedContentMatcher.find() && updatedContentMatcher.group(0).equals(currentPrefix)) {
-            contentWithoutPotentialPrefix = updatedContentRaw.substring(currentPrefix.length());
-        }
-
-        // Reconstruct the final content with the correct prefix and the new raw content.
-        // Get the current user's info to form the prefix for the update.
+        // Get the current user's (admin's) info to form the prefix for the update
         Pair<String, String> userInfo = null;
         try {
             userInfo = getUserRoleAndName(loggedInUserId);
@@ -1488,17 +1531,28 @@ public class AdmindsController {
         }
         String rolePrefix = (userInfo.getKey() != null) ? "[" + userInfo.getKey().toUpperCase() + "] " : "";
         String namePrefix = (userInfo.getValue() != null) ? userInfo.getValue() + ": " : "";
+        String newCombinedPrefix = rolePrefix + namePrefix;
 
-        // Combine the current poster's prefix with the actual content typed by the user.
-        finalContentToSave = rolePrefix + namePrefix + contentWithoutPotentialPrefix;
+        // Strip any existing "ROLE NAME:" prefix from the user's input from the TextArea,
+        // so we can re-add the *correct* prefix based on the *current* logged-in user.
+        String contentWithoutAnyExistingPrefixInInput = updatedContentRaw;
+        // This regex matches a prefix like "[ROLE] Name:" at the beginning of the string.
+        java.util.regex.Pattern prefixInInputPattern = java.util.regex.Pattern.compile("^\\[.+\\]\\s*[^:]+:\\s*");
+        java.util.regex.Matcher matcher = prefixInInputPattern.matcher(updatedContentRaw);
 
+        if (matcher.find() && matcher.start() == 0) { // If a prefix is found at the very beginning
+            contentWithoutAnyExistingPrefixInInput = updatedContentRaw.substring(matcher.end());
+        }
 
-        int pengumumanId = selectedAnnouncement.getPengumumanId(); // Property name from Pengumuman service
+        // Combine the *current* poster's prefix with the actual content typed by the user (stripped of old prefixes).
+        String finalContentToSave = newCombinedPrefix + contentWithoutAnyExistingPrefixInInput;
+
+        int pengumumanId = selectedAnnouncement.getPengumumanId();
 
         try (Connection con = DBS.getConnection()) {
             String sql = "UPDATE Pengumuman SET pengumuman = ?, waktu = NOW() WHERE pengumuman_id = ?";
             PreparedStatement stmt = con.prepareStatement(sql);
-            stmt.setString(1, finalContentToSave); // Use the content with preserved/new prefix
+            stmt.setString(1, finalContentToSave);
             stmt.setInt(2, pengumumanId);
 
             int rowsAffected = stmt.executeUpdate();
@@ -1518,9 +1572,9 @@ public class AdmindsController {
     @FXML
     void handleDeleteAnnouncement() {
         Pengumuman selectedAnnouncement = announcementTable.getSelectionModel().getSelectedItem(); // Changed to Pengumuman service
-        if (selectedAnnouncement == null) {
-            AlertClass.WarningAlert("Selection Error", "No Announcement Selected", "Please select an announcement to delete.");
-            return;
+        if (selectedAnnouncement == null) { //
+            AlertClass.WarningAlert("Selection Error", "No Announcement Selected", "Please select an announcement to delete."); //
+            return; //
         }
 
         Optional<ButtonType> result = AlertClass.ConfirmationAlert(
@@ -1529,25 +1583,25 @@ public class AdmindsController {
                 "Are you sure you want to delete this announcement? This action cannot be undone."
         );
 
-        if (result.isPresent() && result.get() == ButtonType.OK) {
+        if (result.isPresent() && result.get() == ButtonType.OK) { //
             // Use the pengumuman_id directly from the selected object
-            int pengumumanId = selectedAnnouncement.getPengumumanId();
+            int pengumumanId = selectedAnnouncement.getPengumumanId(); //
 
-            try (Connection con = DBS.getConnection()) {
-                String sql = "DELETE FROM Pengumuman WHERE pengumuman_id = ?";
-                PreparedStatement stmt = con.prepareStatement(sql);
-                stmt.setInt(1, pengumumanId);
+            try (Connection con = DBS.getConnection()) { //
+                String sql = "DELETE FROM Pengumuman WHERE pengumuman_id = ?"; //
+                PreparedStatement stmt = con.prepareStatement(sql); //
+                stmt.setInt(1, pengumumanId); //
 
-                int rowsAffected = stmt.executeUpdate();
-                if (rowsAffected > 0) {
-                    AlertClass.InformationAlert("Success", "Announcement Deleted", "Announcement deleted successfully.");
-                    announcementTextArea.clear();
+                int rowsAffected = stmt.executeUpdate(); //
+                if (rowsAffected > 0) { //
+                    AlertClass.InformationAlert("Success", "Announcement Deleted", "Announcement deleted successfully."); //
+                    announcementTextArea.clear(); //
                     loadAnnouncements(); // Refresh the table
                 } else {
-                    AlertClass.ErrorAlert("Failed", "Announcement Not Deleted", "Failed to delete announcement.");
+                    AlertClass.ErrorAlert("Failed", "Announcement Not Deleted", "Failed to delete announcement."); //
                 }
             } catch (SQLException e) {
-                AlertClass.ErrorAlert("Database Error", "Failed to delete announcement", e.getMessage());
+                AlertClass.ErrorAlert("Database Error", "Failed to delete announcement", e.getMessage()); //
                 e.printStackTrace();
             }
         }
@@ -1568,6 +1622,31 @@ public class AdmindsController {
         }
     }
 
+    // [ADD] New method to load years for the studentFilterYearsChoiceBox
+    private void loadYearsForStudentFilter() {
+        studentFilterYearsChoiceBox.getItems().clear();
+        studentFilterYearsChoiceBox.getItems().add("All Years"); // Option to show all years
+
+        Set<String> years = new HashSet<>();
+        String sql = "SELECT user_id FROM Users";
+        try (Connection con = DBS.getConnection();
+             PreparedStatement stmt = con.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
+            while (rs.next()) {
+                String userId = rs.getString("user_id");
+                if (userId != null && userId.length() >= 3) {
+                    years.add(userId.substring(1, 3)); // Extract the two digits after the role prefix
+                }
+            }
+        } catch (SQLException e) {
+            AlertClass.ErrorAlert("Database Error", "Failed to load years for student filter", e.getMessage());
+            e.printStackTrace();
+        }
+        // Sort years for consistent display
+        SortedSet<String> sortedYears = new TreeSet<>(years);
+        studentFilterYearsChoiceBox.getItems().addAll(sortedYears);
+    }
+
     @FXML
     void handleClassFilterSelection() {
         loadStudentsInSelectedClass();
@@ -1576,6 +1655,7 @@ public class AdmindsController {
     private void loadStudentsInSelectedClass() {
         ObservableList<StudentEntry> studentsInClassList = FXCollections.observableArrayList();
         String selectedClassDisplay = studentClassFilterChoiceBox.getValue();
+        String selectedYear = studentFilterYearsChoiceBox.getValue(); // [ADD] Get selected year
 
         if (selectedClassDisplay == null || selectedClassDisplay.isEmpty()) {
             studentInClassTableView.setItems(FXCollections.emptyObservableList());
@@ -1599,19 +1679,34 @@ public class AdmindsController {
         }
 
         // Changed table name from Student_Class_Enrollment to Enrollment
-        String sql = "SELECT u.user_id, u.nama, u.NIS_NIP FROM Users u " +
-                "JOIN Enrollment sce ON u.user_id = sce.Users_user_id " +
-                "WHERE sce.Kelas_kelas_id = ? AND sce.Kelas_Users_user_id = ? AND u.Role_role_id = 'S'";
+        StringBuilder sqlBuilder = new StringBuilder("SELECT u.user_id, u.nama, u.NIS_NIP FROM Users u " +
+                "JOIN Student_Class_Enrollment sce ON u.user_id = sce.Users_user_id " +
+                "WHERE sce.Kelas_kelas_id = ? AND sce.Kelas_Users_user_id = ? AND u.Role_role_id = 'S'");
+
+        // [ADD] Add year filter to the query
+        if (selectedYear != null && !selectedYear.equals("All Years")) {
+            sqlBuilder.append(" AND SUBSTRING(u.user_id, 2, 2) = ?"); // Filter by the 2nd and 3rd characters for year ID
+        }
+        sqlBuilder.append(" ORDER BY u.user_id"); // [ADD] Order by user_id
+
         try (Connection con = DBS.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sql)) {
+             PreparedStatement stmt = con.prepareStatement(sqlBuilder.toString())) { // [CHANGE] Use sqlBuilder.toString()
             stmt.setInt(1, kelasId);
             stmt.setString(2, waliUserId);
+            int paramIndex = 3; // [CHANGE] Start paramIndex from 3
+
+            // [ADD] Set year parameter if selected
+            if (selectedYear != null && !selectedYear.equals("All Years")) {
+                stmt.setString(paramIndex++, selectedYear);
+            }
+
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
+                Users user = new Users(rs.getString("user_id"), rs.getString("nama"), rs.getString("NIS_NIP"));
                 studentsInClassList.add(new StudentEntry(
-                        rs.getString("nama"),
-                        rs.getString("NIS_NIP"),
-                        rs.getString("user_id") // Pass user_id for deletion/editing
+                        user.getNama(),
+                        user.getNisNip(),
+                        user.getUserId()// Pass user_id for deletion/editing
                 ));
             }
             studentInClassTableView.setItems(studentsInClassList);
@@ -1660,7 +1755,7 @@ public class AdmindsController {
 
             try (Connection con = DBS.getConnection()) {
                 // Changed table name from Student_Class_Enrollment to Enrollment
-                String sql = "DELETE FROM Enrollment WHERE Users_user_id = ? AND Kelas_kelas_id = ? AND Kelas_Users_user_id = ?";
+                String sql = "DELETE FROM Student_Class_Enrollment WHERE Users_user_id = ? AND Kelas_kelas_id = ? AND Kelas_Users_user_id = ?";
                 PreparedStatement stmt = con.prepareStatement(sql);
                 stmt.setString(1, selectedStudent.getUserId());
                 stmt.setInt(2, kelasId);
@@ -1671,9 +1766,8 @@ public class AdmindsController {
                     AlertClass.InformationAlert("Success", "Student Removed", "'" + selectedStudent.getStudentName() + "' has been removed from the class.");
                     loadStudentsInSelectedClass(); // Refresh table
                     deleteStudentFromClassButton.setDisable(true); // Disable after success
-                    editStudentInClassButton.setDisable(true); // Disable after success
                 } else {
-                    AlertClass.ErrorAlert("Failed", "Removal Failed", "Failed to remove student from class. Enrollment might not exist.");
+                    AlertClass.ErrorAlert("Failed", "Removal Failed", "Failed to remove student from class. Student_Class_Enrollment might not exist.");
                 }
             } catch (SQLException e) {
                 AlertClass.ErrorAlert("Database Error", "Removal Failed", e.getMessage());
@@ -1682,27 +1776,7 @@ public class AdmindsController {
         }
     }
 
-    @FXML
-    void handleEditStudentInClass() {
-        StudentEntry selectedStudent = studentInClassTableView.getSelectionModel().getSelectedItem();
-        if (selectedStudent == null) {
-            AlertClass.WarningAlert("Selection Error", "No Student Selected", "Please select a student to edit.");
-            return;
-        }
 
-        // Switch to the "Manage Users" tab and select the user for editing
-        adminTabPane.getSelectionModel().select(1); // Assuming "Manage Users" is the second tab (index 1)
-        // Adjust the display format to match what loadUsersForEditDelete creates for selection
-        // The format is now "USER_ID - Full Name (NIS/NIP: XXX)"
-        String userIdToSelect = selectedStudent.getUserId();
-        String userDisplay = userDisplayMap.get(userIdToSelect); // Retrieve the full display string from the map
-        if (userDisplay != null) {
-            selectUserForEditDeleteChoiceBox.setValue(userDisplay);
-            handleUserSelectionForEditDelete(); // Load details for the selected user
-        } else {
-            AlertClass.ErrorAlert("Error", "User Not Found", "Could not find selected student in the user list for editing.");
-        }
-    }
 
     // NEW: Class Management Methods (Create, Update, Delete)
     private void loadWaliKelasForChoiceBox() {
@@ -1714,10 +1788,11 @@ public class AdmindsController {
              PreparedStatement stmt = con.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
+                Users waliKelas = new Users(rs.getString("user_id"), rs.getString("nama"));
                 String userId = rs.getString("user_id");
                 String nama = rs.getString("nama");
-                String display = nama + " (" + userId + ")";
-                waliKelasData.add(new Pair<>(display, userId));
+                String display = waliKelas.getNama() + " (" + waliKelas.getUserId() + ")";
+                waliKelasData.add(new Pair<>(display, waliKelas.getUserId()));
                 newClassWaliKelasChoiceBox.getItems().add(display);
             }
         } catch (SQLException e) {
@@ -1735,11 +1810,13 @@ public class AdmindsController {
              PreparedStatement stmt = con.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
+                Semester semester = new Semester(rs.getInt("semester_id"),
+                        rs.getString("tahun_ajaran"), rs.getString("semester"));
                 int semesterId = rs.getInt("semester_id");
                 String tahunAjaran = rs.getString("tahun_ajaran");
                 String semesterName = rs.getString("semester");
-                String display = tahunAjaran + " - " + semesterName;
-                semesterData.add(new Pair<>(display, semesterId));
+                String display = semester.getTahunAjaran() + " - " + semester.getNamaSemester();
+                semesterData.add(new Pair<>(display, semester.getSemesterId()));
                 newClassSemesterChoiceBox.getItems().add(display);
             }
         } catch (SQLException e) {
@@ -1758,12 +1835,17 @@ public class AdmindsController {
              PreparedStatement stmt = con.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
+                Kelas kelas = new Kelas(
+                        rs.getString("wali_id"),
+                        rs.getInt("kelas_id"),
+                        rs.getString("nama_kelas"));
+                Users waliKelas = new Users(rs.getString("wali_name"));
                 int kelasId = rs.getInt("kelas_id");
                 String namaKelas = rs.getString("nama_kelas");
                 String waliId = rs.getString("wali_id");
                 String waliName = rs.getString("wali_name");
-                String display = namaKelas + " (Wali: " + waliName + ")";
-                String combinedId = kelasId + "-" + waliId; // Store for lookup
+                String display = kelas.getNamaKelas() + " (Wali: " + waliKelas.getNama() + ")";
+                String combinedId = kelas.getKelasId() + "-" + kelas.getUsersUserId(); // Store for lookup
                 editableClassesMap.put(display, combinedId);
                 editClassChoiceBox.getItems().add(display);
             }
@@ -2002,7 +2084,7 @@ public class AdmindsController {
                 // Delete from dependent tables first due to ON DELETE NO ACTION
                 // Order matters: Enrollment, Jadwal, Materi, Tugas, Ujian, Detail_Pengajar
                 String[] dependentTables = {
-                        "Enrollment", "Jadwal", "Materi", "Tugas", "Ujian", "Detail_Pengajar"
+                        "Student_Class_Enrollment", "Jadwal", "Materi", "Tugas", "Ujian", "Detail_Pengajar"
                 };
 
                 for (String tableName : dependentTables) {
@@ -2125,11 +2207,5 @@ public class AdmindsController {
             e.printStackTrace();
         }
     }
-
-    // Helper class for ChoiceBox items (to store display text and associated ID)
-
-
-    // New Model Class for StudentEntry in TableView
-
 
 }
