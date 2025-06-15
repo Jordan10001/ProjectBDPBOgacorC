@@ -14,7 +14,7 @@ public class Users {
     private final StringProperty email;
     private final StringProperty nomerHp;
     private final StringProperty roleRoleId;
-    private final StringProperty roleName; // Added for display purposes
+  // Added for display purposes
 
     // Constructor with all parameters
     public Users(String userId, String username, String password, String nisNip,
@@ -30,19 +30,11 @@ public class Users {
         this.email = new SimpleStringProperty(email);
         this.nomerHp = new SimpleStringProperty(nomerHp);
         this.roleRoleId = new SimpleStringProperty(roleRoleId);
-        this.roleName = new SimpleStringProperty(); // Initialize here
+        // Initialize here
     }
 
 
     // Overloaded Constructor with all parameters including roleName (for UI display)
-    public Users(String userId, String username, String password, String nisNip,
-                 String nama, String gender, String alamat, String email,
-                 String nomerHp, String roleRoleId, String roleName) {
-        // Call the primary constructor to handle initial setup of all core properties
-        this(userId, username, password, nisNip, nama, gender, alamat, email, nomerHp, roleRoleId);
-        // Then set the roleName specific to this constructor
-        this.roleName.set(roleName);
-    }
 
     // NEW: Constructor for displaying user data in tables (e.g., Admin/Kepala dashboard)
     // Does not include password or roleRoleId directly, as they are not retrieved for display in this context.
@@ -57,8 +49,23 @@ public class Users {
         this.alamat = new SimpleStringProperty(alamat);
         this.email = new SimpleStringProperty(email);
         this.nomerHp = new SimpleStringProperty(nomerHp);
+        this.roleRoleId = new SimpleStringProperty(roleName); // Not directly retrieved, set to empty
+
+    }
+
+    public Users(String userId, String username, String nisNip, String nama,
+                 String gender, String alamat, String email, String nomerHp) {
+        this.userId = new SimpleStringProperty(userId);
+        this.username = new SimpleStringProperty(username);
+        this.password = new SimpleStringProperty(""); // Not retrieved, set to empty
+        this.nisNip = new SimpleStringProperty(nisNip);
+        this.nama = new SimpleStringProperty(nama);
+        this.gender = new SimpleStringProperty(gender);
+        this.alamat = new SimpleStringProperty(alamat);
+        this.email = new SimpleStringProperty(email);
+        this.nomerHp = new SimpleStringProperty(nomerHp);
         this.roleRoleId = new SimpleStringProperty(""); // Not directly retrieved, set to empty
-        this.roleName = new SimpleStringProperty(roleName);
+
     }
 
 
@@ -73,7 +80,7 @@ public class Users {
         this.email = new SimpleStringProperty("");
         this.nomerHp = new SimpleStringProperty("");
         this.roleRoleId = new SimpleStringProperty(""); // Not directly retrieved, set to empty
-        this.roleName = new SimpleStringProperty("");
+
     }
 
     public Users(String userId,   String nama) {
@@ -87,7 +94,7 @@ public class Users {
         this.email = new SimpleStringProperty("");
         this.nomerHp = new SimpleStringProperty("");
         this.roleRoleId = new SimpleStringProperty(""); // Not directly retrieved, set to empty
-        this.roleName = new SimpleStringProperty("");
+
     }
 
     public Users( String nama) {
@@ -101,7 +108,7 @@ public class Users {
         this.email = new SimpleStringProperty("");
         this.nomerHp = new SimpleStringProperty("");
         this.roleRoleId = new SimpleStringProperty("");
-        this.roleName = new SimpleStringProperty(""); // Initialize here
+        // Initialize here
     }
 
 
@@ -116,7 +123,7 @@ public class Users {
     public String getEmail() { return email.get(); }
     public String getNomerHp() { return nomerHp.get(); }
     public String getRoleRoleId() { return roleRoleId.get(); }
-    public String getRoleName() { return roleName.get(); } // Getter for roleName
+     // Getter for roleName
 
     // Property methods (important for JavaFX TableView and Binding)
     public StringProperty userIdProperty() { return userId; }
@@ -129,7 +136,7 @@ public class Users {
     public StringProperty emailProperty() { return email; }
     public StringProperty nomerHpProperty() { return nomerHp; }
     public StringProperty roleRoleIdProperty() { return roleRoleId; }
-    public StringProperty roleNameProperty() { return roleName; } // Property method for roleName
+    // Property method for roleName
 
     // Setters (if you need to modify values after object creation,
     // which is common for mutable data in JavaFX models)
@@ -143,5 +150,5 @@ public class Users {
     public void setEmail(String email) { this.email.set(email); }
     public void setNomerHp(String nomerHp) { this.nomerHp.set(nomerHp); }
     public void setRoleRoleId(String roleRoleId) { this.roleRoleId.set(roleRoleId); }
-    public void setRoleName(String roleName) { this.roleName.set(roleName); }
+
 }

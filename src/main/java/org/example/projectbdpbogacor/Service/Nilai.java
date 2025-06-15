@@ -22,7 +22,14 @@ public class Nilai {
         this.jenisNilai = new SimpleStringProperty(jenisNilai);
         this.matpelMapelId = new SimpleIntegerProperty(matpelMapelId);
         this.raporRaporId = new SimpleIntegerProperty(raporRaporId);
+    }
 
+    public Nilai( int nilaiAngka, String jenisNilai) {
+        this.nilaiId = new SimpleIntegerProperty();
+        this.nilaiAngka = new SimpleIntegerProperty(nilaiAngka);
+        this.jenisNilai = new SimpleStringProperty(jenisNilai);
+        this.matpelMapelId = new SimpleIntegerProperty();
+        this.raporRaporId = new SimpleIntegerProperty();
     }
 
     // Getters

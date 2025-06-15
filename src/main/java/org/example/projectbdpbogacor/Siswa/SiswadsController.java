@@ -12,7 +12,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.example.projectbdpbogacor.Aset.AlertClass;
 import org.example.projectbdpbogacor.DBSource.DBS;
 import org.example.projectbdpbogacor.HelloApplication;
-import org.example.projectbdpbogacor.Service.Pengumuman;
+import org.example.projectbdpbogacor.Service.*;
 import org.example.projectbdpbogacor.Tabel.*;
 
 import java.io.IOException;
@@ -211,14 +211,24 @@ public class SiswadsController {
             stmt.setString(1, loggedInUserId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                userIdLabel.setText(rs.getString("user_id"));
-                usernameLabel.setText(rs.getString("username"));
-                nisNipLabel.setText(rs.getString("NIS_NIP"));
-                nameLabel.setText(rs.getString("nama"));
-                genderLabel.setText(rs.getString("gender").equals("L") ? "Laki-laki" : "Perempuan");
-                addressLabel.setText(rs.getString("alamat"));
-                emailLabel.setText(rs.getString("email"));
-                phoneLabel.setText(rs.getString("nomer_hp"));
+                Users biodata = new Users(
+                        rs.getString("user_id"),
+                        rs.getString("username"),
+                        rs.getString("NIS_NIP"),
+                        rs.getString("nama"),
+                        rs.getString("gender"),
+                        rs.getString("alamat"),
+                        rs.getString("email"),
+                        rs.getString("nomer_hp"));
+
+                userIdLabel.setText(biodata.getUserId());
+                usernameLabel.setText(biodata.getUsername());
+                nisNipLabel.setText(biodata.getNisNip());
+                nameLabel.setText(biodata.getNama());
+                genderLabel.setText(biodata.getGender());
+                addressLabel.setText(biodata.getAlamat());
+                emailLabel.setText(biodata.getEmail());
+                phoneLabel.setText(biodata.getNomerHp());
             }
         } catch (SQLException e) {
             AlertClass.ErrorAlert("Database Error", "Failed to load biodata", e.getMessage());
@@ -284,10 +294,14 @@ public class SiswadsController {
             stmt.setString(1, loggedInUserId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
+                Nilai nilai = new Nilai(
+                        rs.getInt("nilai"),
+                        rs.getString("jenis_nilai"));
+                Matpel matpel = new Matpel( rs.getString("nama_mapel"));
                 nilaiList.add(new NilaiEntry(
-                        rs.getString("jenis_nilai"),
-                        rs.getString("nama_mapel"),
-                        rs.getInt("nilai")
+                        nilai.getJenisNilai(),
+                        matpel.getNamaMapel(),
+                        nilai.getNilaiAngka()
                 ));
             }
             nilaiUjianTable.setItems(nilaiList);
@@ -318,12 +332,19 @@ public class SiswadsController {
             stmt.setString(1, loggedInUserId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                tugasList.add(new TugasEntry(
+                Tugas tugas = new Tugas(
                         rs.getString("keterangan"),
-                        rs.getTimestamp("deadline").toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
-                        rs.getTimestamp("tanggal_direlease").toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
-                        rs.getString("nama_mapel"),
-                        rs.getString("nama_kelas")
+                        rs.getTimestamp("deadline").toLocalDateTime(),
+                        rs.getTimestamp("tanggal_direlease").toLocalDateTime()
+                );
+                Matpel matpel = new Matpel(rs.getString("nama_mapel"));
+                Kelas kelas = new Kelas(rs.getString("nama_kelas"));
+                tugasList.add(new TugasEntry(
+                        tugas.getKeterangan(),
+                        tugas.getDeadline().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+                        tugas.getTanggalDirelease().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+                        matpel.getNamaMapel(),
+                        kelas.getNamaKelas()
                 ));
             }
             tugasTable.setItems(tugasList);
@@ -351,10 +372,13 @@ public class SiswadsController {
             stmt.setString(1, loggedInUserId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
+                Materi materi = new Materi(rs.getString("nama_materi"));
+                Matpel matpel = new Matpel(rs.getString("nama_mapel"));
+                Kelas kelas = new Kelas(rs.getString("nama_kelas"));
                 materiList.add(new MateriEntry(
-                        rs.getString("nama_materi"),
-                        rs.getString("nama_mapel"),
-                        rs.getString("nama_kelas")
+                        materi.getNamaMateri(),
+                        matpel.getNamaMapel(),
+                        kelas.getNamaKelas()
                 ));
             }
             materiTable.setItems(materiList);
@@ -383,11 +407,17 @@ public class SiswadsController {
             stmt.setString(1, loggedInUserId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                ujianList.add(new UjianEntry(
+                Ujian ujian = new Ujian(
                         rs.getString("jenis_ujian"),
-                        rs.getTimestamp("tanggal").toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
-                        rs.getString("nama_mapel"),
-                        rs.getString("nama_kelas")
+                        rs.getTimestamp("tanggal").toLocalDateTime()
+                );
+                Matpel matpel = new Matpel(rs.getString("nama_mapel"));
+                Kelas kelas = new Kelas(rs.getString("nama_kelas"));
+                ujianList.add(new UjianEntry(
+                        ujian.getJenisUjian(),
+                        ujian.getTanggal().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+                        matpel.getNamaMapel(),
+                        kelas.getNamaKelas()
                 ));
             }
             ujianTable.setItems(ujianList);
@@ -420,13 +450,23 @@ public class SiswadsController {
             stmt.setString(1, loggedInUserId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                absensiList.add(new AbsensiEntry(
-                        rs.getTimestamp("tanggal").toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
-                        rs.getString("status"),
-                        rs.getString("nama_mapel"),
-                        rs.getString("nama_kelas"),
+                Absensi absensi = new Absensi(
+                        rs.getTimestamp("tanggal").toLocalDateTime(),
+                        rs.getString("status")
+                );
+                Matpel matpel = new Matpel(rs.getString("nama_mapel"));
+                Kelas kelas = new Kelas(rs.getString("nama_kelas"));
+                Jadwal jadwal = new Jadwal(
                         rs.getString("jam_mulai"),
                         rs.getString("jam_selsai")
+                );
+                absensiList.add(new AbsensiEntry(
+                        absensi.getTanggal().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+                        absensi.getStatus(),
+                        matpel.getNamaMapel(),
+                        kelas.getNamaKelas(),
+                        jadwal.getJamMulai(),
+                        jadwal.getJamSelesai()
                 ));
             }
             absensiTable.setItems(absensiList);
@@ -496,8 +536,10 @@ public class SiswadsController {
             stmt.setString(1, userId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                userName = rs.getString("nama");
-                roleName = rs.getString("role_name");
+                Users user = new Users(rs.getString("nama"));
+                Role role = new Role(rs.getString("role_name"));
+                userName = user.getNama();
+                roleName = role.getRoleName();
             }
         }
         return new Pair<>(roleName, userName);

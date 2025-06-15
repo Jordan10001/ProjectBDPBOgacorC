@@ -48,6 +48,16 @@ public class Jadwal {
         this.kelasKelasId = new SimpleIntegerProperty(kelasKelasId);
     }
 
+    public Jadwal( String jamMulai, String jamSelesai) {
+        this.jadwalId = new SimpleIntegerProperty();
+        this.hari = new SimpleStringProperty();
+        this.jamMulai = new SimpleStringProperty(jamMulai);
+        this.jamSelesai = new SimpleStringProperty(jamSelesai);
+        this.kelasUsersUserId = new SimpleStringProperty();
+        this.matpelMapelId = new SimpleIntegerProperty();
+        this.kelasKelasId = new SimpleIntegerProperty();
+    }
+
     // Getters
     public int getJadwalId() { return jadwalId.get(); }
     public String getHari() { return hari.get(); }

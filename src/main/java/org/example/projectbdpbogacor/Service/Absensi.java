@@ -26,6 +26,14 @@ public class Absensi {
         this.jadwalJadwalId = new SimpleIntegerProperty(jadwalJadwalId);
     }
 
+    public Absensi(LocalDateTime tanggal, String status) {
+        this.absensiId = new SimpleIntegerProperty();
+        this.tanggal = new SimpleObjectProperty<>(tanggal);
+        this.status = new SimpleStringProperty(status);
+        this.usersUserId = new SimpleStringProperty();
+        this.jadwalJadwalId = new SimpleIntegerProperty();
+    }
+
     // Getters
     public int getAbsensiId() { return absensiId.get(); }
     public LocalDateTime getTanggal() { return tanggal.get(); }
