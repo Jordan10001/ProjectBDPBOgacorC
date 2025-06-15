@@ -1,6 +1,5 @@
-package org.example.projectbdpbogacor.model;
+package org.example.projectbdpbogacor.Tabel;
 
-import java.util.List;
 import java.util.Map;
 
 public class RaporEntry {

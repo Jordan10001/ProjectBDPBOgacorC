@@ -1,5 +1,5 @@
 // ProjectBDPBOgacor/src/main/java/org/example/projectbdpbogacor/model/JadwalEntry.java
-package org.example.projectbdpbogacor.model;
+package org.example.projectbdpbogacor.Tabel;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;

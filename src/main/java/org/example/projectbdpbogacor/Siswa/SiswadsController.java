@@ -5,17 +5,15 @@ import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
 import javafx.scene.control.Label;
-import javafx.scene.control.Tab;
 import javafx.scene.control.TabPane;
 import javafx.scene.control.TableColumn;
 import javafx.scene.control.TableView;
-import javafx.scene.control.TextArea;
 import javafx.scene.control.cell.PropertyValueFactory;
 import org.example.projectbdpbogacor.Aset.AlertClass;
 import org.example.projectbdpbogacor.DBSource.DBS;
 import org.example.projectbdpbogacor.HelloApplication;
 import org.example.projectbdpbogacor.Service.Pengumuman;
-import org.example.projectbdpbogacor.model.*;
+import org.example.projectbdpbogacor.Tabel.*;
 
 import java.io.IOException;
 import java.sql.Connection;
@@ -24,7 +22,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
 import java.time.format.DateTimeFormatter;
-import java.time.LocalDateTime;
 
 public class SiswadsController {
 

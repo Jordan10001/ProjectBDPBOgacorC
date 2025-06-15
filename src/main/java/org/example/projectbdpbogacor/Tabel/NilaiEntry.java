@@ -1,5 +1,5 @@
 // ProjectBDPBOgacor/src/main/java/org/example/projectbdpbogacor/model/NilaiEntry.java
-package org.example.projectbdpbogacor.model;
+package org.example.projectbdpbogacor.Tabel;
 
 import javafx.beans.property.SimpleIntegerProperty;
 import javafx.beans.property.SimpleStringProperty;

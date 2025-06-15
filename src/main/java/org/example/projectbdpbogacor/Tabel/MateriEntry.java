@@ -1,5 +1,5 @@
 // ProjectBDPBOgacor/src/main/java/org/example/projectbdpbogacor/model/MateriEntry.java
-package org.example.projectbdpbogacor.model;
+package org.example.projectbdpbogacor.Tabel;
 
 //UNTUK ENTITY MATERI
 

@@ -1,4 +1,4 @@
-package org.example.projectbdpbogacor.model;
+package org.example.projectbdpbogacor.Tabel;
 
 import javafx.beans.property.IntegerProperty;
 import javafx.beans.property.SimpleIntegerProperty;

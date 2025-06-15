@@ -1,7 +1,5 @@
 package org.example.projectbdpbogacor.Admin;
 
-import javafx.beans.property.SimpleStringProperty;
-import javafx.beans.property.StringProperty;
 import javafx.collections.FXCollections;
 import javafx.collections.ObservableList;
 import javafx.fxml.FXML;
@@ -11,7 +9,7 @@ import org.example.projectbdpbogacor.Aset.AlertClass;
 import org.example.projectbdpbogacor.Aset.HashGenerator;
 import org.example.projectbdpbogacor.DBSource.DBS;
 import org.example.projectbdpbogacor.HelloApplication;
-import org.example.projectbdpbogacor.model.*;
+import org.example.projectbdpbogacor.Tabel.*;
 import org.example.projectbdpbogacor.Service.*; // Import all Service classes
 
 import java.io.IOException;
@@ -21,8 +19,6 @@ import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.Map;

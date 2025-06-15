@@ -13,11 +13,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.example.projectbdpbogacor.Aset.AlertClass;
 import org.example.projectbdpbogacor.DBSource.DBS;
 import org.example.projectbdpbogacor.HelloApplication;
-import org.example.projectbdpbogacor.model.AbsensiWaliEntry; // Use the specific model for Wali
-import org.example.projectbdpbogacor.model.NilaiEntry;
+import org.example.projectbdpbogacor.Tabel.AbsensiWaliEntry; // Use the specific model for Wali
+import org.example.projectbdpbogacor.Tabel.NilaiEntry;
 import org.example.projectbdpbogacor.Service.Users; // Impor Service.Users
 import org.example.projectbdpbogacor.Service.Semester; // Impor Service.Semester
-import org.example.projectbdpbogacor.model.RaporEntry; // Import RaporEntry
+import org.example.projectbdpbogacor.Tabel.RaporEntry; // Import RaporEntry
 
 import java.io.File;
 import java.io.FileWriter;
@@ -28,7 +28,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.awt.Desktop; // Required for opening file
 import java.time.LocalDateTime; // For accurate time handling
-import java.time.temporal.TemporalAdjusters; // For end of month/year
 
 
 public class WalidsController {

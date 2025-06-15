@@ -9,7 +9,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.example.projectbdpbogacor.Aset.AlertClass;
 import org.example.projectbdpbogacor.DBSource.DBS;
 import org.example.projectbdpbogacor.HelloApplication;
-import org.example.projectbdpbogacor.model.Pair;
+import org.example.projectbdpbogacor.Tabel.Pair;
 // import org.example.projectbdpbogacor.model.PengumumanEntry; // REMOVED
 // import org.example.projectbdpbogacor.model.UserTableEntry; // REMOVED
 import org.example.projectbdpbogacor.Service.Pengumuman; // ADDED
@@ -21,13 +21,9 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Timestamp;
-import java.time.format.DateTimeFormatter;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
 
 public class KepaladsController {
 

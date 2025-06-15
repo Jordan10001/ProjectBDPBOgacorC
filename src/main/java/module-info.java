@@ -22,7 +22,7 @@ module org.example.projectbdpbogacor {
     exports org.example.projectbdpbogacor.Guru;
     exports org.example.projectbdpbogacor.Wali;
     exports org.example.projectbdpbogacor.Siswa;
-    exports org.example.projectbdpbogacor.model;
-    opens org.example.projectbdpbogacor.model to javafx.base, javafx.fxml;
+    exports org.example.projectbdpbogacor.Tabel;
+    opens org.example.projectbdpbogacor.Tabel to javafx.base, javafx.fxml;
 
 }

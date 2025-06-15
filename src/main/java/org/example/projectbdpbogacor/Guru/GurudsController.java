@@ -14,12 +14,11 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.example.projectbdpbogacor.Aset.AlertClass;
 import org.example.projectbdpbogacor.DBSource.DBS;
 import org.example.projectbdpbogacor.HelloApplication;
-import org.example.projectbdpbogacor.model.*;
+import org.example.projectbdpbogacor.Tabel.*;
 import org.example.projectbdpbogacor.Service.Pengumuman;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Button;
-import javafx.scene.control.MenuItem; // For ContextMenu items
 
 import java.io.IOException;
 import java.sql.Connection;

@@ -1,10 +1,11 @@
-// ProjectBDPBOgacor/src/main/java/org/example/projectbdpbogacor/model/AbsensiEntry.java
-package org.example.projectbdpbogacor.model;
+// ProjectBDPBOgacor/src/main/java/org/example/projectbdpbogacor/model/AbsensiWaliEntry.java
+package org.example.projectbdpbogacor.Tabel;
 
 import javafx.beans.property.SimpleStringProperty;
 import javafx.beans.property.StringProperty;
 
-public class AbsensiEntry {
+public class AbsensiWaliEntry {
+    private final StringProperty studentName;
     private final StringProperty tanggal;
     private final StringProperty status;
     private final StringProperty namaMapel;
@@ -12,15 +13,24 @@ public class AbsensiEntry {
     private final StringProperty jamMulai;
     private final StringProperty jamSelesai;
 
-    public AbsensiEntry(String tanggal, String status, String namaMapel,
-                        String namaKelas, String jamMulai,
-                        String jamSelesai) {
+    public AbsensiWaliEntry(String studentName, String tanggal, String status,
+                            String namaMapel, String namaKelas, String jamMulai,
+                            String jamSelesai) {
+        this.studentName = new SimpleStringProperty(studentName);
         this.tanggal = new SimpleStringProperty(tanggal);
         this.status = new SimpleStringProperty(status);
         this.namaMapel = new SimpleStringProperty(namaMapel);
         this.namaKelas = new SimpleStringProperty(namaKelas);
         this.jamMulai = new SimpleStringProperty(jamMulai);
         this.jamSelesai = new SimpleStringProperty(jamSelesai);
+    }
+
+    public String getStudentName() {
+        return studentName.get();
+    }
+
+    public StringProperty studentNameProperty() {
+        return studentName;
     }
 
     public String getTanggal() {
