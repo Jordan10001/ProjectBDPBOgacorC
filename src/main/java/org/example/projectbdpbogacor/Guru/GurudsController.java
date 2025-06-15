@@ -14,8 +14,8 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.example.projectbdpbogacor.Aset.AlertClass;
 import org.example.projectbdpbogacor.DBSource.DBS;
 import org.example.projectbdpbogacor.HelloApplication;
+import org.example.projectbdpbogacor.Service.*;
 import org.example.projectbdpbogacor.Tabel.*;
-import org.example.projectbdpbogacor.Service.Pengumuman;
 import javafx.scene.control.DatePicker;
 import javafx.scene.control.TextArea;
 import javafx.scene.control.Button;
@@ -243,7 +243,7 @@ public class GurudsController {
         gradeSemesterChoiceBox.getSelectionModel().selectedItemProperty().addListener((observable, oldValue, newValue) -> loadExistingGrades());
 
         // Populate fixed choices for ujianJenisUjianChoiceBox and gradeTypeChoiseBox
-        ujianJenisUjianChoiceBox.getItems().addAll("UTS", "UAS", "Harian");
+        ujianJenisUjianChoiceBox.getItems().addAll("UTS", "UAS", "HARIAN");
         ujianJenisUjianChoiceBox.setValue("UTS");
 
         gradeTypeChoiseBox.getItems().addAll("UTS", "UAS", "TUGAS 1", "TUGAS 2", "TUGAS 3", "TUGAS 4");
@@ -470,12 +470,19 @@ public class GurudsController {
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                jadwalList.add(new JadwalEntry(
+                Jadwal jadwal = new Jadwal(
                         rs.getString("hari"),
                         rs.getString("jam_mulai"),
-                        rs.getString("jam_selsai"),
-                        rs.getString("nama_mapel"),
-                        rs.getString("nama_kelas"),
+                        rs.getString("jam_selsai")
+                );
+                Matpel mapel = new Matpel(rs.getString("nama_mapel"));
+                Kelas kelas = new Kelas(rs.getString("nama_kelas"));
+                jadwalList.add(new JadwalEntry(
+                        jadwal.getHari(),
+                        jadwal.getJamMulai(),
+                        jadwal.getJamSelesai(),
+                        mapel.getNamaMapel(),
+                        kelas.getNamaKelas(),
                         ""
                 ));
             }
@@ -529,11 +536,16 @@ public class GurudsController {
              PreparedStatement stmt = con.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
+                Semester semester = new Semester(
+                        rs.getInt("semester_id"),
+                        rs.getString("tahun_ajaran"),
+                        rs.getString("semester")
+                );
                 int semesterId = rs.getInt("semester_id");
                 String tahunAjaran = rs.getString("tahun_ajaran");
                 String semesterName = rs.getString("semester");
-                String display = tahunAjaran + " - " + semesterName;
-                semestersMap.put(display, semesterId);
+                String display = semester.getTahunAjaran() + " - " + semester.getNamaSemester();
+                semestersMap.put(display, semester.getSemesterId());
                 gradeSemesterChoiceBox.getItems().add(display);
             }
         } catch (SQLException e) {
@@ -572,11 +584,13 @@ public class GurudsController {
             stmt.setString(2, waliUserId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
+                Users student = new Users(rs.getString("user_id"),
+                        rs.getString("NIS_NIP"),rs.getString("nama"));
                 String userId = rs.getString("user_id");
                 String nama = rs.getString("nama");
                 String nisNip = rs.getString("NIS_NIP");
-                String display = nama + " (NIS: " + nisNip + ")";
-                studentsMap.put(display, userId);
+                String display = student.getNama() + " (NIS: " + student.getNisNip() + ")";
+                studentsMap.put(display, student.getUserId());
                 gradeStudentChoiceBox.getItems().add(display);
             }
         } catch (SQLException e) {
@@ -827,11 +841,18 @@ public class GurudsController {
             stmt.setInt(3, mapelId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                existingGrades.add(new NilaiEntry(
-                        rs.getInt("nilai_id"), // Pass nilai_id to the constructor
+                Nilai nilai = new Nilai(
+                        rs.getInt("nilai_id"),
                         rs.getString("jenis_nilai"),
-                        rs.getString("nama_mapel"),
                         rs.getInt("nilai")
+                );
+                Matpel mapel = new Matpel(rs.getString("nama_mapel"));
+
+                existingGrades.add(new NilaiEntry(
+                        nilai.getNilaiId(), // Pass nilai_id to the constructor
+                        nilai.getJenisNilai(),
+                        mapel.getNamaMapel(),
+                        nilai.getNilaiAngka()
                 ));
             }
             existingGradesTable.setItems(existingGrades);
@@ -999,15 +1020,25 @@ public class GurudsController {
             stmt.setString(1, loggedInUserId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                tugasList.add(new TugasEntry(
+                Tugas tugas = new Tugas(
                         rs.getInt("tugas_id"),
                         rs.getString("keterangan"),
-                        rs.getTimestamp("deadline").toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
-                        rs.getTimestamp("tanggal_direlease").toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
-                        rs.getString("nama_mapel"),
-                        rs.getString("nama_kelas"),
+                        rs.getTimestamp("deadline").toLocalDateTime(),
+                        rs.getTimestamp("tanggal_direlease").toLocalDateTime(),
                         rs.getString("Kelas_Users_user_id"),
                         rs.getInt("Kelas_kelas_id")
+                );
+                Matpel mapel = new Matpel(rs.getString("nama_mapel"));
+                Kelas kelas = new Kelas(rs.getString("nama_kelas"));
+                tugasList.add(new TugasEntry(
+                        tugas.getTugasId(),
+                        tugas.getKeterangan(),
+                        tugas.getDeadline().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+                        tugas.getTanggalDirelease().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+                        mapel.getNamaMapel(),
+                        kelas.getNamaKelas(),
+                        tugas.getKelasUsersUserId(),
+                        tugas.getKelasKelasId()
                 ));
             }
             tugasTable.setItems(tugasList);
@@ -1199,13 +1230,21 @@ public class GurudsController {
             stmt.setString(1, loggedInUserId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                materiList.add(new MateriEntry(
+                Materi materi = new Materi(
                         rs.getInt("materi_id"),
                         rs.getString("nama_materi"),
-                        rs.getString("nama_mapel"),
-                        rs.getString("nama_kelas"),
                         rs.getString("Kelas_Users_user_id"),
                         rs.getInt("Kelas_kelas_id")
+                );
+                Matpel mapel = new Matpel(rs.getString("nama_mapel"));
+                Kelas kelas = new Kelas(rs.getString("nama_kelas"));
+                materiList.add(new MateriEntry(
+                        materi.getMateriId(),
+                        materi.getNamaMateri(),
+                        mapel.getNamaMapel(),
+                        kelas.getNamaKelas(),
+                        materi.getKelasUsersUserId(),
+                        materi.getKelasKelasId()
                 ));
             }
             materiTable.setItems(materiList);
@@ -1408,14 +1447,20 @@ public class GurudsController {
             stmt.setString(1, loggedInUserId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                ujianList.add(new UjianEntry(
-                        rs.getInt("ujian_id"),
+                Ujian ujian = new Ujian(rs.getInt("ujian_id"),
                         rs.getString("jenis_ujian"),
-                        rs.getTimestamp("tanggal").toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
-                        rs.getString("nama_mapel"),
-                        rs.getString("nama_kelas"),
-                        rs.getString("Kelas_Users_user_id"),
-                        rs.getInt("Kelas_kelas_id")
+                        rs.getTimestamp("tanggal").toLocalDateTime(),
+                        rs.getString("Kelas_Users_user_id"),rs.getInt("Kelas_kelas_id"));
+                Matpel mapel = new Matpel(rs.getString("nama_mapel"));
+                Kelas kelas = new Kelas(rs.getString("nama_kelas"));
+                ujianList.add(new UjianEntry(
+                        ujian.getUjianId(),
+                        ujian.getJenisUjian(),
+                        ujian.getTanggal().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+                        mapel.getNamaMapel(),
+                        kelas.getNamaKelas(),
+                        ujian.getKelasUsersUserId(),
+                        ujian.getKelasKelasId()
                 ));
             }
             ujianTable.setItems(ujianList);
@@ -1476,22 +1521,25 @@ public class GurudsController {
     @FXML
     void loadGuruAnnouncements() {
         ObservableList<Pengumuman> announcementList = FXCollections.observableArrayList();
-        // Guru can see all announcements, not just their own
         String sql = "SELECT pengumuman_id, pengumuman, waktu, Users_user_id FROM Pengumuman ORDER BY waktu DESC";
         try (Connection con = DBS.getConnection();
-             PreparedStatement stmt = con.prepareStatement(sql)) {
-            // No user_id filter here, as Guru can view all announcements
-             ResultSet rs = stmt.executeQuery();
+             PreparedStatement stmt = con.prepareStatement(sql);
+             ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 Timestamp timestamp = rs.getTimestamp("waktu");
-
                 String originalContent = rs.getString("pengumuman");
                 String userIdOfPoster = rs.getString("Users_user_id");
 
-                boolean hasPrefix = originalContent.matches("^\\[.+\\]\\s*[^:]+:\\s*");
                 String displayContent = originalContent;
 
-                if (!hasPrefix) {
+                // [FIX] This part ensures the prefix is only added for display if not already present.
+                // It's crucial to NOT modify the originalContent from the DB unless absolutely necessary,
+                // just for display purposes. The regex should be robust.
+                // Pattern: Starts with '[' (role text) ']' optional spaces (name text) ':' optional spaces (rest of content)
+                java.util.regex.Pattern existingPrefixPattern = java.util.regex.Pattern.compile("^\\[[^\\]]+\\]\\s*[^:]+:\\s*");
+                java.util.regex.Matcher matcher = existingPrefixPattern.matcher(originalContent);
+
+                if (!matcher.find()) { // If the existing prefix pattern is NOT found at the beginning
                     try {
                         Pair<String, String> posterInfo = getUserRoleAndName(userIdOfPoster);
                         if (posterInfo.getKey() != null && posterInfo.getValue() != null) {
@@ -1499,16 +1547,17 @@ public class GurudsController {
                         }
                     } catch (SQLException e) {
                         System.err.println("Error fetching poster info for announcement ID " + rs.getInt("pengumuman_id") + ": " + e.getMessage());
+                        // Fallback to original content if poster info can't be fetched
                         displayContent = originalContent;
                     }
                 }
+                // Else, if a prefix WAS found by matcher.find(), then displayContent remains originalContent, which is what we want.
 
                 announcementList.add(new Pengumuman(
                         rs.getInt("pengumuman_id"),
                         displayContent, // Use processed content for the pengumumanContent field
                         userIdOfPoster,
                         timestamp != null ? timestamp.toLocalDateTime() : null
-
                 ));
             }
             guruAnnouncementTable.setItems(announcementList);
@@ -1527,8 +1576,10 @@ public class GurudsController {
             stmt.setString(1, userId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                userName = rs.getString("nama");
-                roleName = rs.getString("role_name");
+                Users user = new Users(rs.getString("nama"));
+                Role role = new Role(rs.getString("role_name"));
+                userName = user.getNama();
+                roleName = role.getRoleName();
             }
         }
         return new Pair<>(roleName, userName);
@@ -1580,11 +1631,12 @@ public class GurudsController {
             stmt.setString(2, waliUserId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
+                Users user = new Users(rs.getString("user_id"), rs.getString("NIS_NIP"), rs.getString("nama"));
                 String userId = rs.getString("user_id");
                 String nama = rs.getString("nama");
                 String nisNip = rs.getString("NIS_NIP");
-                String display = nama + " (NIS: " + nisNip + ")";
-                studentsMap.put(display, userId);
+                String display = user.getNama() + " (NIS: " + user.getNisNip() + ")";
+                studentsMap.put(display, user.getUserId());
                 absensiStudentChoiceBox.getItems().add(display);
             }
         } catch (SQLException e) {
@@ -1624,9 +1676,10 @@ public class GurudsController {
             stmt.setString(3, waliUserId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
+                Matpel mapel = new Matpel(rs.getInt("mapel_id"), rs.getString("nama_mapel"));
                 int mapelId = rs.getInt("mapel_id");
                 String namaMapel = rs.getString("nama_mapel");
-                subjectsMap.put(namaMapel, mapelId);
+                subjectsMap.put(mapel.getNamaMapel(), mapel.getMapelId());
                 absensiSubjectChoiceBox.getItems().add(namaMapel);
             }
         } catch (SQLException e) {
@@ -1665,11 +1718,12 @@ public class GurudsController {
             stmt.setInt(3, mapelId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
+                Users user = new Users(rs.getString("user_id"), rs.getString("NIS_NIP"), rs.getString("nama"));
                 String userId = rs.getString("user_id");
                 String nama = rs.getString("nama");
                 String nisNip = rs.getString("NIS_NIP");
-                String display = nama + " (NIS: " + nisNip + ")";
-                studentsMap.put(display, userId);
+                String display = user.getNama() + " (NIS: " + user.getNisNip() + ")";
+                studentsMap.put(display, user.getUserId());
                 absensiStudentChoiceBox.getItems().add(display);
             }
         } catch (SQLException e) {
@@ -1889,13 +1943,18 @@ public class GurudsController {
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
+                Absensi absen = new Absensi(rs.getTimestamp("tanggal").toLocalDateTime()
+                        ,rs.getString("status") );
+                Matpel mapel = new Matpel(rs.getString("nama_mapel"));
+                Kelas kelas = new Kelas(rs.getString("nama_kelas"));
+                Jadwal jadwal = new Jadwal(rs.getString("jam_mulai"), rs.getString("jam_selsai"));
                 absensiList.add(new AbsensiEntry(
-                        rs.getTimestamp("tanggal").toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
-                        rs.getString("status"),
-                        rs.getString("nama_mapel"),
-                        rs.getString("nama_kelas"),
-                        rs.getString("jam_mulai"),
-                        rs.getString("jam_selsai")
+                        absen.getTanggal().toString(),
+                        absen.getStatus(),
+                        mapel.getNamaMapel(),
+                        kelas.getNamaKelas(),
+                        jadwal.getJamMulai(),
+                        jadwal.getJamSelesai()
                 ));
             }
             absensiTable.setItems(absensiList);

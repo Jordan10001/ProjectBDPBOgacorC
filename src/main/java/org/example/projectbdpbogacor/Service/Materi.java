@@ -28,6 +28,15 @@ public class Materi {
         this.kelasKelasId = new SimpleIntegerProperty(kelasKelasId);
     }
 
+    public Materi(int materiId, String namaMateri, String kelasUsersUserId,
+                   int kelasKelasId) {
+        this.materiId = new SimpleIntegerProperty(materiId);
+        this.namaMateri = new SimpleStringProperty(namaMateri);
+        this.kelasUsersUserId = new SimpleStringProperty(kelasUsersUserId);
+        this.matpelMapelId = new SimpleIntegerProperty();
+        this.kelasKelasId = new SimpleIntegerProperty(kelasKelasId);
+    }
+
     // Constructor (minimal sesuai skema yang Anda berikan)
     public Materi(String namaMateri) {
         this.materiId = new SimpleIntegerProperty();

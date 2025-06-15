@@ -21,7 +21,7 @@ public class Ujian {
 
     // Constructor (dengan asumsi kolom tambahan)
     public Ujian(int ujianId, String jenisUjian, LocalDateTime tanggal,
-                 String kelasUsersUserId, int matpelMapelId, int kelasKelasId, String durasi) {
+                 String kelasUsersUserId, int matpelMapelId, int kelasKelasId) {
         this.ujianId = new SimpleIntegerProperty(ujianId);
         this.jenisUjian = new SimpleStringProperty(jenisUjian);
         this.tanggal = new SimpleObjectProperty<>(tanggal);
@@ -29,6 +29,17 @@ public class Ujian {
         this.matpelMapelId = new SimpleIntegerProperty(matpelMapelId);
         this.kelasKelasId = new SimpleIntegerProperty(kelasKelasId);
     }
+
+    public Ujian(int ujianId, String jenisUjian, LocalDateTime tanggal,
+                 String kelasUsersUserId,  int kelasKelasId) {
+        this.ujianId = new SimpleIntegerProperty(ujianId);
+        this.jenisUjian = new SimpleStringProperty(jenisUjian);
+        this.tanggal = new SimpleObjectProperty<>(tanggal);
+        this.kelasUsersUserId = new SimpleStringProperty(kelasUsersUserId);
+        this.matpelMapelId = new SimpleIntegerProperty();
+        this.kelasKelasId = new SimpleIntegerProperty(kelasKelasId);
+    }
+
 
     public Ujian(String jenisUjian, LocalDateTime tanggal) {
         this.ujianId = new SimpleIntegerProperty();
@@ -40,10 +51,7 @@ public class Ujian {
     }
 
     // Constructor (minimal sesuai skema yang Anda berikan)
-    public Ujian(int ujianId, String jenisUjian, LocalDateTime tanggal,
-                 String kelasUsersUserId, int matpelMapelId, int kelasKelasId) {
-        this(ujianId, jenisUjian, tanggal, kelasUsersUserId, matpelMapelId, kelasKelasId, ""); // Default durasi
-    }
+
 
     // Getters
     public int getUjianId() { return ujianId.get(); }

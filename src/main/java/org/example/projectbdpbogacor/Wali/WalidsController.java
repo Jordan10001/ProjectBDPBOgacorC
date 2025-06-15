@@ -13,10 +13,9 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.example.projectbdpbogacor.Aset.AlertClass;
 import org.example.projectbdpbogacor.DBSource.DBS;
 import org.example.projectbdpbogacor.HelloApplication;
+import org.example.projectbdpbogacor.Service.*;
 import org.example.projectbdpbogacor.Tabel.AbsensiWaliEntry; // Use the specific model for Wali
 import org.example.projectbdpbogacor.Tabel.NilaiEntry;
-import org.example.projectbdpbogacor.Service.Users; // Impor Service.Users
-import org.example.projectbdpbogacor.Service.Semester; // Impor Service.Semester
 import org.example.projectbdpbogacor.Tabel.RaporEntry; // Import RaporEntry
 
 import java.io.File;
@@ -284,14 +283,23 @@ public class WalidsController {
 
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
-                absensiList.add(new AbsensiWaliEntry(
-                        rs.getString("student_name"),
-                        rs.getTimestamp("tanggal").toLocalDateTime().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
-                        rs.getString("status"),
-                        rs.getString("nama_mapel"),
-                        rs.getString("nama_kelas"),
+                Users user = new Users(rs.getString("student_name"));
+                Absensi absensi = new Absensi(
+                        rs.getTimestamp("tanggal").toLocalDateTime(),
+                        rs.getString("status"));
+                Matpel matpel = new Matpel(rs.getString("nama_mapel"));
+                Kelas kelas = new Kelas(rs.getString("nama_kelas"));
+                Jadwal jadwal = new Jadwal(
                         rs.getString("jam_mulai"),
-                        rs.getString("jam_selsai")
+                        rs.getString("jam_selsai"));
+                absensiList.add(new AbsensiWaliEntry(
+                        user.getNama(),
+                        absensi.getTanggal().format(DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm")),
+                        absensi.getStatus(),
+                        matpel.getNamaMapel(),
+                        kelas.getNamaKelas(),
+                        jadwal.getJamMulai(),
+                        jadwal.getJamSelesai()
                 ));
             }
             absensiTable.setItems(absensiList);
@@ -337,10 +345,14 @@ public class WalidsController {
             stmt.setInt(2, semesterId);
             ResultSet rs = stmt.executeQuery();
             while (rs.next()) {
+                Nilai nilai = new Nilai(
+                        rs.getInt("nilai"),
+                        rs.getString("jenis_nilai"));
+                Matpel matpel = new Matpel(rs.getString("nama_mapel"));
                 nilaiList.add(new NilaiEntry(
-                        rs.getString("jenis_nilai"),
-                        rs.getString("nama_mapel"),
-                        rs.getInt("nilai")
+                        nilai.getJenisNilai(),
+                        matpel.getNamaMapel(),
+                        nilai.getNilaiAngka()
                 ));
             }
             nilaiUjianTable.setItems(nilaiList);

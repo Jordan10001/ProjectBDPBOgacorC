@@ -9,6 +9,7 @@ import javafx.scene.control.cell.PropertyValueFactory;
 import org.example.projectbdpbogacor.Aset.AlertClass;
 import org.example.projectbdpbogacor.DBSource.DBS;
 import org.example.projectbdpbogacor.HelloApplication;
+import org.example.projectbdpbogacor.Service.Role;
 import org.example.projectbdpbogacor.Tabel.Pair;
 // import org.example.projectbdpbogacor.model.PengumumanEntry; // REMOVED
 // import org.example.projectbdpbogacor.model.UserTableEntry; // REMOVED
@@ -247,8 +248,10 @@ public class KepaladsController {
             stmt.setString(1, userId);
             ResultSet rs = stmt.executeQuery();
             if (rs.next()) {
-                userName = rs.getString("nama");
-                roleName = rs.getString("role_name");
+                Users user = new Users(rs.getString("nama"));
+                Role role = new Role(rs.getString("role_name"));
+                userName = user.getNama();
+                roleName = role.getRoleName();
             }
         }
         return new Pair<>(roleName, userName);
@@ -296,23 +299,26 @@ public class KepaladsController {
     }
 
     private void loadAnnouncements() {
-        ObservableList<Pengumuman> announcementList = FXCollections.observableArrayList(); // Changed to Pengumuman service
+        ObservableList<Pengumuman> announcementList = FXCollections.observableArrayList();
         String sql = "SELECT pengumuman_id, pengumuman, waktu, Users_user_id FROM Pengumuman ORDER BY waktu DESC";
         try (Connection con = DBS.getConnection();
              PreparedStatement stmt = con.prepareStatement(sql);
              ResultSet rs = stmt.executeQuery()) {
             while (rs.next()) {
                 Timestamp timestamp = rs.getTimestamp("waktu");
-
-
-
                 String originalContent = rs.getString("pengumuman");
                 String userIdOfPoster = rs.getString("Users_user_id");
 
-                boolean hasPrefix = originalContent.matches("^\\[.+\\]\\s*[^:]+:\\s*");
                 String displayContent = originalContent;
 
-                if (!hasPrefix) {
+                // [FIX] This part ensures the prefix is only added for display if not already present.
+                // It's crucial to NOT modify the originalContent from the DB unless absolutely necessary,
+                // just for display purposes. The regex should be robust.
+                // Pattern: Starts with '[' (role text) ']' optional spaces (name text) ':' optional spaces (rest of content)
+                java.util.regex.Pattern existingPrefixPattern = java.util.regex.Pattern.compile("^\\[[^\\]]+\\]\\s*[^:]+:\\s*");
+                java.util.regex.Matcher matcher = existingPrefixPattern.matcher(originalContent);
+
+                if (!matcher.find()) { // If the existing prefix pattern is NOT found at the beginning
                     try {
                         Pair<String, String> posterInfo = getUserRoleAndName(userIdOfPoster);
                         if (posterInfo.getKey() != null && posterInfo.getValue() != null) {
@@ -320,15 +326,17 @@ public class KepaladsController {
                         }
                     } catch (SQLException e) {
                         System.err.println("Error fetching poster info for announcement ID " + rs.getInt("pengumuman_id") + ": " + e.getMessage());
+                        // Fallback to original content if poster info can't be fetched
                         displayContent = originalContent;
                     }
                 }
+                // Else, if a prefix WAS found by matcher.find(), then displayContent remains originalContent, which is what we want.
 
-                announcementList.add(new Pengumuman( // Using Pengumuman service constructor
+                announcementList.add(new Pengumuman(
                         rs.getInt("pengumuman_id"),
                         displayContent, // Use processed content for the pengumumanContent field
-                        userIdOfPoster, // Pass the user ID of the poster
-                        timestamp != null ? timestamp.toLocalDateTime() : null // Pass LocalDateTime object
+                        userIdOfPoster,
+                        timestamp != null ? timestamp.toLocalDateTime() : null
                 ));
             }
             announcementTable.setItems(announcementList);

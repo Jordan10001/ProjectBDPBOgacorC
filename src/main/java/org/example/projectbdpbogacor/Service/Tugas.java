@@ -31,6 +31,18 @@ public class Tugas {
         this.kelasKelasId = new SimpleIntegerProperty(kelasKelasId);
     }
 
+    public Tugas(int tugasId, String keterangan, LocalDateTime deadline,
+                 LocalDateTime tanggalDirelease, String kelasUsersUserId,
+                 int kelasKelasId) {
+        this.tugasId = new SimpleIntegerProperty(tugasId);
+        this.keterangan = new SimpleStringProperty(keterangan);
+        this.deadline = new SimpleObjectProperty<>(deadline);
+        this.tanggalDirelease = new SimpleObjectProperty<>(tanggalDirelease);
+        this.kelasUsersUserId = new SimpleStringProperty(kelasUsersUserId);
+        this.matpelMapelId = new SimpleIntegerProperty();
+        this.kelasKelasId = new SimpleIntegerProperty(kelasKelasId);
+    }
+
     public Tugas( String keterangan, LocalDateTime deadline,
                  LocalDateTime tanggalDirelease) {
         this.tugasId = new SimpleIntegerProperty();
