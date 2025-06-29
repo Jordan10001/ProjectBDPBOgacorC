@@ -8,220 +8,309 @@
 <?import javafx.scene.control.TableColumn?>
 <?import javafx.scene.control.TableView?>
 <?import javafx.scene.layout.AnchorPane?>
-<?import javafx.scene.layout.ColumnConstraints?>
-<?import javafx.scene.layout.GridPane?>
-<?import javafx.scene.layout.RowConstraints?>
+<?import javafx.scene.layout.HBox?>
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="600.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.projectbdpbogacor.Siswa.SiswadsController">
+<AnchorPane prefHeight="700.0" prefWidth="1300.0" styleClass="root" stylesheets="@Aset/light-mode.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.projectbdpbogacor.Siswa.SiswadsController">
     <children>
-        <VBox alignment="TOP_CENTER" prefHeight="700.0" prefWidth="1300.0" spacing="10.0" AnchorPane.bottomAnchor="0.0" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <padding>
-                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-            </padding>
-            <Label fx:id="welcomeUserLabel" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Welcome, Admin!" />
-            <TabPane fx:id="siswaTabPane" prefHeight="570.0" style="-fx-background-color: #8cff00; -fx-background-radius: 15px; -fx-border-radius: 15px;" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
-                <Tab text="Biodata">
-                    <content>
-                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
+        <VBox alignment="TOP_CENTER" layoutX="14.0" layoutY="14.0" prefHeight="672.0" prefWidth="1272.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+            <children>
+                <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="1272.0" spacing="10.0">
+                    <children>
+                        <Label fx:id="welcomeUserLabel" text="Welcome, Siswa!" styleClass="label">
+                            <font>
+                                <Font name="System Bold" size="18.0" />
+                            </font>
+                        </Label>
+                        <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
                             <children>
-                                <VBox alignment="CENTER" layoutX="442.0" layoutY="7.0" prefHeight="433.0" prefWidth="375.0" spacing="15.0">
+                                <Button onAction="#handleLogout" styleClass="button" text="Logout" />
+                            </children>
+                        </HBox>
+                    </children>
+                    <padding>
+                        <Insets left="10.0" right="10.0" />
+                    </padding>
+                </HBox>
+                <TabPane fx:id="siswaTabPane" prefHeight="622.0" prefWidth="1272.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" styleClass="tab-pane">
+                    <tabs>
+                        <Tab text="Biodata" styleClass="tab">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
                                     <children>
-                                        <Label text="Biodata Siswa">
-                                            <font>
-                                                <Font name="System Bold" size="20.0" />
-                                            </font>
-                                        </Label>
-                                        <GridPane alignment="CENTER" hgap="10.0" style="-fx-background-color: #ffffff; -fx-background-radius: 15px;" vgap="10.0">
-                                            <columnConstraints>
-                                                <ColumnConstraints maxWidth="150.0" minWidth="10.0" prefWidth="100.0" />
-                                                <ColumnConstraints maxWidth="250.0" minWidth="10.0" prefWidth="250.0" />
-                                            </columnConstraints>
-                                            <rowConstraints>
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                                <RowConstraints minHeight="10.0" prefHeight="30.0" vgrow="SOMETIMES" />
-                                            </rowConstraints>
+                                        <VBox layoutX="14.0" layoutY="14.0" prefHeight="580.0" prefWidth="1244.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
                                             <children>
-                                                <Label text="User ID:" />
-                                                <Label text="Username:" GridPane.rowIndex="1" />
-                                                <Label text="NIS/NIP:" GridPane.rowIndex="2" />
-                                                <Label text="Name:" GridPane.rowIndex="3" />
-                                                <Label text="Gender:" GridPane.rowIndex="4" />
-                                                <Label text="Address:" GridPane.rowIndex="5" />
-                                                <Label text="Email:" GridPane.rowIndex="6" />
-                                                <Label text="Phone:" GridPane.rowIndex="7" />
-                                                <Label fx:id="userIdLabel" text="-" GridPane.columnIndex="1" />
-                                                <Label fx:id="usernameLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="1" />
-                                                <Label fx:id="nisNipLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="2" />
-                                                <Label fx:id="nameLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="3" />
-                                                <Label fx:id="genderLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="4" />
-                                                <Label fx:id="addressLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="5" />
-                                                <Label fx:id="emailLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="6" />
-                                                <Label fx:id="phoneLabel" text="-" GridPane.columnIndex="1" GridPane.rowIndex="7" />
+                                                <Label styleClass="label" text="Personal Information">
+                                                    <font>
+                                                        <Font name="System Bold" size="16.0" />
+                                                    </font>
+                                                </Label>
+                                                <HBox spacing="20.0">
+                                                    <children>
+                                                        <VBox spacing="5.0">
+                                                            <children>
+                                                                <Label styleClass="label" text="User ID:" />
+                                                                <Label fx:id="userIdLabel" styleClass="label" text="[User ID]" />
+                                                                <Label styleClass="label" text="Username:" />
+                                                                <Label fx:id="usernameLabel" styleClass="label" text="[Username]" />
+                                                                <Label styleClass="label" text="NIS/NIP:" />
+                                                                <Label fx:id="nisNipLabel" styleClass="label" text="[NIS/NIP]" />
+                                                                <Label styleClass="label" text="Full Name:" />
+                                                                <Label fx:id="nameLabel" styleClass="label" text="[Full Name]" />
+                                                            </children>
+                                                        </VBox>
+                                                        <VBox spacing="5.0">
+                                                            <children>
+                                                                <Label styleClass="label" text="Gender:" />
+                                                                <Label fx:id="genderLabel" styleClass="label" text="[Gender]" />
+                                                                <Label styleClass="label" text="Address:" />
+                                                                <Label fx:id="addressLabel" styleClass="label" text="[Address]" />
+                                                                <Label styleClass="label" text="Email:" />
+                                                                <Label fx:id="emailLabel" styleClass="label" text="[Email]" />
+                                                                <Label styleClass="label" text="Phone Number:" />
+                                                                <Label fx:id="phoneLabel" styleClass="label" text="[Phone Number]" />
+                                                            </children>
+                                                        </VBox>
+                                                    </children>
+                                                </HBox>
                                             </children>
                                             <padding>
                                                 <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
                                             </padding>
-                                        </GridPane>
+                                        </VBox>
                                     </children>
-                                </VBox>
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-                <Tab text="Jadwal Kelas">
-                    <content>
-                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                            <children>
-                                <Label layoutX="590.0" layoutY="28.0" text="Jadwal Kelas">
-                                    <font>
-                                        <Font name="System Bold" size="20.0" />
-                                    </font>
-                                </Label>
-                                <TableView fx:id="jadwalKelasTable" layoutX="10.0" layoutY="77.0" prefHeight="362.0" prefWidth="1240.0" style="-fx-border-radius: 15px;">
-                                    <columns>
-                                        <TableColumn fx:id="hariColumn" prefWidth="100.0" text="Hari" />
-                                        <TableColumn fx:id="jamMulaiColumn" maxWidth="160.0" minWidth="160.0" prefWidth="160.0" text="Jam Mulai" />
-                                        <TableColumn fx:id="jamSelesaiColumn" maxWidth="160.0" minWidth="160.0" prefWidth="160.0" text="Jam Selesai" />
-                                        <TableColumn fx:id="namaMapelColumn" maxWidth="300.0" minWidth="300.0" prefWidth="300.0" text="Mata Pelajaran" />
-                                        <TableColumn fx:id="namaKelasJadwalColumn" minWidth="0.0" prefWidth="0.0" text="Kelas" />
-                                        <TableColumn fx:id="namaPengajarJadwalColumn" maxWidth="520.0" minWidth="520.0" prefWidth="520.0" text="Pengajar" />
-                                    </columns>
-                                </TableView>
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-                <Tab text="Nilai Ujian">
-                    <content>
-                        <AnchorPane maxHeight="520.0" minHeight="-Infinity" prefHeight="520.0" prefWidth="200.0">
-                            <children>
-                                <Label layoutX="590.0" layoutY="28.0" text="Nilai Ujian">
-                                    <font>
-                                        <Font name="System Bold" size="20.0" />
-                                    </font>
-                                </Label>
-                                <TableView fx:id="nilaiUjianTable" layoutX="10.0" layoutY="77.0" prefHeight="364.0" prefWidth="1240.0">
-                                    <columns>
-                                        <TableColumn fx:id="jenisNilaiColumn" prefWidth="200.0" text="Jenis Nilai" />
-                                        <TableColumn fx:id="namaMapelNilaiColumn" prefWidth="400.0" text="Mata Pelajaran" />
-                                        <TableColumn fx:id="existingNilaiColumn" prefWidth="200.0" text="Nilai" />
-                                    </columns>
-                                </TableView>
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-                <Tab text="Tugas">
-                    <content>
-                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                            <children>
-                                <Label layoutX="620.0" layoutY="28.0" text="Tugas">
-                                    <font>
-                                        <Font name="System Bold" size="20.0" />
-                                    </font>
-                                </Label>
-                                <TableView fx:id="tugasTable" layoutX="10.0" layoutY="73.0" prefHeight="367.0" prefWidth="1240.0">
-                                    <columns>
-                                        <TableColumn fx:id="keteranganTugasColumn" prefWidth="400.0" text="Keterangan" />
-                                        <TableColumn fx:id="deadlineTugasColumn" prefWidth="200.0" text="Deadline" />
-                                        <TableColumn fx:id="tanggalRilisTugasColumn" prefWidth="200.0" text="Tanggal Rilis" />
-                                        <TableColumn fx:id="mapelTugasColumn" prefWidth="200.0" text="Mata Pelajaran" />
-                                        <TableColumn fx:id="kelasTugasColumn" prefWidth="239.199951171875" text="Kelas" />
-                                    </columns>
-                                </TableView>
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-                <Tab text="Materi">
-                    <content>
-                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                            <children>
-                                <Label layoutX="620.0" layoutY="28.0" text="Materi">
-                                    <font>
-                                        <Font name="System Bold" size="20.0" />
-                                    </font>
-                                </Label>
-                                <TableView fx:id="materiTable" layoutX="10.0" layoutY="73.0" maxHeight="368.0" maxWidth="1240.0" minHeight="362.0" minWidth="1240.0" prefHeight="368.0" prefWidth="1240.0">
-                                    <columns>
-                                        <TableColumn fx:id="namaMateriColumn" prefWidth="500.0" text="Nama Materi" />
-                                        <TableColumn fx:id="mapelMateriColumn" prefWidth="400.0" text="Mata Pelajaran" />
-                                        <TableColumn fx:id="kelasMateriColumn" prefWidth="367.0" text="Kelas" />
-                                    </columns>
-                                </TableView>
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-                <Tab text="Ujian">
-                    <content>
-                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                            <children>
-                                <Label layoutX="620.0" layoutY="28.0" text="Ujian">
-                                    <font>
-                                        <Font name="System Bold" size="20.0" />
-                                    </font>
-                                </Label>
-                                <TableView fx:id="ujianTable" layoutX="10.0" layoutY="72.0" maxWidth="1240.0" minWidth="1240.0" prefHeight="368.0" prefWidth="1240.0">
-                                    <columns>
-                                        <TableColumn fx:id="jenisUjianColumn" prefWidth="250.0" text="Jenis Ujian" />
-                                        <TableColumn fx:id="tanggalUjianColumn" prefWidth="250.0" text="Tanggal" />
-                                        <TableColumn fx:id="mapelUjianColumn" prefWidth="350.0" text="Mata Pelajaran" />
-                                        <TableColumn fx:id="kelasUjianColumn" prefWidth="350.0" text="Kelas" />
-                                    </columns>
-                                </TableView>
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-                <Tab text="Absensi">
-                    <content>
-                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                            <children>
-                                <Label layoutX="600.0" layoutY="28.0" text="Absensi">
-                                    <font>
-                                        <Font name="System Bold" size="20.0" />
-                                    </font>
-                                </Label>
-                                <TableView fx:id="absensiTable" layoutX="10.0" layoutY="73.0" maxWidth="1240.0" minWidth="1240.0" prefHeight="366.0" prefWidth="1240.0">
-                                    <columns>
-                                        <TableColumn fx:id="tanggalAbsensiColumn" prefWidth="200.0" text="Tanggal" />
-                                        <TableColumn fx:id="statusAbsensiColumn" prefWidth="200.0" text="Status" />
-                                        <TableColumn fx:id="mapelAbsensiColumn" prefWidth="250.0" text="Mata Pelajaran" />
-                                        <TableColumn fx:id="kelasAbsensiColumn" prefWidth="250.0" text="Kelas" />
-                                        <TableColumn fx:id="jamMulaiAbsensiColumn" prefWidth="180.0" text="Jam Mulai" />
-                                        <TableColumn fx:id="jamSelesaiAbsensiColumn" prefWidth="180.0" text="Jam Selesai" />
-                                    </columns>
-                                </TableView>
-                            </children>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-                <Tab text="Announcements">
-                    <content>
-                        <AnchorPane prefHeight="200.0" prefWidth="200.0">
-                            <TableView fx:id="announcementTable" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
-                                <columns>
-                                    <TableColumn fx:id="announcementWaktuColumn" prefWidth="150.0" text="Waktu" />
-                                    <TableColumn fx:id="announcementContentColumn" prefWidth="600.0" text="Isi Pengumuman" />
-                                </columns>
-                                <columnResizePolicy>
-                                    <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
-                                </columnResizePolicy>
-                            </TableView>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-            </TabPane>
-            <Button onAction="#handleLogout" text="Logout" />
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+
+                        <Tab text="Jadwal Kelas" styleClass="tab">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <VBox layoutX="14.0" layoutY="14.0" prefHeight="580.0" prefWidth="1244.0" spacing="15.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+                                            <children>
+                                                <Label styleClass="label" text="Your Class Schedule">
+                                                    <font>
+                                                        <Font name="System Bold" size="16.0" />
+                                                    </font>
+                                                </Label>
+                                                <TableView fx:id="jadwalKelasTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                                                    <columns>
+                                                        <TableColumn fx:id="hariColumn" prefWidth="100.0" text="Day" />
+                                                        <TableColumn fx:id="jamMulaiColumn" prefWidth="100.0" text="Start Time" />
+                                                        <TableColumn fx:id="jamSelesaiColumn" prefWidth="100.0" text="End Time" />
+                                                        <TableColumn fx:id="namaMapelColumn" prefWidth="200.0" text="Subject" />
+                                                        <TableColumn fx:id="namaKelasJadwalColumn" prefWidth="200.0" text="Class" />
+                                                        <TableColumn fx:id="namaPengajarJadwalColumn" prefWidth="200.0" text="Teacher" />
+                                                    </columns>
+                                                    <columnResizePolicy>
+                                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                    </columnResizePolicy>
+                                                </TableView>
+                                            </children>
+                                            <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                            </padding>
+                                        </VBox>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+
+                        <Tab text="Nilai Ujian" styleClass="tab">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <VBox layoutX="14.0" layoutY="14.0" prefHeight="580.0" prefWidth="1244.0" spacing="15.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+                                            <children>
+                                                <Label styleClass="label" text="Your Exam Scores">
+                                                    <font>
+                                                        <Font name="System Bold" size="16.0" />
+                                                    </font>
+                                                </Label>
+                                                <TableView fx:id="nilaiUjianTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                                                    <columns>
+                                                        <TableColumn fx:id="jenisNilaiColumn" prefWidth="150.0" text="Exam Type" />
+                                                        <TableColumn fx:id="namaMapelNilaiColumn" prefWidth="200.0" text="Subject" />
+                                                        <TableColumn fx:id="existingNilaiColumn" prefWidth="100.0" text="Score" />
+                                                    </columns>
+                                                    <columnResizePolicy>
+                                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                    </columnResizePolicy>
+                                                </TableView>
+                                            </children>
+                                            <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                            </padding>
+                                        </VBox>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+
+                        <Tab text="Tugas" styleClass="tab">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <VBox layoutX="14.0" layoutY="14.0" prefHeight="580.0" prefWidth="1244.0" spacing="15.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+                                            <children>
+                                                <Label styleClass="label" text="Your Assignments">
+                                                    <font>
+                                                        <Font name="System Bold" size="16.0" />
+                                                    </font>
+                                                </Label>
+                                                <TableView fx:id="tugasTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                                                    <columns>
+                                                        <TableColumn fx:id="keteranganTugasColumn" prefWidth="250.0" text="Description" />
+                                                        <TableColumn fx:id="deadlineTugasColumn" prefWidth="150.0" text="Deadline" />
+                                                        <TableColumn fx:id="tanggalRilisTugasColumn" prefWidth="150.0" text="Release Date" />
+                                                        <TableColumn fx:id="mapelTugasColumn" prefWidth="150.0" text="Subject" />
+                                                        <TableColumn fx:id="kelasTugasColumn" prefWidth="150.0" text="Class" />
+                                                    </columns>
+                                                    <columnResizePolicy>
+                                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                    </columnResizePolicy>
+                                                </TableView>
+                                            </children>
+                                            <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                            </padding>
+                                        </VBox>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+
+                        <Tab text="Materi" styleClass="tab">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <VBox layoutX="14.0" layoutY="14.0" prefHeight="580.0" prefWidth="1244.0" spacing="15.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+                                            <children>
+                                                <Label styleClass="label" text="Your Learning Materials">
+                                                    <font>
+                                                        <Font name="System Bold" size="16.0" />
+                                                    </font>
+                                                </Label>
+                                                <TableView fx:id="materiTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                                                    <columns>
+                                                        <TableColumn fx:id="namaMateriColumn" prefWidth="300.0" text="Material Name" />
+                                                        <TableColumn fx:id="mapelMateriColumn" prefWidth="200.0" text="Subject" />
+                                                        <TableColumn fx:id="kelasMateriColumn" prefWidth="200.0" text="Class" />
+                                                    </columns>
+                                                    <columnResizePolicy>
+                                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                    </columnResizePolicy>
+                                                </TableView>
+                                            </children>
+                                            <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                            </padding>
+                                        </VBox>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+
+                        <Tab text="Ujian" styleClass="tab">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <VBox layoutX="14.0" layoutY="14.0" prefHeight="580.0" prefWidth="1244.0" spacing="15.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+                                            <children>
+                                                <Label styleClass="label" text="Upcoming Exams">
+                                                    <font>
+                                                        <Font name="System Bold" size="16.0" />
+                                                    </font>
+                                                </Label>
+                                                <TableView fx:id="ujianTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                                                    <columns>
+                                                        <TableColumn fx:id="jenisUjianColumn" prefWidth="150.0" text="Exam Type" />
+                                                        <TableColumn fx:id="tanggalUjianColumn" prefWidth="180.0" text="Date" />
+                                                        <TableColumn fx:id="mapelUjianColumn" prefWidth="150.0" text="Subject" />
+                                                        <TableColumn fx:id="kelasUjianColumn" prefWidth="150.0" text="Class" />
+                                                    </columns>
+                                                    <columnResizePolicy>
+                                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                    </columnResizePolicy>
+                                                </TableView>
+                                            </children>
+                                            <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                            </padding>
+                                        </VBox>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+
+                        <Tab text="Absensi" styleClass="tab">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <VBox layoutX="14.0" layoutY="14.0" prefHeight="580.0" prefWidth="1244.0" spacing="15.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+                                            <children>
+                                                <Label styleClass="label" text="Your Attendance Records">
+                                                    <font>
+                                                        <Font name="System Bold" size="16.0" />
+                                                    </font>
+                                                </Label>
+                                                <TableView fx:id="absensiTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                                                    <columns>
+                                                        <TableColumn fx:id="tanggalAbsensiColumn" prefWidth="150.0" text="Date/Time" />
+                                                        <TableColumn fx:id="statusAbsensiColumn" prefWidth="100.0" text="Status" />
+                                                        <TableColumn fx:id="mapelAbsensiColumn" prefWidth="150.0" text="Subject" />
+                                                        <TableColumn fx:id="kelasAbsensiColumn" prefWidth="150.0" text="Class" />
+                                                        <TableColumn fx:id="jamMulaiAbsensiColumn" prefWidth="100.0" text="Start Time" />
+                                                        <TableColumn fx:id="jamSelesaiAbsensiColumn" prefWidth="100.0" text="End Time" />
+                                                    </columns>
+                                                    <columnResizePolicy>
+                                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                    </columnResizePolicy>
+                                                </TableView>
+                                            </children>
+                                            <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                            </padding>
+                                        </VBox>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+
+                        <Tab text="Pengumuman" styleClass="tab">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <VBox layoutX="14.0" layoutY="14.0" prefHeight="580.0" prefWidth="1244.0" spacing="15.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+                                            <children>
+                                                <Label styleClass="label" text="Announcements">
+                                                    <font>
+                                                        <Font name="System Bold" size="16.0" />
+                                                    </font>
+                                                </Label>
+                                                <TableView fx:id="announcementTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                                                    <columns>
+                                                        <TableColumn fx:id="announcementWaktuColumn" prefWidth="180.0" text="Timestamp" />
+                                                        <TableColumn fx:id="announcementContentColumn" prefWidth="800.0" text="Content" />
+                                                    </columns>
+                                                    <columnResizePolicy>
+                                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                    </columnResizePolicy>
+                                                </TableView>
+                                            </children>
+                                            <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                            </padding>
+                                        </VBox>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+                    </tabs>
+                </TabPane>
+            </children>
         </VBox>
     </children>
 </AnchorPane>

@@ -15,74 +15,109 @@
 <?import javafx.scene.layout.VBox?>
 <?import javafx.scene.text.Font?>
 
-<AnchorPane prefHeight="700.0" prefWidth="1300.0" xmlns="http://javafx.com/javafx/23.0.1" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.projectbdpbogacor.Kepala.KepaladsController">
+<AnchorPane prefHeight="700.0" prefWidth="1300.0" styleClass="root" stylesheets="@Aset/light-mode.css" xmlns="http://javafx.com/javafx/21" xmlns:fx="http://javafx.com/fxml/1" fx:controller="org.example.projectbdpbogacor.Kepala.KepaladsController">
     <children>
-        <VBox alignment="TOP_CENTER" prefHeight="700.0" prefWidth="1300.0" spacing="10.0" AnchorPane.bottomAnchor="0.7999999999999545" AnchorPane.leftAnchor="0.0" AnchorPane.rightAnchor="0.0" AnchorPane.topAnchor="0.0">
-            <padding>
-                <Insets bottom="20.0" left="20.0" right="20.0" top="20.0" />
-            </padding>
-            <Label fx:id="welcomeUserLabel" style="-fx-font-size: 24px; -fx-font-weight: bold;" text="Welcome, Admin!" />
-            <TabPane fx:id="kepalaTabPane" maxHeight="570.0" minHeight="570.0" prefHeight="570.0" style="-fx-background-color: #8cff00; -fx-background-radius: 15px; -fx-border-radius: 15px;" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS">
+        <VBox alignment="TOP_CENTER" layoutX="14.0" layoutY="14.0" prefHeight="672.0" prefWidth="1272.0" spacing="10.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+            <children>
+                <HBox alignment="CENTER_LEFT" prefHeight="40.0" prefWidth="1272.0" spacing="10.0">
+                    <children>
+                        <Label fx:id="welcomeUserLabel" text="Welcome, Kepala Sekolah!" styleClass="label">
+                            <font>
+                                <Font name="System Bold" size="18.0" />
+                            </font>
+                        </Label>
+                        <HBox alignment="CENTER_RIGHT" HBox.hgrow="ALWAYS">
+                            <children>
+                                <Button onAction="#handleLogout" styleClass="button" text="Logout" />
+                            </children>
+                        </HBox>
+                    </children>
+                    <padding>
+                        <Insets left="10.0" right="10.0" />
+                    </padding>
+                </HBox>
+                <TabPane fx:id="kepalaTabPane" prefHeight="622.0" prefWidth="1272.0" tabClosingPolicy="UNAVAILABLE" VBox.vgrow="ALWAYS" styleClass="tab-pane">
+                    <tabs>
+                        <Tab text="Announcements" styleClass="tab">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <VBox layoutX="14.0" layoutY="14.0" prefHeight="580.0" prefWidth="1244.0" spacing="15.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+                                            <children>
+                                                <Label styleClass="label" text="Manage Announcements">
+                                                    <font>
+                                                        <Font name="System Bold" size="16.0" />
+                                                    </font>
+                                                </Label>
+                                                <TextArea fx:id="announcementTextArea" promptText="Enter announcement content here..." prefHeight="100.0" VBox.vgrow="ALWAYS" styleClass="text-area" />
+                                                <HBox alignment="CENTER_RIGHT" spacing="10.0">
+                                                    <children>
+                                                        <Button fx:id="createAnnouncementButton" onAction="#handleCreateAnnouncement" styleClass="button" text="Create Announcement" />
+                                                        <Button fx:id="updateAnnouncementButton" onAction="#handleUpdateAnnouncement" styleClass="button" text="Update Selected" />
+                                                        <Button fx:id="deleteAnnouncementButton" onAction="#handleDeleteAnnouncement" styleClass="button" text="Delete Selected" />
+                                                    </children>
+                                                </HBox>
+                                                <TableView fx:id="announcementTable" VBox.vgrow="ALWAYS" styleClass="table-view">
+                                                    <columns>
+                                                        <TableColumn fx:id="announcementWaktuColumn" prefWidth="180.0" text="Timestamp" />
+                                                        <TableColumn fx:id="announcementContentColumn" prefWidth="800.0" text="Content" />
+                                                    </columns>
+                                                    <columnResizePolicy>
+                                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                    </columnResizePolicy>
+                                                </TableView>
+                                            </children>
+                                            <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                            </padding>
+                                        </VBox>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
 
-                <Tab text="View All Users">
-                    <content>
-                        <AnchorPane>
-                            <VBox layoutX="10.0" layoutY="10.0" spacing="10.0" AnchorPane.bottomAnchor="10.0" AnchorPane.leftAnchor="10.0" AnchorPane.rightAnchor="10.0" AnchorPane.topAnchor="10.0">
-                                <children>
-                                    <HBox alignment="CENTER_LEFT" spacing="10.0">
-                                        <children>
-                                            <Label text="Filter by Role:" />
-                                            <ChoiceBox fx:id="filterRoleChoiceBox" prefWidth="150.0" />
-                                            <Label text="Filter by Name/Username/NIS/NIP:" />
-                                            <TextField fx:id="filterNameField" promptText="Enter name or ID" />
-                                        </children>
-                                    </HBox>
-                                    <TableView fx:id="allUsersTableView" VBox.vgrow="ALWAYS">
-                                        <columns>
-                                            <TableColumn fx:id="tableUserIdColumn" prefWidth="93.60000455379486" text="User ID" />
-                                            <TableColumn fx:id="tableUsernameColumn" prefWidth="146.4000015258789" text="Username" />
-                                            <TableColumn fx:id="tableNisNipColumn" prefWidth="108.79998779296875" text="NIS/NIP" />
-                                            <TableColumn fx:id="tableNamaColumn" prefWidth="123.199951171875" text="Name" />
-                                            <TableColumn fx:id="tableGenderColumn" prefWidth="80.00003051757812" text="Gender" />
-                                            <TableColumn fx:id="tableAlamatColumn" prefWidth="196.00006103515625" text="Address" />
-                                            <TableColumn fx:id="tableEmailColumn" prefWidth="207.20001220703125" text="Email" />
-                                            <TableColumn fx:id="tableNomerHpColumn" prefWidth="169.5999755859375" text="Phone" />
-                                            <TableColumn fx:id="tableRoleColumn" minWidth="0.0" prefWidth="111.199951171875" text="Role" />
-                                        </columns>
-                                    </TableView>
-                                </children>
-                            </VBox>
-                        </AnchorPane>
-                    </content>
-                </Tab>
-                <Tab text="Announcements">
-                    <content>
-                        <VBox alignment="TOP_CENTER" prefHeight="532.0" prefWidth="1260.0" spacing="10.0">
-                            <padding>
-                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
-                            </padding>
-                            <Label text="Manage Announcements">
-                                <font>
-                                    <Font name="System Bold" size="20.0" />
-                                </font>
-                            </Label>
-                            <TextArea fx:id="announcementTextArea" prefHeight="100.0" promptText="Enter announcement content here..." />
-                            <HBox alignment="CENTER" prefHeight="30.0" spacing="10.0">
-                                <Button fx:id="createAnnouncementButton" onAction="#handleCreateAnnouncement" text="Publish Announcement" />
-                                <Button fx:id="updateAnnouncementButton" onAction="#handleUpdateAnnouncement" text="Update Selected" />
-                                <Button fx:id="deleteAnnouncementButton" onAction="#handleDeleteAnnouncement" text="Delete Selected" />
-                            </HBox>
-                            <TableView fx:id="announcementTable" prefHeight="300.0" prefWidth="1240.0">
-                                <columns>
-                                    <TableColumn fx:id="announcementWaktuColumn" maxWidth="150.0" minWidth="150.0" prefWidth="150.0" text="Date/Time" />
-                                    <TableColumn fx:id="announcementContentColumn" maxWidth="1090.0" minWidth="1090.0" prefWidth="1091.0" text="Announcement Content" />
-                                </columns>
-                            </TableView>
-                        </VBox>
-                    </content>
-                </Tab>
-            </TabPane>
-            <Button onAction="#handleLogout" text="Logout" />
+                        <Tab text="View All Users" styleClass="tab">
+                            <content>
+                                <AnchorPane minHeight="0.0" minWidth="0.0" prefHeight="180.0" prefWidth="200.0">
+                                    <children>
+                                        <VBox layoutX="14.0" layoutY="14.0" prefHeight="580.0" prefWidth="1244.0" spacing="15.0" AnchorPane.bottomAnchor="14.0" AnchorPane.leftAnchor="14.0" AnchorPane.rightAnchor="14.0" AnchorPane.topAnchor="14.0">
+                                            <children>
+                                                <HBox alignment="CENTER_LEFT" spacing="10.0">
+                                                    <children>
+                                                        <Label styleClass="label" text="Filter by Role:" />
+                                                        <ChoiceBox fx:id="filterRoleChoiceBox" onAction="#handleFilterUsers" prefWidth="150.0" styleClass="choice-box" />
+                                                        <Label styleClass="label" text="Search by Name/Username/NIS/NIP:" />
+                                                        <TextField fx:id="filterNameField" onAction="#handleFilterUsers" promptText="Enter keywords" HBox.hgrow="ALWAYS" styleClass="text-field" />
+                                                    </children>
+                                                </HBox>
+                                                <TableView fx:id="allUsersTableView" VBox.vgrow="ALWAYS" styleClass="table-view">
+                                                    <columns>
+                                                        <TableColumn fx:id="tableUserIdColumn" prefWidth="100.0" text="User ID" />
+                                                        <TableColumn fx:id="tableUsernameColumn" prefWidth="150.0" text="Username" />
+                                                        <TableColumn fx:id="tableNisNipColumn" prefWidth="120.0" text="NIS/NIP" />
+                                                        <TableColumn fx:id="tableNamaColumn" prefWidth="200.0" text="Full Name" />
+                                                        <TableColumn fx:id="tableGenderColumn" prefWidth="80.0" text="Gender" />
+                                                        <TableColumn fx:id="tableAlamatColumn" prefWidth="200.0" text="Address" />
+                                                        <TableColumn fx:id="tableEmailColumn" prefWidth="180.0" text="Email" />
+                                                        <TableColumn fx:id="tableNomerHpColumn" prefWidth="120.0" text="Phone Number" />
+                                                        <TableColumn fx:id="tableRoleColumn" prefWidth="120.0" text="Role" />
+                                                    </columns>
+                                                    <columnResizePolicy>
+                                                        <TableView fx:constant="CONSTRAINED_RESIZE_POLICY" />
+                                                    </columnResizePolicy>
+                                                </TableView>
+                                            </children>
+                                            <padding>
+                                                <Insets bottom="10.0" left="10.0" right="10.0" top="10.0" />
+                                            </padding>
+                                        </VBox>
+                                    </children>
+                                </AnchorPane>
+                            </content>
+                        </Tab>
+                    </tabs>
+                </TabPane>
+            </children>
         </VBox>
     </children>
 </AnchorPane>

@@ -37,24 +37,9 @@ public class LoginController {
     void initialize() {
         selectRole.getItems().addAll("Admin", "Kepala Sekolah", "Guru", "Wali Kelas", "Siswa");
         selectRole.setValue("Choice Role");
-
-        HelloApplication app = HelloApplication.getInstance();
-        if (app != null) {
-            darkModeToggle.setSelected(app.isDarkMode());
-            darkModeToggle.setText(app.isDarkMode() ? "Light Mode" : "Dark Mode");
-        }
-
         DBS.checkConnection();
     }
 
-    @FXML
-    void handleModeToggle(ActionEvent event) {
-        HelloApplication app = HelloApplication.getInstance();
-        if (app != null) {
-            app.toggleMode();
-            darkModeToggle.setText(app.isDarkMode() ? "Light Mode" : "Dark Mode"); // Update button text
-        }
-    }
 
     // Helper method to convert full role name to single-character role ID
     private String getRoleIdFromRoleName(String roleName) {

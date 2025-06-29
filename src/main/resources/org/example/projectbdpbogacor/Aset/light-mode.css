@@ -1,39 +1,164 @@
-/* src/main/resources/org/example/projectbdpbogacor/light-mode.css */
+/* MODERN LIGHT THEME - FINAL & CONSISTENT VERSION */
 
 .root {
-    -fx-background-color: #f0f0f0; /* Warna latar belakang terang */
+    -fx-background-color: #f4f4f9;
+    -fx-font-family: 'Segoe UI', sans-serif;
 }
 
 .label {
-    -fx-text-fill: #333333; /* Warna teks gelap */
+    -fx-font-size: 13px;
+    -fx-text-fill: #333333;
 }
+
+.main-title {
+    -fx-font-size: 32px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+
+/* Style untuk kartu login agar konsisten */
+.login-card {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 12px;
+    -fx-background-radius: 12px;
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 2);
+}
+.login-card .welcome-label { -fx-font-weight: bold; -fx-text-fill: #2c3e50; }
+.login-card .prompt-label { -fx-text-fill: #888888; }
+title-label{
+    -fx-font-size: 24px important;
+    -fx-font-weight: bold important;
+    -fx-text-fill: #2c3e50  important;
+    }
 
 .button {
-    -fx-background-color: #e0e0e0;
-    -fx-text-fill: #333333;
-    -fx-border-color: #cccccc;
-    -fx-border-radius: 5px;
-    -fx-padding: 8px 15px;
+    -fx-background-color: #4a90e2;
+    -fx-text-fill: white;
+    -fx-font-weight: bold;
+    -fx-font-size: 13px;
+    -fx-background-radius: 8px;
+    -fx-padding: 10px 20px;
+}
+.button:hover {
+    -fx-background-color: #357abd;
 }
 
-.text-field {
+.button-logout {
+    -fx-background-color: #e74c3c;
+}
+.button-logout:hover {
+     -fx-background-color: #c0392b;
+}
+
+.text-field, .password-field, .text-area {
     -fx-background-color: #ffffff;
     -fx-text-fill: #333333;
-    -fx-border-color: #cccccc;
-    -fx-border-radius: 3px;
+    -fx-border-color: #dcdcdc;
+    -fx-border-radius: 8px;
+    -fx-font-size: 14px;
+    -fx-prompt-text-fill: #aaaaaa;
+}
+.text-field:focused, .password-field:focused, .text-area:focused {
+    -fx-border-color: #4a90e2;
+    -fx-border-width: 2px;
 }
 
-/* Styles specifically for the login-view.fxml elements */
-#loginPane {
-    -fx-background-color: #f8f8f8;
-    -fx-border-color: #e0e0e0;
-    -fx-border-radius: 10px;
-    -fx-padding: 20px;
-    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.1), 10, 0, 0, 0);
+.choice-box {
+    -fx-background-color: white;
+    -fx-border-color: #dcdcdc;
+    -fx-border-radius: 8px;
+    -fx-mark-color: #4a90e2;
+}
+.choice-box > .label {
+    -fx-text-fill: #333333;
+}
+.choice-box .context-menu {
+    -fx-background-color: white;
+}
+.choice-box .menu-item:focused {
+    -fx-background-color: #f0f0f0;
+}
+.choice-box .menu-item > .label {
+    -fx-text-fill: #333333;
 }
 
-#loginTitle {
-    -fx-font-size: 24px;
+/* Penyesuaian Tab agar sama dengan struktur dark mode */
+.tab-pane .tab-header-area .tab-header-background {
+    -fx-background-color: transparent;
+}
+.tab-pane .tab {
+    -fx-background-color: #e9e9f0;
+    -fx-padding: 8px 20px;
+    -fx-background-insets: 0;
+    -fx-background-radius: 8px 8px 0 0;
+}
+.tab-pane .tab:selected {
+    -fx-background-color: #ffffff;
+    -fx-border-color: #dcdcdc;
+    -fx-border-width: 1px 1px 0 1px;
+}
+.tab-pane .tab .label {
+    -fx-text-fill: #333333;
+}
+.tab-pane .tab:selected .label {
+    -fx-font-weight: bold;
+}
+.tab-pane > .tab-content-area {
+    -fx-background-color: #ffffff;
+    -fx-padding: 15px;
+    -fx-border-color: #dcdcdc;
+    -fx-border-width: 0 1px 1px 1px;
+}
+
+.table-view {
+    -fx-border-color: #dcdcdc;
+    -fx-border-radius: 8px;
+}
+.table-view .column-header-background {
+    -fx-background-color: #f4f4f9;
+}
+.table-view .column-header, .table-view .filler {
+    -fx-background-color: transparent;
+    -fx-font-size: 12px;
     -fx-font-weight: bold;
     -fx-text-fill: #333333;
+}
+.table-view .cell{
+    -fx-border-color: transparent;
+    -fx-padding: 8px;
+    -fx-text-fill: #333333;
+}
+.table-row-cell:odd {
+    -fx-background-color: #ffffff;
+}
+.table-row-cell:even{
+    -fx-background-color: #f8f8fc;
+}
+.table-row-cell:selected {
+    -fx-background-color: #4a90e2;
+}
+.table-row-cell:selected .text {
+    -fx-fill: white;
+}
+
+.form-panel {
+    -fx-padding: 15px;
+    -fx-border-color: #e0e0e0;
+    -fx-border-radius: 8px;
+    -fx-background-color: white;
+}
+.form-title {
+    -fx-font-size: 14px;
+    -fx-font-weight: bold;
+    -fx-text-fill: #2c3e50;
+}
+/* Contoh di light-mode.css atau dark-mode.css */
+.login-pane {
+    -fx-background-color: #FFFFFF; /* Ganti dengan warna latar belakang yang Anda inginkan */
+    -fx-border-color: #CCCCCC;    /* Ganti dengan warna border yang Anda inginkan */
+    -fx-border-width: 2px;       /* Ketebalan border */
+    -fx-border-radius: 10px;     /* Sudut border yang membulat (opsional) */
+    -fx-background-radius: 10px; /* Sudut latar belakang yang membulat (sesuai border-radius) */
+    -fx-effect: dropshadow(gaussian, rgba(0,0,0,0.2), 10, 0, 0, 5); /* Efek bayangan (opsional, untuk tampilan card) */
 }
