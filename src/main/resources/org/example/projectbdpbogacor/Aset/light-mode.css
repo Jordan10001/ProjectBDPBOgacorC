@@ -33,7 +33,7 @@ title-label{
     }
 
 .button {
-    -fx-background-color: #4a90e2;
+    -fx-background-color: #5cb85c; /* Hijau */
     -fx-text-fill: white;
     -fx-font-weight: bold;
     -fx-font-size: 13px;
@@ -41,7 +41,7 @@ title-label{
     -fx-padding: 10px 20px;
 }
 .button:hover {
-    -fx-background-color: #357abd;
+    -fx-background-color: #4cae4c; /* Hijau lebih gelap untuk hover */
 }
 
 .button-logout {
@@ -60,7 +60,7 @@ title-label{
     -fx-prompt-text-fill: #aaaaaa;
 }
 .text-field:focused, .password-field:focused, .text-area:focused {
-    -fx-border-color: #4a90e2;
+    -fx-border-color: #5cb85c; /* Hijau */
     -fx-border-width: 2px;
 }
 
@@ -68,7 +68,7 @@ title-label{
     -fx-background-color: white;
     -fx-border-color: #dcdcdc;
     -fx-border-radius: 8px;
-    -fx-mark-color: #4a90e2;
+    -fx-mark-color: #5cb85c; /* Hijau */
 }
 .choice-box > .label {
     -fx-text-fill: #333333;
@@ -136,7 +136,7 @@ title-label{
     -fx-background-color: #f8f8fc;
 }
 .table-row-cell:selected {
-    -fx-background-color: #4a90e2;
+    -fx-background-color: #5cb85c; /* Hijau */
 }
 .table-row-cell:selected .text {
     -fx-fill: white;
